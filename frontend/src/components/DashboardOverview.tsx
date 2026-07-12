@@ -135,9 +135,8 @@ export default function DashboardOverview() {
   useEffect(() => {
     if (!isClient) return;
 
-    // Define styling properties depending on light/dark mode
     const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-    const textColor = theme === 'dark' ? '#94a3b8' : '#64748b';
+    const textColor = theme === 'dark' ? '#94a3b8' : '#334155';
 
     // Build Bar Chart (Donation Growth)
     if (barChartRef.current) {
@@ -185,8 +184,8 @@ export default function DashboardOverview() {
           datasets: [{
             label: 'Target Goal Progress',
             data: [5000, 12000, 19000, 34000, 48500],
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            borderColor: '#d97706',
+            backgroundColor: 'rgba(217, 119, 6, 0.15)',
             borderWidth: 2,
             fill: true,
             tension: 0.4
@@ -215,12 +214,12 @@ export default function DashboardOverview() {
 
   if (!isClient) return null;
 
-  const glassClass = theme === 'dark' ? 'apple-glass' : 'apple-glass-light';
+  const glassClass = theme === 'dark' ? 'apple-glass text-slate-100' : 'apple-glass-light text-slate-800';
 
   return (
-    <div className={`min-h-screen relative p-6 md:p-8 transition-colors duration-500 overflow-hidden ${theme === 'dark' ? 'bg-[#030712] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`min-h-screen relative p-6 md:p-8 transition-colors duration-500 overflow-hidden ${theme === 'dark' ? 'bg-[#030712]' : 'bg-slate-100'}`}>
       
-      {/* Background Ambient Color Blobs (Apple Design Aesthetic) */}
+      {/* Background Ambient Color Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 pointer-events-none" />
       <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-2 pointer-events-none" />
       <div className="absolute top-[40%] left-[30%] w-[45%] h-[45%] rounded-full ambient-glow-3 pointer-events-none" />
@@ -229,44 +228,44 @@ export default function DashboardOverview() {
       <header className={`relative z-10 flex flex-col md:flex-row md:items-center justify-between p-6 mb-8 rounded-3xl ${glassClass}`}>
         <div className="flex items-center gap-3">
           <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-            <Heart className="w-8 h-8 text-emerald-400 animate-pulse" />
+            <Heart className="w-8 h-8 text-emerald-500 dark:text-emerald-400 animate-pulse" />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 dark:from-emerald-400 dark:via-teal-400 dark:to-amber-400 bg-clip-text text-transparent">
               Token of Halawa
             </h1>
-            <p className="text-sm opacity-60 mt-0.5">{t.subtitle}</p>
+            <p className="text-sm opacity-70 dark:opacity-60 mt-0.5">{t.subtitle}</p>
           </div>
         </div>
 
         {/* Global Toolbar */}
         <div className="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
           {showSyncAlert && (
-            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-2 rounded-full animate-bounce">
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs px-3.5 py-2 rounded-full animate-bounce font-bold">
               <Check className="w-3.5 h-3.5" />
               <span>{t.syncStatus}</span>
             </div>
           )}
 
           {/* Language Selector */}
-          <div className="flex items-center bg-white/5 dark:bg-black/20 border border-white/10 rounded-2xl px-3 py-2 text-xs">
-            <Globe className="w-4 h-4 mr-2 text-slate-400" />
+          <div className="flex items-center bg-slate-200/50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded-2xl px-3 py-2 text-xs">
+            <Globe className="w-4 h-4 mr-2 text-slate-500 dark:text-slate-400" />
             <select 
               value={lang} 
               onChange={(e) => setLang(e.target.value as any)}
-              className="bg-transparent outline-none cursor-pointer font-semibold text-slate-300 pr-1"
+              className="bg-transparent outline-none cursor-pointer font-bold text-slate-700 dark:text-slate-300 pr-1"
             >
-              <option value="en" className="text-slate-800">English</option>
-              <option value="ml" className="text-slate-800">മലയാളം</option>
-              <option value="ar" className="text-slate-800">العربية (RTL)</option>
-              <option value="ta" className="text-slate-800">தமிழ்</option>
+              <option value="en" className="text-slate-850">English</option>
+              <option value="ml" className="text-slate-850">മലയാളം</option>
+              <option value="ar" className="text-slate-850">العربية (RTL)</option>
+              <option value="ta" className="text-slate-850">தமிழ்</option>
             </select>
           </div>
 
           {/* Theme Selector */}
           <button 
             onClick={toggleTheme} 
-            className="p-2.5 bg-white/5 dark:bg-black/20 hover:bg-white/10 border border-white/10 rounded-2xl text-slate-400 hover:text-slate-200 transition-colors"
+            className="p-2.5 bg-slate-200/50 dark:bg-black/20 hover:bg-slate-300/50 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-slate-750 dark:hover:text-slate-200 transition-colors"
             title={t.themeToggle}
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-emerald-600" />}
@@ -283,12 +282,12 @@ export default function DashboardOverview() {
           {/* Card 1: Today's Collection */}
           <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold opacity-60">{t.todayCollection}</span>
-              <TrendingUp className="w-5 h-5 text-emerald-400" />
+              <span className="text-sm font-semibold opacity-70 dark:opacity-60">{t.todayCollection}</span>
+              <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">$4,850.00</h3>
-              <p className="text-xs text-emerald-400 mt-2 font-bold flex items-center gap-1">
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">$4,850.00</h3>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-bold flex items-center gap-1">
                 <span>+18.5%</span>
                 <span className="opacity-60 font-medium">from yesterday</span>
               </p>
@@ -298,12 +297,12 @@ export default function DashboardOverview() {
           {/* Card 2: Monthly Collection */}
           <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold opacity-60">{t.monthlyCollection}</span>
-              <Calendar className="w-5 h-5 text-amber-400" />
+              <span className="text-sm font-semibold opacity-70 dark:opacity-60">{t.monthlyCollection}</span>
+              <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">$42,390.00</h3>
-              <p className="text-xs text-amber-400 mt-2 font-bold flex items-center gap-1">
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">$42,390.00</h3>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-bold flex items-center gap-1">
                 <span>92%</span>
                 <span className="opacity-60 font-medium">of target goal met</span>
               </p>
@@ -313,12 +312,12 @@ export default function DashboardOverview() {
           {/* Card 3: Pending Verification */}
           <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold opacity-60">{t.pendingVerification}</span>
-              <AlertCircle className="w-5 h-5 text-yellow-400" />
+              <span className="text-sm font-semibold opacity-70 dark:opacity-60">{t.pendingVerification}</span>
+              <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">14 Receipts</h3>
-              <p className="text-xs text-yellow-400 mt-2 font-bold flex items-center gap-1">
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">14 Receipts</h3>
+              <p className="text-xs text-amber-600 dark:text-yellow-400 mt-2 font-bold flex items-center gap-1">
                 <span>Active</span>
                 <span className="opacity-60 font-medium">workflow queue</span>
               </p>
@@ -328,12 +327,12 @@ export default function DashboardOverview() {
           {/* Card 4: Active Donors */}
           <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold opacity-60">{t.activeDonors}</span>
-              <Users className="w-5 h-5 text-indigo-400" />
+              <span className="text-sm font-semibold opacity-70 dark:opacity-60">{t.activeDonors}</span>
+              <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">1,240 Profiles</h3>
-              <p className="text-xs text-indigo-400 mt-2 font-bold flex items-center gap-1">
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">1,240 Profiles</h3>
+              <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-bold flex items-center gap-1">
                 <span>Verified</span>
                 <span className="opacity-60 font-medium">no duplicates</span>
               </p>
@@ -345,50 +344,50 @@ export default function DashboardOverview() {
         <div className="xl:col-span-1 row-span-3">
           <div className={`p-6 rounded-3xl sticky top-6 flex flex-col gap-6 ${glassClass}`}>
             <div>
-              <h2 className="text-xl font-extrabold flex items-center gap-2">
-                <Activity className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-xl font-extrabold flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                <Activity className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
                 {t.quickActions}
               </h2>
-              <p className="text-xs opacity-50 mt-1">Direct operations shortcuts</p>
+              <p className="text-xs opacity-60 mt-1">Direct operations shortcuts</p>
             </div>
 
             <div className="flex flex-col gap-3">
-              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-emerald-400 font-bold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/35 dark:border-emerald-500/25 text-emerald-700 dark:text-emerald-400 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
                   <PlusCircle className="w-4 h-4" />
                   {t.logDonation}
                 </span>
-                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md font-normal">Ctrl+N</span>
+                <span className="text-[10px] bg-emerald-550/20 text-emerald-750 dark:text-emerald-400 px-2 py-0.5 rounded-md font-normal">Ctrl+N</span>
               </button>
 
-              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-slate-200/50 dark:bg-white/5 hover:bg-slate-300/50 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
                   <UserPlus className="w-4 h-4" />
                   {t.registerDonor}
                 </span>
               </button>
 
-              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-slate-200/50 dark:bg-white/5 hover:bg-slate-300/50 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4" />
                   {t.verifyDonations}
                 </span>
-                <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2.5 py-0.5 rounded-full font-bold">14</span>
+                <span className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-xs px-2.5 py-0.5 rounded-full font-bold">14</span>
               </button>
 
-              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-slate-200/50 dark:bg-white/5 hover:bg-slate-300/50 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-green-400" />
+                  <MessageSquare className="w-4 h-4 text-green-600 dark:text-green-400" />
                   {t.whatsappReceipt}
                 </span>
               </button>
             </div>
 
             {/* Outstanding Balance Banner */}
-            <div className="mt-2 p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 text-amber-400">
-              <span className="text-[10px] uppercase font-extrabold tracking-wider opacity-60">{t.outstandingAmount}</span>
+            <div className="mt-2 p-5 rounded-2xl bg-gradient-to-br from-amber-500/15 to-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 text-amber-800 dark:text-amber-400">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider opacity-70 dark:opacity-60">{t.outstandingAmount}</span>
               <h4 className="text-2xl font-extrabold mt-1">$12,450.00</h4>
-              <p className="text-[10px] mt-1.5 opacity-60">System calculated pending monthly collections balance.</p>
+              <p className="text-[10px] mt-1.5 opacity-70 dark:opacity-60">System calculated pending monthly collections balance.</p>
             </div>
           </div>
         </div>
@@ -396,8 +395,8 @@ export default function DashboardOverview() {
         {/* Dynamic Charts Modules */}
         <div className="xl:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className={`p-6 rounded-3xl ${glassClass}`}>
-            <h3 className="text-sm font-bold text-slate-400 mb-4 flex items-center gap-2">
-              <BarChart2 className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
+              <BarChart2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               {t.chartGrowth}
             </h3>
             <div className="h-64 relative">
@@ -406,8 +405,8 @@ export default function DashboardOverview() {
           </div>
 
           <div className={`p-6 rounded-3xl ${glassClass}`}>
-            <h3 className="text-sm font-bold text-slate-400 mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-amber-400" />
+            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-amber-500 dark:text-amber-400" />
               {t.chartTrend}
             </h3>
             <div className="h-64 relative">
@@ -421,22 +420,22 @@ export default function DashboardOverview() {
           
           {/* Donation velocity heatmap */}
           <div className={`lg:col-span-2 p-6 rounded-3xl ${glassClass}`}>
-            <h3 className="text-sm font-bold text-slate-400 mb-4">{t.heatmap}</h3>
+            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">{t.heatmap}</h3>
             {/* Heatmap Grid */}
             <div className="grid grid-cols-7 gap-2.5">
               {Array.from({ length: 28 }).map((_, i) => {
                 const opacities = ['bg-emerald-500/10', 'bg-emerald-500/30', 'bg-emerald-500/60', 'bg-emerald-500/90'];
                 const color = opacities[i % 4];
                 return (
-                  <div key={i} className={`h-8 rounded-lg ${color} transition-all duration-300 hover:scale-110 cursor-pointer border border-white/5`} title={`Velocity Index: ${(i + 1) * 3}`} />
+                  <div key={i} className={`h-8 rounded-lg ${color} transition-all duration-300 hover:scale-110 cursor-pointer border border-slate-200 dark:border-white/5`} title={`Velocity Index: ${(i + 1) * 3}`} />
                 );
               })}
             </div>
-            <div className="flex justify-between items-center mt-4 text-[10px] text-slate-400">
+            <div className="flex justify-between items-center mt-4 text-[10px] text-slate-500 dark:text-slate-400">
               <span>Monday</span>
               <span>Sunday</span>
               <span className="flex items-center gap-1.5 font-bold">
-                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-md" />
+                <span className="w-2.5 h-2.5 bg-emerald-550 dark:bg-emerald-500 rounded-md" />
                 Velocity Peak
               </span>
             </div>
@@ -444,39 +443,39 @@ export default function DashboardOverview() {
 
           {/* Leaders Board Summary */}
           <div className={`p-6 rounded-3xl ${glassClass}`}>
-            <h3 className="text-sm font-bold text-slate-400 mb-4">{t.topVolunteers}</h3>
+            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">{t.topVolunteers}</h3>
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-2.5 text-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2.5 text-xs">
                 <div className="flex items-center gap-3.5">
-                  <span className="font-extrabold text-amber-400 text-sm">#1</span>
+                  <span className="font-extrabold text-amber-500 dark:text-amber-400 text-sm">#1</span>
                   <div>
-                    <h5 className="font-bold text-slate-200">Ahmad Sulaiman</h5>
-                    <span className="text-[10px] opacity-50">Sector Alpha</span>
+                    <h5 className="font-bold text-slate-700 dark:text-slate-200">Ahmad Sulaiman</h5>
+                    <span className="text-[10px] opacity-60 dark:opacity-50">Sector Alpha</span>
                   </div>
                 </div>
-                <span className="font-extrabold text-emerald-400 text-sm">$12,400</span>
+                <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">$12,400</span>
               </div>
 
-              <div className="flex items-center justify-between border-b border-white/5 pb-2.5 text-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-2.5 text-xs">
                 <div className="flex items-center gap-3.5">
                   <span className="font-extrabold text-slate-400 text-sm">#2</span>
                   <div>
-                    <h5 className="font-bold text-slate-200">Fathima R.</h5>
-                    <span className="text-[10px] opacity-50">Unit Gamma</span>
+                    <h5 className="font-bold text-slate-700 dark:text-slate-200">Fathima R.</h5>
+                    <span className="text-[10px] opacity-60 dark:opacity-50">Unit Gamma</span>
                   </div>
                 </div>
-                <span className="font-extrabold text-emerald-400 text-sm">$9,850</span>
+                <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">$9,850</span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3.5">
                   <span className="font-extrabold text-amber-700 text-sm">#3</span>
                   <div>
-                    <h5 className="font-bold text-slate-200">Zayn Khalid</h5>
-                    <span className="text-[10px] opacity-50">Class 10B</span>
+                    <h5 className="font-bold text-slate-700 dark:text-slate-200">Zayn Khalid</h5>
+                    <span className="text-[10px] opacity-60 dark:opacity-50">Class 10B</span>
                   </div>
                 </div>
-                <span className="font-extrabold text-emerald-400 text-sm">$8,900</span>
+                <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">$8,900</span>
               </div>
             </div>
           </div>
@@ -485,19 +484,19 @@ export default function DashboardOverview() {
         {/* Audit Log Activities Footer Pane */}
         <div className="xl:col-span-3">
           <div className={`p-6 rounded-3xl ${glassClass}`}>
-            <h3 className="text-sm font-bold text-slate-400 mb-4">{t.recentActivity}</h3>
-            <div className="flex flex-col gap-3 font-mono text-[11px] text-slate-400">
-              <div className="flex justify-between border-b border-white/5 pb-1">
+            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">{t.recentActivity}</h3>
+            <div className="flex flex-col gap-3 font-mono text-[11px] text-slate-650 dark:text-slate-400">
+              <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-1">
                 <span>[2026-07-12 23:14:11] AUDIT_LOG: Donor merge executed on target TOH-D-000104. Source ID soft-deleted.</span>
-                <span className="opacity-50">IP: 192.168.1.144</span>
+                <span className="opacity-60 dark:opacity-50">IP: 192.168.1.144</span>
               </div>
-              <div className="flex justify-between border-b border-white/5 pb-1">
+              <div className="flex justify-between border-b border-slate-200 dark:border-white/5 pb-1">
                 <span>[2026-07-12 23:09:45] WORKFLOW: Donation verification stage advanced to LEVEL 3 (Area Manager Approved).</span>
-                <span className="opacity-50">IP: 192.168.1.185</span>
+                <span className="opacity-60 dark:opacity-50">IP: 192.168.1.185</span>
               </div>
               <div className="flex justify-between">
                 <span>[2026-07-12 23:01:05] SEC_WATCH: Session refresh tokens issued for user uid_admin_09.</span>
-                <span className="opacity-50">IP: 192.168.1.102</span>
+                <span className="opacity-60 dark:opacity-50">IP: 192.168.1.102</span>
               </div>
             </div>
           </div>

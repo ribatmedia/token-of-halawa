@@ -5,7 +5,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { 
   Heart, Users, CheckCircle, TrendingUp, Calendar, AlertCircle, 
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
-  Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check 
+  Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, ChevronRight 
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -13,7 +13,6 @@ if (typeof window !== 'undefined') {
   Chart.register(...registerables);
 }
 
-// Translations structure
 const translations = {
   en: {
     title: 'Intelligent Donation Hub',
@@ -33,7 +32,7 @@ const translations = {
     heatmap: 'Weekly Donation Velocity Heatmap',
     chartGrowth: 'Monthly Donation Growth Trajectory',
     chartTrend: 'Campaign Collection Progression',
-    searchPlaceholder: 'Global command bar (Ctrl+K)...',
+    searchPlaceholder: 'Search collections, donors, or areas...',
     outstandingAmount: 'Outstanding Renewal Balance',
     themeToggle: 'Toggle Theme Mode',
     languageToggle: 'Change Language',
@@ -127,7 +126,6 @@ export default function DashboardOverview() {
 
   useEffect(() => {
     setIsClient(true);
-    // Simulate PWA offline sync alert
     const timer = setTimeout(() => {
       setShowSyncAlert(true);
     }, 2000);
@@ -136,6 +134,10 @@ export default function DashboardOverview() {
 
   useEffect(() => {
     if (!isClient) return;
+
+    // Define styling properties depending on light/dark mode
+    const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+    const textColor = theme === 'dark' ? '#94a3b8' : '#64748b';
 
     // Build Bar Chart (Donation Growth)
     if (barChartRef.current) {
@@ -147,7 +149,9 @@ export default function DashboardOverview() {
           datasets: [{
             label: 'Collected ($)',
             data: [14200, 18500, 24000, 31000, 29000, 42000],
-            backgroundColor: theme === 'dark' ? '#34a862' : '#25884b',
+            backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.85)' : 'rgba(37, 136, 75, 0.85)',
+            borderColor: theme === 'dark' ? 'rgba(16, 185, 129, 1)' : 'rgba(37, 136, 75, 1)',
+            borderWidth: 1,
             borderRadius: 8,
           }]
         },
@@ -158,8 +162,14 @@ export default function DashboardOverview() {
             legend: { display: false }
           },
           scales: {
-            y: { grid: { color: theme === 'dark' ? '#1e293b' : '#e2e8f0' } },
-            x: { grid: { display: false } }
+            y: { 
+              grid: { color: gridColor },
+              ticks: { color: textColor }
+            },
+            x: { 
+              grid: { display: false },
+              ticks: { color: textColor }
+            }
           }
         }
       });
@@ -175,8 +185,9 @@ export default function DashboardOverview() {
           datasets: [{
             label: 'Target Goal Progress',
             data: [5000, 12000, 19000, 34000, 48500],
-            borderColor: '#dca413',
-            backgroundColor: 'rgba(220, 164, 19, 0.1)',
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            borderWidth: 2,
             fill: true,
             tension: 0.4
           }]
@@ -188,8 +199,14 @@ export default function DashboardOverview() {
             legend: { display: false }
           },
           scales: {
-            y: { grid: { color: theme === 'dark' ? '#1e293b' : '#e2e8f0' } },
-            x: { grid: { display: false } }
+            y: { 
+              grid: { color: gridColor },
+              ticks: { color: textColor }
+            },
+            x: { 
+              grid: { display: false },
+              ticks: { color: textColor }
+            }
           }
         }
       });
@@ -198,38 +215,46 @@ export default function DashboardOverview() {
 
   if (!isClient) return null;
 
+  const glassClass = theme === 'dark' ? 'apple-glass' : 'apple-glass-light';
+
   return (
-    <div className={`min-h-screen p-6 transition-colors duration-300 ${theme === 'dark' ? 'bg-[#090d16] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`min-h-screen relative p-6 md:p-8 transition-colors duration-500 overflow-hidden ${theme === 'dark' ? 'bg-[#030712] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       
+      {/* Background Ambient Color Blobs (Apple Design Aesthetic) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-2 pointer-events-none" />
+      <div className="absolute top-[40%] left-[30%] w-[45%] h-[45%] rounded-full ambient-glow-3 pointer-events-none" />
+
       {/* Header Bar */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-white/5 gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Heart className="w-8 h-8 text-primary-500 animate-pulse" />
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary-400 via-primary-500 to-accent-500 bg-clip-text text-transparent">
+      <header className={`relative z-10 flex flex-col md:flex-row md:items-center justify-between p-6 mb-8 rounded-3xl ${glassClass}`}>
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+            <Heart className="w-8 h-8 text-emerald-400 animate-pulse" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400 bg-clip-text text-transparent">
               Token of Halawa
             </h1>
+            <p className="text-sm opacity-60 mt-0.5">{t.subtitle}</p>
           </div>
-          <p className="text-sm text-slate-400 mt-1">{t.subtitle}</p>
         </div>
 
         {/* Global Toolbar */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Offline Sync Status (PWA Support) */}
+        <div className="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
           {showSyncAlert && (
-            <div className="flex items-center gap-2 bg-primary-500/10 border border-primary-500/30 text-primary-400 text-xs px-3 py-1.5 rounded-full animate-bounce">
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-2 rounded-full animate-bounce">
               <Check className="w-3.5 h-3.5" />
               <span>{t.syncStatus}</span>
             </div>
           )}
 
           {/* Language Selector */}
-          <div className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs">
+          <div className="flex items-center bg-white/5 dark:bg-black/20 border border-white/10 rounded-2xl px-3 py-2 text-xs">
             <Globe className="w-4 h-4 mr-2 text-slate-400" />
             <select 
               value={lang} 
               onChange={(e) => setLang(e.target.value as any)}
-              className="bg-transparent text-slate-200 outline-none cursor-pointer pr-1"
+              className="bg-transparent outline-none cursor-pointer font-semibold text-slate-300 pr-1"
             >
               <option value="en" className="text-slate-800">English</option>
               <option value="ml" className="text-slate-800">മലയാളം</option>
@@ -241,122 +266,138 @@ export default function DashboardOverview() {
           {/* Theme Selector */}
           <button 
             onClick={toggleTheme} 
-            className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-400 hover:text-slate-200 transition-colors"
+            className="p-2.5 bg-white/5 dark:bg-black/20 hover:bg-white/10 border border-white/10 rounded-2xl text-slate-400 hover:text-slate-200 transition-colors"
             title={t.themeToggle}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-accent-400" /> : <Moon className="w-4 h-4 text-primary-600" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-emerald-600" />}
           </button>
         </div>
       </header>
 
       {/* Main Grid Content */}
-      <main className="grid grid-cols-1 xl:grid-cols-4 gap-6 mt-8" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <main className="relative z-10 grid grid-cols-1 xl:grid-cols-4 gap-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         
         {/* Statistics Panels */}
         <div className="xl:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
           {/* Card 1: Today's Collection */}
-          <div className={`p-6 rounded-2xl border transition-all duration-300 ${theme === 'dark' ? 'bg-[#0f1524] border-white/5 hover:border-primary-500/30' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-400">{t.todayCollection}</span>
-              <TrendingUp className="w-5 h-5 text-primary-500" />
+              <span className="text-sm font-semibold opacity-60">{t.todayCollection}</span>
+              <TrendingUp className="w-5 h-5 text-emerald-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold tracking-tight">$4,850.00</h3>
-              <p className="text-xs text-primary-500 mt-1 font-semibold">+18.5% from yesterday</p>
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">$4,850.00</h3>
+              <p className="text-xs text-emerald-400 mt-2 font-bold flex items-center gap-1">
+                <span>+18.5%</span>
+                <span className="opacity-60 font-medium">from yesterday</span>
+              </p>
             </div>
           </div>
 
           {/* Card 2: Monthly Collection */}
-          <div className={`p-6 rounded-2xl border transition-all duration-300 ${theme === 'dark' ? 'bg-[#0f1524] border-white/5 hover:border-primary-500/30' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-400">{t.monthlyCollection}</span>
-              <Calendar className="w-5 h-5 text-accent-500" />
+              <span className="text-sm font-semibold opacity-60">{t.monthlyCollection}</span>
+              <Calendar className="w-5 h-5 text-amber-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold tracking-tight">$42,390.00</h3>
-              <p className="text-xs text-accent-500 mt-1 font-semibold">92% of target goal met</p>
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">$42,390.00</h3>
+              <p className="text-xs text-amber-400 mt-2 font-bold flex items-center gap-1">
+                <span>92%</span>
+                <span className="opacity-60 font-medium">of target goal met</span>
+              </p>
             </div>
           </div>
 
           {/* Card 3: Pending Verification */}
-          <div className={`p-6 rounded-2xl border transition-all duration-300 ${theme === 'dark' ? 'bg-[#0f1524] border-white/5 hover:border-primary-500/30' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-400">{t.pendingVerification}</span>
-              <AlertCircle className="w-5 h-5 text-yellow-500" />
+              <span className="text-sm font-semibold opacity-60">{t.pendingVerification}</span>
+              <AlertCircle className="w-5 h-5 text-yellow-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold tracking-tight">14 Receipts</h3>
-              <p className="text-xs text-yellow-500 mt-1 font-semibold">Workflow queue: Active</p>
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">14 Receipts</h3>
+              <p className="text-xs text-yellow-400 mt-2 font-bold flex items-center gap-1">
+                <span>Active</span>
+                <span className="opacity-60 font-medium">workflow queue</span>
+              </p>
             </div>
           </div>
 
           {/* Card 4: Active Donors */}
-          <div className={`p-6 rounded-2xl border transition-all duration-300 ${theme === 'dark' ? 'bg-[#0f1524] border-white/5 hover:border-primary-500/30' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-400">{t.activeDonors}</span>
-              <Users className="w-5 h-5 text-indigo-500" />
+              <span className="text-sm font-semibold opacity-60">{t.activeDonors}</span>
+              <Users className="w-5 h-5 text-indigo-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-2xl font-bold tracking-tight">1,240 Profiles</h3>
-              <p className="text-xs text-indigo-500 mt-1 font-semibold">0 duplicate registrations</p>
+              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-300 bg-clip-text text-transparent">1,240 Profiles</h3>
+              <p className="text-xs text-indigo-400 mt-2 font-bold flex items-center gap-1">
+                <span>Verified</span>
+                <span className="opacity-60 font-medium">no duplicates</span>
+              </p>
             </div>
           </div>
         </div>
 
         {/* Quick Actions Side Panel */}
         <div className="xl:col-span-1 row-span-3">
-          <div className={`p-6 rounded-2xl border sticky top-6 ${theme === 'dark' ? 'bg-[#0f1524] border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-primary-500" />
-              {t.quickActions}
-            </h2>
+          <div className={`p-6 rounded-3xl sticky top-6 flex flex-col gap-6 ${glassClass}`}>
+            <div>
+              <h2 className="text-xl font-extrabold flex items-center gap-2">
+                <Activity className="w-5 h-5 text-emerald-400" />
+                {t.quickActions}
+              </h2>
+              <p className="text-xs opacity-50 mt-1">Direct operations shortcuts</p>
+            </div>
+
             <div className="flex flex-col gap-3">
-              <button className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-primary-500/10 hover:bg-primary-500/20 text-primary-500 font-semibold text-sm transition-all border border-primary-500/20 text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-emerald-400 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
                   <PlusCircle className="w-4 h-4" />
                   {t.logDonation}
                 </span>
-                <span className="text-xs font-normal opacity-60">Ctrl+N</span>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md font-normal">Ctrl+N</span>
               </button>
 
-              <button className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 font-semibold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
                   <UserPlus className="w-4 h-4" />
                   {t.registerDonor}
                 </span>
               </button>
 
-              <button className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 font-semibold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4" />
                   {t.verifyDonations}
                 </span>
-                <span className="bg-yellow-500/20 text-yellow-500 text-xs px-2 py-0.5 rounded-full font-bold">14</span>
+                <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2.5 py-0.5 rounded-full font-bold">14</span>
               </button>
 
-              <button className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 font-semibold text-sm transition-all text-left">
+              <button className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-bold text-sm transition-all text-left">
                 <span className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-green-500" />
+                  <MessageSquare className="w-4 h-4 text-green-400" />
                   {t.whatsappReceipt}
                 </span>
               </button>
             </div>
 
             {/* Outstanding Balance Banner */}
-            <div className="mt-6 p-4 rounded-xl bg-accent-500/10 border border-accent-500/20 text-accent-400">
-              <span className="text-xs uppercase font-bold tracking-wider">{t.outstandingAmount}</span>
-              <h4 className="text-xl font-bold mt-1">$12,450.00</h4>
-              <p className="text-[10px] mt-1 opacity-80">Auto renewal engine calculated outstanding balances</p>
+            <div className="mt-2 p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 text-amber-400">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider opacity-60">{t.outstandingAmount}</span>
+              <h4 className="text-2xl font-extrabold mt-1">$12,450.00</h4>
+              <p className="text-[10px] mt-1.5 opacity-60">System calculated pending monthly collections balance.</p>
             </div>
           </div>
         </div>
 
         {/* Dynamic Charts Modules */}
         <div className="xl:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0f1524] border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <h3 className="text-sm font-bold text-slate-400 mb-4 flex items-center gap-2">
-              <BarChart2 className="w-4 h-4 text-primary-500" />
+              <BarChart2 className="w-4 h-4 text-emerald-400" />
               {t.chartGrowth}
             </h3>
             <div className="h-64 relative">
@@ -364,9 +405,9 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0f1524] border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <h3 className="text-sm font-bold text-slate-400 mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-accent-500" />
+              <FileText className="w-4 h-4 text-amber-400" />
               {t.chartTrend}
             </h3>
             <div className="h-64 relative">
@@ -379,63 +420,63 @@ export default function DashboardOverview() {
         <div className="xl:col-span-3 grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Donation velocity heatmap */}
-          <div className={`lg:col-span-2 p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0f1524] border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`lg:col-span-2 p-6 rounded-3xl ${glassClass}`}>
             <h3 className="text-sm font-bold text-slate-400 mb-4">{t.heatmap}</h3>
             {/* Heatmap Grid */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-2.5">
               {Array.from({ length: 28 }).map((_, i) => {
-                const opacities = ['bg-primary-500/10', 'bg-primary-500/30', 'bg-primary-500/60', 'bg-primary-500/90'];
+                const opacities = ['bg-emerald-500/10', 'bg-emerald-500/30', 'bg-emerald-500/60', 'bg-emerald-500/90'];
                 const color = opacities[i % 4];
                 return (
-                  <div key={i} className={`h-8 rounded-md ${color} transition-all duration-300 hover:scale-110 cursor-pointer`} title={`Velocity Index: ${(i + 1) * 3}`} />
+                  <div key={i} className={`h-8 rounded-lg ${color} transition-all duration-300 hover:scale-110 cursor-pointer border border-white/5`} title={`Velocity Index: ${(i + 1) * 3}`} />
                 );
               })}
             </div>
-            <div className="flex justify-between items-center mt-4 text-[10px] text-slate-500">
+            <div className="flex justify-between items-center mt-4 text-[10px] text-slate-400">
               <span>Monday</span>
               <span>Sunday</span>
-              <span className="flex items-center gap-1 font-bold">
-                <span className="w-2.5 h-2.5 bg-primary-500 rounded" />
+              <span className="flex items-center gap-1.5 font-bold">
+                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-md" />
                 Velocity Peak
               </span>
             </div>
           </div>
 
           {/* Leaders Board Summary */}
-          <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0f1524] border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <h3 className="text-sm font-bold text-slate-400 mb-4">{t.topVolunteers}</h3>
-            <div className="flex flex-col gap-3.5">
-              <div className="flex items-center justify-between border-b border-white/5 pb-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-accent-500 text-sm">#1</span>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between border-b border-white/5 pb-2.5 text-xs">
+                <div className="flex items-center gap-3.5">
+                  <span className="font-extrabold text-amber-400 text-sm">#1</span>
                   <div>
-                    <h5 className="font-semibold">Ahmad Sulaiman</h5>
-                    <span className="text-[10px] text-slate-500">Sector Alpha</span>
+                    <h5 className="font-bold text-slate-200">Ahmad Sulaiman</h5>
+                    <span className="text-[10px] opacity-50">Sector Alpha</span>
                   </div>
                 </div>
-                <span className="font-bold text-primary-500">$12,400</span>
+                <span className="font-extrabold text-emerald-400 text-sm">$12,400</span>
               </div>
 
-              <div className="flex items-center justify-between border-b border-white/5 pb-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-400 text-sm">#2</span>
+              <div className="flex items-center justify-between border-b border-white/5 pb-2.5 text-xs">
+                <div className="flex items-center gap-3.5">
+                  <span className="font-extrabold text-slate-400 text-sm">#2</span>
                   <div>
-                    <h5 className="font-semibold">Fathima R.</h5>
-                    <span className="text-[10px] text-slate-500">Unit Gamma</span>
+                    <h5 className="font-bold text-slate-200">Fathima R.</h5>
+                    <span className="text-[10px] opacity-50">Unit Gamma</span>
                   </div>
                 </div>
-                <span className="font-bold text-primary-500">$9,850</span>
+                <span className="font-extrabold text-emerald-400 text-sm">$9,850</span>
               </div>
 
               <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-amber-700 text-sm">#3</span>
+                <div className="flex items-center gap-3.5">
+                  <span className="font-extrabold text-amber-700 text-sm">#3</span>
                   <div>
-                    <h5 className="font-semibold">Zayn Khalid</h5>
-                    <span className="text-[10px] text-slate-500">Class 10B</span>
+                    <h5 className="font-bold text-slate-200">Zayn Khalid</h5>
+                    <span className="text-[10px] opacity-50">Class 10B</span>
                   </div>
                 </div>
-                <span className="font-bold text-primary-500">$8,900</span>
+                <span className="font-extrabold text-emerald-400 text-sm">$8,900</span>
               </div>
             </div>
           </div>
@@ -443,20 +484,20 @@ export default function DashboardOverview() {
 
         {/* Audit Log Activities Footer Pane */}
         <div className="xl:col-span-3">
-          <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0f1524] border-white/5' : 'bg-white border-slate-200 shadow-sm'}`}>
+          <div className={`p-6 rounded-3xl ${glassClass}`}>
             <h3 className="text-sm font-bold text-slate-400 mb-4">{t.recentActivity}</h3>
             <div className="flex flex-col gap-3 font-mono text-[11px] text-slate-400">
               <div className="flex justify-between border-b border-white/5 pb-1">
                 <span>[2026-07-12 23:14:11] AUDIT_LOG: Donor merge executed on target TOH-D-000104. Source ID soft-deleted.</span>
-                <span className="text-slate-500">IP: 192.168.1.144</span>
+                <span className="opacity-50">IP: 192.168.1.144</span>
               </div>
               <div className="flex justify-between border-b border-white/5 pb-1">
                 <span>[2026-07-12 23:09:45] WORKFLOW: Donation verification stage advanced to LEVEL 3 (Area Manager Approved).</span>
-                <span className="text-slate-500">IP: 192.168.1.185</span>
+                <span className="opacity-50">IP: 192.168.1.185</span>
               </div>
               <div className="flex justify-between">
                 <span>[2026-07-12 23:01:05] SEC_WATCH: Session refresh tokens issued for user uid_admin_09.</span>
-                <span className="text-slate-500">IP: 192.168.1.102</span>
+                <span className="opacity-50">IP: 192.168.1.102</span>
               </div>
             </div>
           </div>

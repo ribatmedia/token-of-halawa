@@ -124,6 +124,18 @@ export default function DashboardOverview() {
   const barChartInst = useRef<Chart | null>(null);
   const lineChartInst = useRef<Chart | null>(null);
 
+  // Sync theme state to document DOM (Crucial for Tailwind dark: classes)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const root = window.document.documentElement;
+      if (theme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+  }, [theme]);
+
   useEffect(() => {
     setIsClient(true);
     const timer = setTimeout(() => {
@@ -286,7 +298,7 @@ export default function DashboardOverview() {
               <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">$4,850.00</h3>
+              <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">$4,850.00</h3>
               <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 font-bold flex items-center gap-1">
                 <span>+18.5%</span>
                 <span className="opacity-60 font-medium">from yesterday</span>
@@ -301,7 +313,7 @@ export default function DashboardOverview() {
               <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">$42,390.00</h3>
+              <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">$42,390.00</h3>
               <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-bold flex items-center gap-1">
                 <span>92%</span>
                 <span className="opacity-60 font-medium">of target goal met</span>
@@ -316,7 +328,7 @@ export default function DashboardOverview() {
               <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">14 Receipts</h3>
+              <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">14 Receipts</h3>
               <p className="text-xs text-amber-600 dark:text-yellow-400 mt-2 font-bold flex items-center gap-1">
                 <span>Active</span>
                 <span className="opacity-60 font-medium">workflow queue</span>
@@ -331,7 +343,7 @@ export default function DashboardOverview() {
               <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="mt-4">
-              <h3 className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">1,240 Profiles</h3>
+              <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">1,240 Profiles</h3>
               <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-bold flex items-center gap-1">
                 <span>Verified</span>
                 <span className="opacity-60 font-medium">no duplicates</span>

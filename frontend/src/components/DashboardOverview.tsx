@@ -838,7 +838,7 @@ export default function DashboardOverview() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Receipt Notification Template</h4>
-                  <p className="text-xs opacity-60">"Dear {{donor_name}}, thank you for your contribution of ${{amount}} to Token of Halawa. Receipt: {{receipt_url}}."</p>
+                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of ${{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>
@@ -846,7 +846,7 @@ export default function DashboardOverview() {
 
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Renewal Reminder Template</h4>
-                  <p className="text-xs opacity-60">"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of ${{amount}} is due. Click here to pay: {{pay_url}}."</p>
+                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of ${{amount}} is due. Click here to pay: {{pay_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>

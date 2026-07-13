@@ -239,7 +239,7 @@ export default function HomePage() {
           <div className="inline-block animate-[scroll_25s_linear_infinite] text-xs font-black tracking-widest uppercase">
             <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
             <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Direct WhatsApp verification now enabled for all volunteers</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> Direct WhatsApp verification now enabled for all campaigners</span>
             {/* Repeat for looping effect */}
             <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
             <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
@@ -259,18 +259,18 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900">Live Leaderboard</h2>
-            <p className="text-slate-500 mt-3 max-w-lg mx-auto">Real-time volunteer and class donation collections index</p>
+            <p className="text-slate-500 mt-3 max-w-lg mx-auto">Real-time campaigner and class donation collections index</p>
           </div>
           
           <div className="grid lg:grid-cols-2 gap-8">
             
-            {/* Volunteers Leaderboard Card */}
+            {/* Campaigners Leaderboard Card */}
             <div className="rounded-3xl bg-white/75 border border-slate-200/85 p-6 md:p-8 flex flex-col min-h-[500px] relative overflow-hidden shadow-xl backdrop-blur-xl">
               
-              {/* Overall Top Volunteers */}
+              {/* Overall Top Campaigners */}
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${studentView === 'overall' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-black text-slate-800">Top Volunteers</h3>
+                  <h3 className="text-2xl font-black text-slate-800">Top Campaigners</h3>
                   <Trophy className="w-7 h-7 text-amber-500 animate-pulse" />
                 </div>
                 <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
@@ -278,7 +278,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Today's Top Volunteers */}
+              {/* Today's Top Campaigners */}
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${studentView === 'today' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-2xl font-black text-slate-800">Today's Top</h3>
@@ -353,7 +353,7 @@ export default function HomePage() {
               <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">Quick Links</h3>
               <ul className="space-y-3.5 text-sm text-slate-400">
                 <li><Link href="/dashboard" className="hover:text-white transition">Admin Portal</Link></li>
-                <li><Link href="/dashboard" className="hover:text-white transition">Volunteer Portal</Link></li>
+                <li><Link href="/dashboard" className="hover:text-white transition">Campaigner Portal</Link></li>
                 <li><a href="#leaderboard" className="hover:text-white transition">Leaderboard</a></li>
                 <li><Link href="/dashboard" className="hover:text-white transition">Live Stats</Link></li>
               </ul>

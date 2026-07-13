@@ -224,8 +224,8 @@ export default function DashboardOverview() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
-  const [todayCollectionTotal, setTodayCollectionTotal] = useState<number>(0);
-  const [monthlyCollectionTotal, setMonthlyCollectionTotal] = useState<number>(0);
+  const todayCollectionTotal = verificationQueue.reduce((acc, item) => acc + (item.status === 'APPROVED' || item.status === 'PENDING' ? Number(item.amount) : 0), 0);
+  const monthlyCollectionTotal = todayCollectionTotal;
 
   // Input states for Log Donation form
   const [donorIdInput, setDonorIdInput] = useState('');
@@ -446,7 +446,7 @@ export default function DashboardOverview() {
           campaignId: campaignIdInput || undefined,
           donationType,
           amount: Number(donationAmount),
-          notes: notes || `Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
+          notes: notes || `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
           paymentMethod
         })
       });
@@ -536,15 +536,36 @@ export default function DashboardOverview() {
     const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
     const textColor = theme === 'dark' ? '#94a3b8' : '#334155';
 
+    // Aggregate monthly data (last 6 months: Feb to Jul)
+    const monthlyLabels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+    const monthlyData = [0, 0, 0, 0, 0, 0];
+    verificationQueue.forEach(item => {
+      const date = new Date(item.createdAt);
+      const m = date.getMonth(); // Feb=1, Mar=2, Apr=3, May=4, Jun=5, Jul=6
+      if (m >= 1 && m <= 6) {
+        monthlyData[m - 1] += Number(item.amount);
+      }
+    });
+
+    // Aggregate weekly progress (for current month)
+    const weeklyLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const weeklyData = [0, 0, 0, 0];
+    verificationQueue.forEach(item => {
+      const date = new Date(item.createdAt);
+      const day = date.getDate();
+      const weekIdx = Math.min(3, Math.floor((day - 1) / 7));
+      weeklyData[weekIdx] += Number(item.amount);
+    });
+
     if (barChartRef.current) {
       if (barChartInst.current) barChartInst.current.destroy();
       barChartInst.current = new Chart(barChartRef.current, {
         type: 'bar',
         data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          labels: monthlyLabels,
           datasets: [{
             label: 'Collected (₹)',
-            data: [14200, 18500, 24000, 31000, 29000, 42000],
+            data: monthlyData,
             backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.85)' : 'rgba(37, 136, 75, 0.85)',
             borderColor: theme === 'dark' ? 'rgba(16, 185, 129, 1)' : 'rgba(37, 136, 75, 1)',
             borderWidth: 1,
@@ -570,10 +591,10 @@ export default function DashboardOverview() {
       lineChartInst.current = new Chart(lineChartRef.current, {
         type: 'line',
         data: {
-          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+          labels: weeklyLabels,
           datasets: [{
             label: 'Campaign Target Goal Progress',
-            data: [5000, 12000, 19000, 34000, 48500],
+            data: weeklyData,
             borderColor: '#d97706',
             backgroundColor: 'rgba(217, 119, 6, 0.15)',
             borderWidth: 2,
@@ -744,74 +765,87 @@ export default function DashboardOverview() {
       <aside className={`relative z-10 w-full lg:w-72 p-6 flex flex-col border-r border-white/5 shrink-0 ${glassClass} rounded-r-none lg:rounded-r-3xl`}>
         
         {/* Brand Banner */}
-        <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-6">
-          <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-lg">
-            <Heart className="w-6 h-6 text-emerald-500 dark:text-emerald-400 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 dark:from-emerald-400 dark:via-teal-400 dark:to-amber-400 bg-clip-text text-transparent leading-none">
-              Token of Halawa
-            </h1>
-            <p className="text-[8px] font-extrabold text-slate-500 tracking-widest mt-1.5 uppercase">{organization?.name || 'Donation Portal'}</p>
-          </div>
-        </div>
-
-        {/* Unified Role Switcher Dropdown */}
-        <div className="mb-8">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Switch Dashboard view</label>
-          <select 
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as any)}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-200/50 dark:bg-black/35 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
-          >
-            <option value="admin" className="text-slate-800">Super Administrator</option>
-            <option value="leader" className="text-slate-800">Class Leader / Manager</option>
-            <option value="volunteer" className="text-slate-800">Campaigner</option>
-          </select>
-        </div>
-
-        {/* Dynamic Sidebar Links */}
-        {selectedRole === 'volunteer' && (
-          <div className="mb-6 p-4 rounded-3xl bg-slate-200/50 dark:bg-black/20 border border-slate-300/80 dark:border-white/5 text-center flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-2xl shadow-lg mb-3">
-              {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'VO'}
+        <div className="flex items-center justify-between lg:justify-start gap-3 mb-6 lg:mb-8 border-b border-white/10 pb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-lg">
+              <Heart className="w-6 h-6 text-emerald-500 dark:text-emerald-400 animate-pulse" />
             </div>
-            <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} · ID: {(user as any)?.hn || '001'}</p>
-            <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
-              Approved Active
-            </span>
+            <div>
+              <h1 className="text-xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 dark:from-emerald-400 dark:via-teal-400 dark:to-amber-400 bg-clip-text text-transparent leading-none">
+                Token of Halawa
+              </h1>
+              <p className="text-[8px] font-extrabold text-slate-500 tracking-widest mt-1.5 uppercase">{organization?.name || 'Donation Portal'}</p>
+            </div>
           </div>
-        )}
+          
+          {/* Mobile hamburger menu toggle */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-xl bg-slate-200/50 dark:bg-white/5 border border-slate-350 dark:border-white/10 text-slate-800 dark:text-white"
+          >
+            {mobileMenuOpen ? <XCircle className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
 
-        <nav className="flex-1 space-y-1.5">
-          {sidebars[selectedRole].map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl cursor-pointer text-left transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold shadow-sm' 
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm font-semibold">{item.name}</span>
-              </button>
-            );
-          })}
-        </nav>
+        {/* Collapsible Mobile Menu Wrapper */}
+        <div className={`${mobileMenuOpen ? 'block' : 'hidden'} lg:block space-y-6 lg:space-y-8 flex-1 flex flex-col`}>
+          {/* Unified Role Switcher Dropdown */}
+          <div>
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Switch Dashboard view</label>
+            <select 
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value as any)}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-200/50 dark:bg-black/35 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
+            >
+              <option value="admin" className="text-slate-800">Super Administrator</option>
+              <option value="leader" className="text-slate-800">Class Leader / Manager</option>
+              <option value="volunteer" className="text-slate-800">Campaigner</option>
+            </select>
+          </div>
 
-        {/* Sidebar Footer details */}
-        <div className="mt-8 pt-6 border-t border-white/10 text-xs opacity-60 flex flex-col gap-2">
-          <p className="font-bold flex items-center gap-1">
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>User: {user?.fullName || 'Admin User'}</span>
-          </p>
-          <button onClick={clearAuth} className="text-red-500 font-bold hover:underline text-left">Logout Console</button>
+          {/* Dynamic Sidebar Links */}
+          {selectedRole === 'volunteer' && (
+            <div className="p-4 rounded-3xl bg-slate-200/50 dark:bg-black/20 border border-slate-300/80 dark:border-white/5 text-center flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-2xl shadow-lg mb-3">
+                {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'VO'}
+              </div>
+              <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} · ID: {(user as any)?.hn || '001'}</p>
+              <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                Approved Active
+              </span>
+            </div>
+          )}
+
+          <nav className="flex-1 space-y-1.5">
+            {sidebars[selectedRole].map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
+                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl cursor-pointer text-left transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold shadow-sm' 
+                      : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-sm font-semibold">{item.name}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Sidebar Footer details */}
+          <div className="pt-6 border-t border-white/10 text-xs opacity-60 flex flex-col gap-2">
+            <p className="font-bold flex items-center gap-1">
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>User: {user?.fullName || 'Admin User'}</span>
+            </p>
+            <button onClick={clearAuth} className="text-red-500 font-bold hover:underline text-left">Logout Console</button>
+          </div>
         </div>
       </aside>
 
@@ -1546,10 +1580,12 @@ export default function DashboardOverview() {
                   </thead>
                   <tbody>
                     {campaignersList.map((item) => {
-                      const collected = item.hn * 450 + 1200;
+                      const collected = verificationQueue
+                        .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
+                        .reduce((acc, q) => acc + Number(q.amount), 0);
                       const target = 10000;
                       const percent = Math.min(100, Math.round((collected / target) * 100));
-                      const receiptsCount = (item.hn % 4) + 1;
+                      const receiptsCount = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
                       return (
                         <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
@@ -1594,9 +1630,11 @@ export default function DashboardOverview() {
                 {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map((className) => {
                   const classCampaigners = campaignersList.filter(c => c.class === className);
                   const totalCampaigners = classCampaigners.length;
-                  const collected = classCampaigners.reduce((acc, c) => acc + (c.hn * 450 + 1200), 0);
+                  const collected = verificationQueue
+                    .filter(q => q.notes?.includes(`Class: ${className}`))
+                    .reduce((acc, q) => acc + Number(q.amount), 0);
                   const target = totalCampaigners * 10000;
-                  const percent = Math.min(100, Math.round((collected / target) * 100));
+                  const percent = target > 0 ? Math.min(100, Math.round((collected / target) * 100)) : 0;
                   return (
                     <div key={className} className="p-5 rounded-3xl bg-white/5 border border-white/10 space-y-4">
                       <div className="flex justify-between items-start">
@@ -1663,7 +1701,9 @@ export default function DashboardOverview() {
               {(() => {
                 const classCampaigners = campaignersList.filter(c => c.class === selectedClassDashboard);
                 const totalCampaigners = classCampaigners.length;
-                const collected = classCampaigners.reduce((acc, c) => acc + (c.hn * 450 + 1200), 0);
+                const collected = verificationQueue
+                  .filter(q => q.notes?.includes(`Class: ${selectedClassDashboard}`))
+                  .reduce((acc, q) => acc + Number(q.amount), 0);
                 const avgCollected = totalCampaigners > 0 ? Math.round(collected / totalCampaigners) : 0;
                 
                 return (
@@ -1699,9 +1739,15 @@ export default function DashboardOverview() {
                           </thead>
                           <tbody>
                             {[...classCampaigners]
-                              .sort((a, b) => (b.hn * 450 + 1200) - (a.hn * 450 + 1200))
+                              .map(item => {
+                                const amount = verificationQueue
+                                  .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
+                                  .reduce((acc, q) => acc + Number(q.amount), 0);
+                                return { ...item, amount };
+                              })
+                              .sort((a, b) => b.amount - a.amount)
                               .map((item, index) => {
-                                const amount = item.hn * 450 + 1200;
+                                const amount = item.amount;
                                 return (
                                   <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                                     <td className="py-3.5 px-4 font-extrabold text-slate-500">#{index + 1}</td>

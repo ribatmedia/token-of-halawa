@@ -81,8 +81,8 @@ export const requirePermission = (permission: string) => {
       return res.status(401).json({ error: 'Authentication credentials required' });
     }
 
-    // Super Admin can do everything
-    if (req.user.roles.includes('SUPER_ADMIN')) {
+    // Super Admin and Org Admin can do everything
+    if (req.user.roles.includes('SUPER_ADMIN') || req.user.roles.includes('ORG_ADMIN')) {
       return next();
     }
 

@@ -731,7 +731,7 @@ export default function DashboardOverview() {
               {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'VO'}
             </div>
             <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Volunteer Campaigner'}</h3>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {user?.class || 'Final Year'} · ID: {user?.hn || '001'}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} · ID: {(user as any)?.hn || '001'}</p>
             <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
               Approved Active
             </span>

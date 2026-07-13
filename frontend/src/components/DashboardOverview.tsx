@@ -143,7 +143,54 @@ const translations = {
     liveRankings: 'நேரடி தரவரிசை',
     expectedTotal: 'எதிர்பார்க்கப்படும் மொத்தம்'
   }
-};
+const campaignersList = [
+  // Final year
+  { hn: 1, name: "Asif ali", class: "Final year" },
+  { hn: 2, name: "Bishrul wafa", class: "Final year" },
+  { hn: 3, name: "Muhammed Falil", class: "Final year" },
+  { hn: 4, name: "Sinan Cheekod", class: "Final year" },
+  { hn: 5, name: "Sinan rafi", class: "Final year" },
+  { hn: 6, name: "Ubayy Valliyad", class: "Final year" },
+  // Degree Third year
+  { hn: 7, name: "Adhil Ameen", class: "Degree Third year" },
+  { hn: 8, name: "Hashir puthoor", class: "Degree Third year" },
+  { hn: 9, name: "Muhammed shaheer", class: "Degree Third year" },
+  { hn: 10, name: "Muhammed Riswan", class: "Degree Third year" },
+  // Degree second year
+  { hn: 11, name: "Muhammed Ali", class: "Degree second year" },
+  { hn: 12, name: "Muhammed Fayis", class: "Degree second year" },
+  { hn: 13, name: "Sinan k", class: "Degree second year" },
+  { hn: 14, name: "Yaseen kondotty", class: "Degree second year" },
+  // Degree first year
+  { hn: 15, name: "Muhammed Melattoor", class: "Degree first year" },
+  { hn: 16, name: "Nihal valliyad", class: "Degree first year" },
+  // Plus two
+  { hn: 17, name: "Anas Rahman", class: "Plus two" },
+  { hn: 18, name: "Anas koduvally", class: "Plus two" },
+  { hn: 19, name: "Anwar", class: "Plus two" },
+  { hn: 20, name: "Adhil Nizar", class: "Plus two" },
+  { hn: 21, name: "Naseel", class: "Plus two" },
+  { hn: 22, name: "Sabith", class: "Plus two" },
+  { hn: 23, name: "Sanah", class: "Plus two" },
+  { hn: 24, name: "Savad", class: "Plus two" },
+  { hn: 25, name: "Hashir kannur", class: "Plus two" },
+  { hn: 26, name: "Yaseen c.k", class: "Plus two" },
+  // Plus one
+  { hn: 27, name: "Abdu Rahman", class: "Plus one" },
+  { hn: 28, name: "Adnan", class: "Plus one" },
+  { hn: 29, name: "Anas Mooniyur", class: "Plus one" },
+  { hn: 30, name: "Anees", class: "Plus one" },
+  { hn: 31, name: "Basith moosa", class: "Plus one" },
+  { hn: 32, name: "Farseen", class: "Plus one" },
+  { hn: 33, name: "Hafil", class: "Plus one" },
+  { hn: 34, name: "Mufeed", class: "Plus one" },
+  { hn: 35, name: "Muzammil", class: "Plus one" },
+  { hn: 36, name: "Rashal", class: "Plus one" },
+  { hn: 37, name: "Rayyan", class: "Plus one" },
+  { hn: 38, name: "Swalih", class: "Plus one" },
+  { hn: 39, name: "Aboobacker Sidheeque", class: "Plus one" },
+  { hn: 40, name: "Aneeb", class: "Plus one" }
+];
 
 export default function DashboardOverview() {
   const { theme, toggleTheme, token, user, organization, setAuth, clearAuth } = useAuthStore();
@@ -165,6 +212,10 @@ export default function DashboardOverview() {
   const [authOrgSlug, setAuthOrgSlug] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+
+  // Campaigner filter states
+  const [campaignerSearch, setCampaignerSearch] = useState('');
+  const [campaignerClassFilter, setCampaignerClassFilter] = useState('ALL');
 
   // Dynamic Live Database States
   const [donors, setDonors] = useState<any[]>([]);
@@ -1128,36 +1179,84 @@ export default function DashboardOverview() {
           )}
 
           {/* VIEW: Manage Campaigners & Campaigner Stats */}
-          {activeTab === 'campaigners' && (
-            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-emerald-400" />
-                Active Campaigns Stats
-              </h3>
+          {activeTab === 'campaigners' && (() => {
+            const filteredCampaigners = campaignersList.filter(item => {
+              const matchesSearch = item.name.toLowerCase().includes(campaignerSearch.toLowerCase()) || item.hn.toString() === campaignerSearch;
+              const matchesClass = campaignerClassFilter === 'ALL' || item.class === campaignerClassFilter;
+              return matchesSearch && matchesClass;
+            });
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                {campaigns.length === 0 ? (
-                  <div className="col-span-2 text-center py-12 text-slate-400">
-                    <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p className="font-bold">No active campaigns created in the database yet.</p>
+            return (
+              <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                      <Users className="w-5 h-5 text-emerald-400" />
+                      Campaigner Volunteers Directory
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Full list of registered volunteers, classes, and Hall Numbers (HN).</p>
                   </div>
-                ) : (
-                  campaigns.map((c) => (
-                    <div key={c.id} className="p-5 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
-                      <div>
-                        <h4 className="font-bold">{c.name}</h4>
-                        <p className="text-[10px] text-slate-400">Goal: ${c.targetAmount}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-emerald-400 font-bold">${c.collectedAmount}</span>
-                        <p className="text-[10px] text-slate-400">Collected</p>
-                      </div>
-                    </div>
-                  ))
-                )}
+                </div>
+
+                {/* Filter controls */}
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                    <input 
+                      type="text" 
+                      value={campaignerSearch}
+                      onChange={(e) => setCampaignerSearch(e.target.value)}
+                      placeholder="Search campaigner by name or HN..."
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
+                    />
+                  </div>
+                  <div>
+                    <select 
+                      value={campaignerClassFilter}
+                      onChange={(e) => setCampaignerClassFilter(e.target.value)}
+                      className="bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL" className="text-slate-800">All Classes</option>
+                      <option value="Final year" className="text-slate-800">Final year</option>
+                      <option value="Degree Third year" className="text-slate-800">Degree Third year</option>
+                      <option value="Degree second year" className="text-slate-800">Degree second year</option>
+                      <option value="Degree first year" className="text-slate-800">Degree first year</option>
+                      <option value="Plus two" className="text-slate-800">Plus two</option>
+                      <option value="Plus one" className="text-slate-800">Plus one</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Volunteers Table */}
+                <div className="overflow-x-auto flex-1 max-h-[500px]">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
+                        <th className="py-3 px-4">HN</th>
+                        <th className="py-3 px-4">Name</th>
+                        <th className="py-3 px-4">Class / Batch</th>
+                        <th className="py-3 px-4">Role</th>
+                        <th className="py-3 px-4">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredCampaigners.map((item) => (
+                        <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
+                          <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
+                          <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
+                          <td className="py-4 px-4">{item.class}</td>
+                          <td className="py-4 px-4 text-xs font-bold text-slate-500 uppercase">Volunteer</td>
+                          <td className="py-4 px-4">
+                            <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Active</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* VIEW: Donors Directory */}
           {activeTab === 'donors' && (

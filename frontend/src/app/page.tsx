@@ -71,41 +71,41 @@ export default function HomePage() {
     };
   }, []);
 
-  // Static mockup data mirroring the Mahabba structure
+  // Static mockup data mirroring the Mahabba structure with actual campaigners
   const topVolunteers = [
-    { name: "Ahmad Sulaiman", unit: "Sector Alpha", total: 12400, donors: 42 },
-    { name: "Fathima R.", unit: "Unit Gamma", total: 9850, donors: 31 },
-    { name: "Zayn Khalid", unit: "Class 10B", total: 8900, donors: 28 },
-    { name: "Mariyam N.", unit: "Unit Delta", total: 7200, donors: 22 },
-    { name: "Rayan Asif", unit: "Class 12A", total: 6150, donors: 19 }
+    { name: "Asif ali", unit: "Final year", total: 12400, donors: 42 },
+    { name: "Bishrul wafa", unit: "Final year", total: 9850, donors: 31 },
+    { name: "Muhammed Falil", unit: "Final year", total: 8900, donors: 28 },
+    { name: "Adhil Ameen", unit: "Degree Third year", total: 7200, donors: 22 },
+    { name: "Muhammed Ali", unit: "Degree second year", total: 6150, donors: 19 }
   ];
 
   const todayVolunteers = [
-    { name: "Ahmad Sulaiman", unit: "Sector Alpha", total: 1550, donors: 6 },
-    { name: "Rayan Asif", unit: "Class 12A", total: 1200, donors: 4 }
+    { name: "Sinan Cheekod", unit: "Final year", total: 1550, donors: 6 },
+    { name: "Muhammed Melattoor", unit: "Degree first year", total: 1200, donors: 4 }
   ];
 
   const expectedVolunteers = [
-    { name: "Ahmad Sulaiman", unit: "Sector Alpha", total: 14200, donors: 48 },
-    { name: "Fathima R.", unit: "Unit Gamma", total: 11100, donors: 36 },
-    { name: "Zayn Khalid", unit: "Class 10B", total: 9400, donors: 32 }
+    { name: "Asif ali", unit: "Final year", total: 14200, donors: 48 },
+    { name: "Bishrul wafa", unit: "Final year", total: 11100, donors: 36 },
+    { name: "Muhammed Falil", unit: "Final year", total: 9400, donors: 32 }
   ];
 
   const topClasses = [
-    { className: "Class 12A", total: 34200, donors: 104 },
-    { className: "Class 10B", total: 28900, donors: 88 },
-    { className: "Class 9C", total: 22100, donors: 71 },
-    { className: "Muthawwal A", total: 19500, donors: 60 }
+    { className: "Final year", total: 34200, donors: 104 },
+    { className: "Degree Third year", total: 28900, donors: 88 },
+    { className: "Degree second year", total: 22100, donors: 71 },
+    { className: "Plus two", total: 19500, donors: 60 }
   ];
 
   const todayClasses = [
-    { className: "Class 12A", total: 2400, donors: 9 },
-    { className: "Class 10B", total: 1850, donors: 6 }
+    { className: "Final year", total: 2400, donors: 9 },
+    { className: "Degree Third year", total: 1850, donors: 6 }
   ];
 
   const muthawwalStandings = [
-    { className: "Muthawwal Batch A", total: 48500, donors: 145 },
-    { className: "Muthawwal Batch B", total: 39200, donors: 120 }
+    { className: "Muthawwal Final Year", total: 48500, donors: 145 },
+    { className: "Muthawwal Degree Third Year", total: 39200, donors: 120 }
   ];
 
   const renderLeaderboardItem = (item: VolunteerData, index: number, rankColor: string) => (

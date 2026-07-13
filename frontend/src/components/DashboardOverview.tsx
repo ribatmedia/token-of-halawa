@@ -716,10 +716,12 @@ export default function DashboardOverview() {
       { id: 'developer', name: 'Developer Tools', icon: KeyRound }
     ],
     leader: [
-      { id: 'progress', name: 'Class Progress', icon: TrendingUp },
-      { id: 'campaigners', name: 'Campaigners Stats', icon: Users },
-      { id: 'verify', name: 'Verify Payments', icon: ShieldCheck },
-      { id: 'donors', name: 'Class Donors', icon: UserCheck }
+      { id: 'progress', name: 'Analytics', icon: BarChart2 },
+      { id: 'campaigners', name: 'Campaigners', icon: Users },
+      { id: 'rankings', name: 'Class Rankings', icon: Trophy },
+      { id: 'verify', name: 'Verify Physical', icon: ShieldCheck },
+      { id: 'donors', name: 'Donors Directory', icon: UserCheck },
+      { id: 'v-history', name: 'My Receipts', icon: FileText }
     ],
     volunteer: [
       { id: 'v-overview', name: 'Dashboard', icon: Laptop },

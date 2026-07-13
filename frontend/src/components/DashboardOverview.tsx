@@ -6,8 +6,8 @@ import {
   Heart, Users, CheckCircle, TrendingUp, Calendar, AlertCircle, 
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
-  UserCheck, Trophy, Flame, Award, Star, Settings, ShieldAlert, Laptop,
-  DollarSign, Search, Filter, Share2, CheckSquare, XCircle, Clock
+  UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, Search, 
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -15,7 +15,9 @@ if (typeof window !== 'undefined') {
   Chart.register(...registerables);
 }
 
-// Full multi-role translated resources
+// Fetch base endpoint URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
 const translations = {
   en: {
     title: 'Intelligent Donation Hub',
@@ -58,7 +60,7 @@ const translations = {
     quickActions: 'ദ്രുത പ്രക്രിയകൾ',
     logDonation: 'ഡൊണേഷൻ രേഖപ്പെടുത്തുക',
     registerDonor: 'ദാതാവിനെ ചേർക്കുക',
-    verifyDonations: 'ഡൊണേഷൻ വെരിഫൈ ചെയ്യുക',
+    verifyDonations: 'ഡൊണേഷൻ വെриഫൈ ചെയ്യുക',
     whatsappReceipt: 'വാട്സാപ്പ് ബ്രോഡ്കാസ്റ്റ്',
     topVolunteers: 'മികച്ച വളണ്ടിയർമാർ',
     topClasses: 'മികച്ച ക്ലാസുകൾ',
@@ -144,7 +146,7 @@ const translations = {
 };
 
 export default function DashboardOverview() {
-  const { theme, toggleTheme } = useAuthStore();
+  const { theme, toggleTheme, token, user, organization, setAuth, clearAuth } = useAuthStore();
   const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>('en');
   const [isClient, setIsClient] = useState(false);
   const [showSyncAlert, setShowSyncAlert] = useState(false);
@@ -154,13 +156,41 @@ export default function DashboardOverview() {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>('admin');
   const [activeTab, setActiveTab] = useState<string>('analytics');
 
-  // Input states for Volunteer's Add Donation form
+  // Input states for Auth forms
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authFullName, setAuthFullName] = useState('');
+  const [authOrgName, setAuthOrgName] = useState('');
+  const [authOrgSlug, setAuthOrgSlug] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+
+  // Dynamic Live Database States
+  const [donors, setDonors] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
+  const [systemLogs, setSystemLogs] = useState<any[]>([]);
+  const [todayCollectionTotal, setTodayCollectionTotal] = useState<number>(0);
+  const [monthlyCollectionTotal, setMonthlyCollectionTotal] = useState<number>(0);
+
+  // Input states for Log Donation form
   const [donorIdInput, setDonorIdInput] = useState('');
+  const [campaignIdInput, setCampaignIdInput] = useState('');
   const [donationAmount, setDonationAmount] = useState('');
   const [donationType, setDonationType] = useState('GENERAL');
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [notes, setNotes] = useState('');
   const [formSuccess, setFormSuccess] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  // Input states for Register Donor form
+  const [newDonorName, setNewDonorName] = useState('');
+  const [newDonorEmail, setNewDonorEmail] = useState('');
+  const [newDonorPhone, setNewDonorPhone] = useState('');
+  const [newDonorCategory, setNewDonorCategory] = useState('GENERAL');
+  const [donorFormSuccess, setDonorFormSuccess] = useState(false);
+  const [donorFormError, setDonorFormError] = useState('');
 
   // Search filter query
   const [searchQuery, setSearchQuery] = useState('');
@@ -197,15 +227,203 @@ export default function DashboardOverview() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Fetch Live Database Data when authenticated
+  const fetchDatabaseData = async () => {
+    if (!token) return;
+    try {
+      // 1. Fetch Donors
+      const donorsRes = await fetch(`${API_URL}/donors`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (donorsRes.ok) {
+        const donorsData = await donorsRes.json();
+        setDonors(donorsData);
+      }
+
+      // 2. Fetch Campaigns
+      const campaignsRes = await fetch(`${API_URL}/campaigns`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (campaignsRes.ok) {
+        const campaignsData = await campaignsRes.json();
+        setCampaigns(campaignsData);
+      }
+
+      // 3. Fetch Verification Queue
+      const queueRes = await fetch(`${API_URL}/donations/queue`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (queueRes.ok) {
+        const queueData = await queueRes.json();
+        setVerificationQueue(queueData);
+      }
+
+    } catch (err) {
+      console.error('Failed to load database values:', err);
+    }
+  };
+
   useEffect(() => {
-    if (!isClient) return;
+    if (token) {
+      fetchDatabaseData();
+    }
+  }, [token]);
+
+  // Handle Login & Registration
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+
+    try {
+      if (authMode === 'login') {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: authEmail, password: authPassword })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setAuth(data.accessToken, data.refreshToken, data.user, data.organization);
+        } else {
+          setAuthError(data.message || 'Login failed');
+        }
+      } else {
+        const res = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            organizationName: authOrgName,
+            slug: authOrgSlug,
+            fullName: authFullName,
+            email: authEmail,
+            password: authPassword
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setAuth(data.accessToken, data.refreshToken, data.user, data.organization);
+        } else {
+          setAuthError(data.message || 'Registration failed');
+        }
+      }
+    } catch (err) {
+      setAuthError('Could not connect to API server. Please verify backend is running on port 5000.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Add Donation Entry API call
+  const handleAddDonation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    setFormSuccess(false);
+
+    if (!donorIdInput || !donationAmount) {
+      setFormError('Please fill out donor and amount');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/donations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          donorId: donorIdInput,
+          campaignId: campaignIdInput || undefined,
+          donationType,
+          amount: Number(donationAmount),
+          notes,
+          paymentMethod
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setFormSuccess(true);
+        setDonorIdInput('');
+        setCampaignIdInput('');
+        setDonationAmount('');
+        setNotes('');
+        fetchDatabaseData(); // refresh list
+      } else {
+        setFormError(data.message || 'Failed to log donation entry');
+      }
+    } catch (err) {
+      setFormError('Error logging donation. Verify backend connections.');
+    }
+  };
+
+  // Register new Donor profile API call
+  const handleRegisterDonor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDonorFormError('');
+    setDonorFormSuccess(false);
+
+    if (!newDonorName || !newDonorEmail) {
+      setDonorFormError('Please specify donor name and email');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/donors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: newDonorName,
+          email: newDonorEmail,
+          phone: newDonorPhone || undefined,
+          category: newDonorCategory
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDonorFormSuccess(true);
+        setNewDonorName('');
+        setNewDonorEmail('');
+        setNewDonorPhone('');
+        fetchDatabaseData(); // refresh list
+      } else {
+        setDonorFormError(data.message || 'Failed to create donor');
+      }
+    } catch (err) {
+      setDonorFormError('Error saving donor profile.');
+    }
+  };
+
+  // Approve / Verify a pending receipt entry
+  const handleApproveDonation = async (id: string, action: 'APPROVED' | 'REJECTED') => {
+    try {
+      const res = await fetch(`${API_URL}/donations/${id}/verify`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ action })
+      });
+      if (res.ok) {
+        fetchDatabaseData();
+      }
+    } catch (err) {
+      console.error('Error verifying donation:', err);
+    }
+  };
+
+  // Build Charts
+  useEffect(() => {
+    if (!isClient || !token) return;
     if (activeTab !== 'analytics' && activeTab !== 'progress') return;
 
-    // Define colors depending on dark/light selector
     const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
     const textColor = theme === 'dark' ? '#94a3b8' : '#334155';
 
-    // Build Bar Chart (Donation Growth)
     if (barChartRef.current) {
       if (barChartInst.current) barChartInst.current.destroy();
       barChartInst.current = new Chart(barChartRef.current, {
@@ -228,20 +446,13 @@ export default function DashboardOverview() {
             legend: { display: false }
           },
           scales: {
-            y: { 
-              grid: { color: gridColor },
-              ticks: { color: textColor }
-            },
-            x: { 
-              grid: { display: false },
-              ticks: { color: textColor }
-            }
+            y: { grid: { color: gridColor }, ticks: { color: textColor } },
+            x: { grid: { display: false }, ticks: { color: textColor } }
           }
         }
       });
     }
 
-    // Build Line Chart (Campaign Trend)
     if (lineChartRef.current) {
       if (lineChartInst.current) lineChartInst.current.destroy();
       lineChartInst.current = new Chart(lineChartRef.current, {
@@ -249,7 +460,7 @@ export default function DashboardOverview() {
         data: {
           labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
           datasets: [{
-            label: 'Target Goal Progress',
+            label: 'Campaign Target Goal Progress',
             data: [5000, 12000, 19000, 34000, 48500],
             borderColor: '#d97706',
             backgroundColor: 'rgba(217, 119, 6, 0.15)',
@@ -265,35 +476,136 @@ export default function DashboardOverview() {
             legend: { display: false }
           },
           scales: {
-            y: { 
-              grid: { color: gridColor },
-              ticks: { color: textColor }
-            },
-            x: { 
-              grid: { display: false },
-              ticks: { color: textColor }
-            }
+            y: { grid: { color: gridColor }, ticks: { color: textColor } },
+            x: { grid: { display: false }, ticks: { color: textColor } }
           }
         }
       });
     }
-  }, [isClient, theme, lang, activeTab]);
-
-  const handleAddDonation = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!donorIdInput || !donationAmount) return;
-    setFormSuccess(true);
-    setTimeout(() => {
-      setFormSuccess(false);
-      setDonorIdInput('');
-      setDonationAmount('');
-      setNotes('');
-    }, 3000);
-  };
+  }, [isClient, theme, lang, activeTab, token]);
 
   if (!isClient) return null;
 
   const glassClass = theme === 'dark' ? 'apple-glass text-slate-100' : 'apple-glass-light text-slate-800';
+
+  // Auth Overlay Modal (rendered if token is absent)
+  if (!token) {
+    return (
+      <div className={`min-h-screen relative flex items-center justify-center p-6 transition-colors duration-500 overflow-hidden ${theme === 'dark' ? 'bg-[#030712]' : 'bg-slate-100'}`}>
+        
+        {/* Background Ambient Color Blobs */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 pointer-events-none" />
+        <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-2 pointer-events-none" />
+        
+        <div className={`w-full max-w-md p-8 rounded-3xl border border-white/10 relative z-10 ${glassClass}`}>
+          <div className="text-center mb-8">
+            <div className="inline-flex p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/25 mb-4">
+              <Heart className="w-8 h-8 text-emerald-500 animate-pulse" />
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-white">Token of Halawa</h2>
+            <p className="text-xs opacity-60 mt-1.5">Enterprise Donation Management Portal</p>
+          </div>
+
+          {authError && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-xs font-semibold mb-6 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{authError}</span>
+            </div>
+          )}
+
+          {/* Login/Register switch tabs */}
+          <div className="flex bg-slate-200/50 dark:bg-black/25 p-1 rounded-2xl mb-6">
+            <button 
+              type="button" 
+              onClick={() => { setAuthMode('login'); setAuthError(''); }}
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${authMode === 'login' ? 'bg-white dark:bg-white/10 text-[#0f4c81] dark:text-emerald-400 shadow' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Sign In
+            </button>
+            <button 
+              type="button" 
+              onClick={() => { setAuthMode('register'); setAuthError(''); }}
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${authMode === 'register' ? 'bg-white dark:bg-white/10 text-[#0f4c81] dark:text-emerald-400 shadow' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Register Admin
+            </button>
+          </div>
+
+          <form onSubmit={handleAuthSubmit} className="space-y-4">
+            {authMode === 'register' && (
+              <>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Organization Name</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={authOrgName}
+                    onChange={(e) => setAuthOrgName(e.target.value)}
+                    placeholder="e.g. Markaz Union"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Organization Slug (Unique Identifier)</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={authOrgSlug}
+                    onChange={(e) => setAuthOrgSlug(e.target.value)}
+                    placeholder="e.g. markaz-union"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Full Name</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={authFullName}
+                    onChange={(e) => setAuthFullName(e.target.value)}
+                    placeholder="e.g. Admin Manager"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+              </>
+            )}
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Email Address</label>
+              <input 
+                type="email" 
+                required 
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                placeholder="e.g. info@ihyaussunna.in"
+                className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Password</label>
+              <input 
+                type="password" 
+                required 
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={authLoading}
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-6 py-3 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition text-sm flex justify-center items-center gap-2 mt-6"
+            >
+              {authLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : authMode === 'login' ? 'Access Console' : 'Initialize Hub'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   // Role sidebar items configuration
   const sidebars = {
@@ -303,6 +615,7 @@ export default function DashboardOverview() {
       { id: 'verify', name: 'Verify Physical', icon: ShieldCheck },
       { id: 'campaigners', name: 'Manage Campaigners', icon: Users },
       { id: 'donors', name: 'Donors Directory', icon: UserCheck },
+      { id: 'add-donor', name: 'Add Donor Profile', icon: UserPlus },
       { id: 'rankings', name: 'Class Rankings', icon: Trophy }
     ],
     leader: [
@@ -340,7 +653,7 @@ export default function DashboardOverview() {
             <h1 className="text-xl font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 dark:from-emerald-400 dark:via-teal-400 dark:to-amber-400 bg-clip-text text-transparent leading-none">
               Token of Halawa
             </h1>
-            <p className="text-[8px] font-extrabold text-slate-500 tracking-widest mt-1.5 uppercase">Donation Portal</p>
+            <p className="text-[8px] font-extrabold text-slate-500 tracking-widest mt-1.5 uppercase">{organization?.name || 'Donation Portal'}</p>
           </div>
         </div>
 
@@ -384,9 +697,9 @@ export default function DashboardOverview() {
         <div className="mt-8 pt-6 border-t border-white/10 text-xs opacity-60 flex flex-col gap-2">
           <p className="font-bold flex items-center gap-1">
             <UserCheck className="w-3.5 h-3.5" />
-            <span>ID: TOH-USR-2026</span>
+            <span>User: {user?.fullName || 'Admin User'}</span>
           </p>
-          <a href="/" className="text-red-500 font-bold hover:underline">Logout Console</a>
+          <button onClick={clearAuth} className="text-red-500 font-bold hover:underline text-left">Logout Console</button>
         </div>
       </aside>
 
@@ -449,19 +762,19 @@ export default function DashboardOverview() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.todayCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">$4,850.00</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">${todayCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.monthlyCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">$42,390.00</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">${monthlyCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
-                  <span className="text-xs font-bold opacity-60 uppercase">{t.targetDonors}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">1,500 Profiles</h3>
+                  <span className="text-xs font-bold opacity-60 uppercase">{t.pendingVerification}</span>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{verificationQueue.length} Entries</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
-                  <span className="text-xs font-bold opacity-60 uppercase">{t.totalCollected}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">$98,400.00</h3>
+                  <span className="text-xs font-bold opacity-60 uppercase">{t.activeDonors}</span>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{donors.length} Profiles</h3>
                 </div>
               </div>
 
@@ -473,7 +786,7 @@ export default function DashboardOverview() {
                     <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-4 rounded-full" style={{ width: '82%' }}></div>
                   </div>
                   <div className="flex justify-between text-xs opacity-60">
-                    <span>1,230 Donors Logged</span>
+                    <span>{donors.length} Donors Logged</span>
                     <span>Min Target: 1,500 Donors (82%)</span>
                   </div>
                 </div>
@@ -518,62 +831,41 @@ export default function DashboardOverview() {
                     className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
                   />
                 </div>
-                <div className="flex gap-2">
-                  <button className="flex items-center gap-1.5 bg-slate-200 dark:bg-white/5 border border-slate-300 dark:border-white/10 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <Filter className="w-3.5 h-3.5" /> Filter
-                  </button>
-                  <button className="flex items-center gap-1.5 bg-slate-200 dark:bg-white/5 border border-slate-300 dark:border-white/10 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <Download className="w-3.5 h-3.5" /> Export Ledger
-                  </button>
-                </div>
               </div>
 
               {/* Transactions Ledger Table */}
               <div className="overflow-x-auto flex-1">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                      <th className="py-3 px-4">Receipt ID</th>
-                      <th className="py-3 px-4">Donor Name</th>
-                      <th className="py-3 px-4">Campaign</th>
-                      <th className="py-3 px-4 text-right">Amount</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Method</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
-                      <td className="py-4 px-4 font-mono text-xs">TOH-2026-000104</td>
-                      <td className="py-4 px-4">Moosa Ali</td>
-                      <td className="py-4 px-4">Ramadan Sadaqah</td>
-                      <td className="py-4 px-4 text-right text-emerald-500 font-bold">$150.00</td>
-                      <td className="py-4 px-4">
-                        <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">Verified</span>
-                      </td>
-                      <td className="py-4 px-4 text-xs font-bold">UPI</td>
-                    </tr>
-                    <tr className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
-                      <td className="py-4 px-4 font-mono text-xs">TOH-2026-000105</td>
-                      <td className="py-4 px-4">Amina Begum</td>
-                      <td className="py-4 px-4">Madrasa Fund</td>
-                      <td className="py-4 px-4 text-right text-emerald-500 font-bold">$300.00</td>
-                      <td className="py-4 px-4">
-                        <span className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">Pending</span>
-                      </td>
-                      <td className="py-4 px-4 text-xs font-bold">CASH</td>
-                    </tr>
-                    <tr className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
-                      <td className="py-4 px-4 font-mono text-xs">TOH-2026-000106</td>
-                      <td className="py-4 px-4">Yusuf Khan</td>
-                      <td className="py-4 px-4">Construction</td>
-                      <td className="py-4 px-4 text-right text-emerald-500 font-bold">$1,000.00</td>
-                      <td className="py-4 px-4">
-                        <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">Verified</span>
-                      </td>
-                      <td className="py-4 px-4 text-xs font-bold">BANK TRANSFER</td>
-                    </tr>
-                  </tbody>
-                </table>
+                {verificationQueue.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-bold">No active collections logged in verification queue.</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
+                        <th className="py-3 px-4">Receipt ID</th>
+                        <th className="py-3 px-4">Donor Name</th>
+                        <th className="py-3 px-4">Category</th>
+                        <th className="py-3 px-4 text-right">Amount</th>
+                        <th className="py-3 px-4">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {verificationQueue.map((item) => (
+                        <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
+                          <td className="py-4 px-4 font-mono text-xs truncate max-w-[150px]">{item.id}</td>
+                          <td className="py-4 px-4">{item.donor?.name || 'General Donor'}</td>
+                          <td className="py-4 px-4">{item.donationType}</td>
+                          <td className="py-4 px-4 text-right text-emerald-550 dark:text-emerald-450 font-bold">${item.amount}</td>
+                          <td className="py-4 px-4">
+                            <span className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">{item.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           )}
@@ -588,33 +880,48 @@ export default function DashboardOverview() {
               <p className="text-xs opacity-60 mb-6">Verify and approve physical donation entries logged by campaigners.</p>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                      <th className="py-3 px-4">Campaigner</th>
-                      <th className="py-3 px-4">Donor Name</th>
-                      <th className="py-3 px-4">Amount</th>
-                      <th className="py-3 px-4">Logged Date</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-white/5 text-slate-800 dark:text-slate-300">
-                      <td className="py-4 px-4 font-bold">Ahmad Sulaiman</td>
-                      <td className="py-4 px-4">Amina Begum</td>
-                      <td className="py-4 px-4 text-emerald-500 font-bold">$300.00</td>
-                      <td className="py-4 px-4 text-xs">Today, 22:15</td>
-                      <td className="py-4 px-4 text-right flex justify-end gap-2">
-                        <button className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs px-3 py-1.5 rounded-xl font-bold">
-                          <CheckSquare className="w-3.5 h-3.5" /> Approve
-                        </button>
-                        <button className="flex items-center gap-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-600 dark:text-red-400 text-xs px-3 py-1.5 rounded-xl font-bold">
-                          <XCircle className="w-3.5 h-3.5" /> Reject
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                {verificationQueue.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    <ShieldCheck className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-bold">All collections verified. Queue is empty.</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
+                        <th className="py-3 px-4">ID</th>
+                        <th className="py-3 px-4">Donor Name</th>
+                        <th className="py-3 px-4">Amount</th>
+                        <th className="py-3 px-4">Logged Date</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {verificationQueue.map((item) => (
+                        <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
+                          <td className="py-4 px-4 font-mono text-xs truncate max-w-[120px]">{item.id}</td>
+                          <td className="py-4 px-4 font-bold">{item.donor?.name || 'General Donor'}</td>
+                          <td className="py-4 px-4 text-emerald-500 font-bold">${item.amount}</td>
+                          <td className="py-4 px-4 text-xs">{new Date(item.createdAt).toLocaleDateString()}</td>
+                          <td className="py-4 px-4 text-right flex justify-end gap-2">
+                            <button 
+                              onClick={() => handleApproveDonation(item.id, 'APPROVED')}
+                              className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs px-3 py-1.5 rounded-xl font-bold"
+                            >
+                              <CheckSquare className="w-3.5 h-3.5" /> Approve
+                            </button>
+                            <button 
+                              onClick={() => handleApproveDonation(item.id, 'REJECTED')}
+                              className="flex items-center gap-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-600 dark:text-red-400 text-xs px-3 py-1.5 rounded-xl font-bold"
+                            >
+                              <XCircle className="w-3.5 h-3.5" /> Reject
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           )}
@@ -628,23 +935,33 @@ export default function DashboardOverview() {
               </div>
 
               {formSuccess && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl text-sm font-semibold mb-6 animate-pulse flex items-center gap-2">
+                <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
                   <Check className="w-4 h-4" />
                   <span>Donation entry logged successfully! Pending leader verification.</span>
                 </div>
               )}
 
+              {formError && (
+                <div className="bg-red-500/10 border border-red-500/25 text-red-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
               <form onSubmit={handleAddDonation} className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Donor Profile Unique ID / Name</label>
-                  <input 
-                    type="text" 
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Donor Name (Select Profile)</label>
+                  <select 
                     required 
                     value={donorIdInput}
                     onChange={(e) => setDonorIdInput(e.target.value)}
-                    placeholder="e.g. TOH-D-000104 or Moosa Ali"
-                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                  />
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                  >
+                    <option value="" disabled className="text-slate-800">Select a Donor profile</option>
+                    {donors.map(d => (
+                      <option key={d.id} value={d.id} className="text-slate-800">{d.name} ({d.email})</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -670,23 +987,41 @@ export default function DashboardOverview() {
                       <option value="MONTHLY">Monthly Contribution</option>
                       <option value="ZAKAT">Zakat</option>
                       <option value="SADAQAH">Sadaqah</option>
+                      <option value="EMERGENCY">Emergency Fund</option>
                       <option value="EDUCATION">Education Fund</option>
                     </select>
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Payment Method</label>
-                  <select 
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                  >
-                    <option value="CASH">Cash</option>
-                    <option value="UPI">UPI Payment</option>
-                    <option value="BANK_TRANSFER">Bank Transfer</option>
-                    <option value="CARD">Credit/Debit Card</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Campaign Target</label>
+                    <select 
+                      value={campaignIdInput}
+                      onChange={(e) => setCampaignIdInput(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="" className="text-slate-800">None / General Pool</option>
+                      {campaigns.map(c => (
+                        <option key={c.id} value={c.id} className="text-slate-800">{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Payment Method</label>
+                    <select 
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="CASH">Cash</option>
+                      <option value="UPI">UPI Payment</option>
+                      <option value="BANK_TRANSFER">Bank Transfer</option>
+                      <option value="CARD">Credit/Debit Card</option>
+                      <option value="CHEQUE">Cheque</option>
+                      <option value="WALLET">Wallet</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -710,42 +1045,116 @@ export default function DashboardOverview() {
             </div>
           )}
 
+          {/* VIEW: Add Donor Profile */}
+          {activeTab === 'add-donor' && (
+            <div className={`p-6 md:p-8 rounded-3xl max-w-2xl mx-auto flex-1 flex flex-col ${glassClass}`}>
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-white">Create Donor Profile</h3>
+                <p className="text-xs opacity-60 mt-1">Register a new donor profile in the database directory.</p>
+              </div>
+
+              {donorFormSuccess && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
+                  <Check className="w-4 h-4" />
+                  <span>Donor profile registered successfully!</span>
+                </div>
+              )}
+
+              {donorFormError && (
+                <div className="bg-red-500/10 border border-red-500/25 text-red-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{donorFormError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleRegisterDonor} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Donor Full Name</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={newDonorName}
+                    onChange={(e) => setNewDonorName(e.target.value)}
+                    placeholder="e.g. Yusuf Khan"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Email Address</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={newDonorEmail}
+                    onChange={(e) => setNewDonorEmail(e.target.value)}
+                    placeholder="e.g. yusuf@gmail.com"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={newDonorPhone}
+                    onChange={(e) => setNewDonorPhone(e.target.value)}
+                    placeholder="e.g. +91 90746 80630"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Donor Category</label>
+                  <select 
+                    value={newDonorCategory}
+                    onChange={(e) => setNewDonorCategory(e.target.value)}
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                  >
+                    <option value="GENERAL">General</option>
+                    <option value="MONTHLY">Monthly Plan</option>
+                    <option value="ZAKAT">Zakat Only</option>
+                    <option value="SADAQAH">Sadaqah Sponsor</option>
+                  </select>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-6 py-3.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition text-sm"
+                >
+                  Create Donor Profile
+                </button>
+              </form>
+            </div>
+          )}
+
           {/* VIEW: Manage Campaigners & Campaigner Stats */}
           {activeTab === 'campaigners' && (
             <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5 text-emerald-400" />
-                Campaigner Volunteers list
+                Active Campaigns Stats
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 flex items-center justify-center font-bold">#1</div>
-                    <div>
-                      <h4 className="font-bold">Ahmad Sulaiman</h4>
-                      <p className="text-[10px] text-slate-400">Class 10B · Active</p>
+                {campaigns.length === 0 ? (
+                  <div className="col-span-2 text-center py-12 text-slate-400">
+                    <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-bold">No active campaigns created in the database yet.</p>
+                  </div>
+                ) : (
+                  campaigns.map((c) => (
+                    <div key={c.id} className="p-5 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+                      <div>
+                        <h4 className="font-bold">{c.name}</h4>
+                        <p className="text-[10px] text-slate-400">Goal: ${c.targetAmount}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-emerald-400 font-bold">${c.collectedAmount}</span>
+                        <p className="text-[10px] text-slate-400">Collected</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-emerald-400 font-bold">$12,400</span>
-                    <p className="text-[10px] text-slate-400">42 Donors</p>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-400 to-slate-500 text-slate-950 flex items-center justify-center font-bold">#2</div>
-                    <div>
-                      <h4 className="font-bold">Fathima R.</h4>
-                      <p className="text-[10px] text-slate-400">Class 12A · Active</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-emerald-400 font-bold">$9,850</span>
-                    <p className="text-[10px] text-slate-400">31 Donors</p>
-                  </div>
-                </div>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -758,43 +1167,46 @@ export default function DashboardOverview() {
                   <UserCheck className="w-5 h-5 text-emerald-400" />
                   Donors Registry Directory
                 </h3>
-                <button className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-2xl text-xs font-bold">
+                <button 
+                  onClick={() => setActiveTab('add-donor')}
+                  className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-2xl text-xs font-bold"
+                >
                   <UserPlus className="w-4 h-4" /> Add Donor Profile
                 </button>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                      <th className="py-3 px-4">Unique ID</th>
-                      <th className="py-3 px-4">Name</th>
-                      <th className="py-3 px-4">Phone Number</th>
-                      <th className="py-3 px-4">Plan</th>
-                      <th className="py-3 px-4">Category</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-white/5 text-slate-800 dark:text-slate-300">
-                      <td className="py-4 px-4 font-mono text-xs text-amber-500">TOH-D-000104</td>
-                      <td className="py-4 px-4 font-bold">Moosa Ali</td>
-                      <td className="py-4 px-4">+91 90746 80630</td>
-                      <td className="py-4 px-4">MONTHLY</td>
-                      <td className="py-4 px-4">
-                        <span className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Premium</span>
-                      </td>
-                    </tr>
-                    <tr className="border-b border-white/5 text-slate-800 dark:text-slate-300">
-                      <td className="py-4 px-4 font-mono text-xs text-amber-500">TOH-D-000105</td>
-                      <td className="py-4 px-4 font-bold">Amina Begum</td>
-                      <td className="py-4 px-4">+91 75108 90163</td>
-                      <td className="py-4 px-4">MONTHLY</td>
-                      <td className="py-4 px-4">
-                        <span className="bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-slate-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">General</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                {donors.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-bold">No donor profiles registered in the database yet.</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
+                        <th className="py-3 px-4">Unique ID</th>
+                        <th className="py-3 px-4">Name</th>
+                        <th className="py-3 px-4">Email</th>
+                        <th className="py-3 px-4">Phone Number</th>
+                        <th className="py-3 px-4">Category</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {donors.map((d) => (
+                        <tr key={d.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
+                          <td className="py-4 px-4 font-mono text-xs text-amber-500 truncate max-w-[120px]">{d.id}</td>
+                          <td className="py-4 px-4 font-bold">{d.name}</td>
+                          <td className="py-4 px-4">{d.email}</td>
+                          <td className="py-4 px-4">{d.phone || 'N/A'}</td>
+                          <td className="py-4 px-4">
+                            <span className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">{d.category || 'GENERAL'}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           )}
@@ -808,20 +1220,22 @@ export default function DashboardOverview() {
               </h3>
 
               <div className="space-y-4 max-w-xl">
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-3">
-                    <span className="font-extrabold text-sm text-amber-400">#1</span>
-                    <h5 className="font-bold text-slate-800 dark:text-white">Class 12A</h5>
+                {donors.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">
+                    <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-bold">No ranking statistics available.</p>
                   </div>
-                  <span className="font-black text-emerald-500">$34,200</span>
-                </div>
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-3">
-                    <span className="font-extrabold text-sm text-slate-400">#2</span>
-                    <h5 className="font-bold text-slate-800 dark:text-white">Class 10B</h5>
-                  </div>
-                  <span className="font-black text-emerald-500">$28,900</span>
-                </div>
+                ) : (
+                  donors.slice(0, 5).map((d, index) => (
+                    <div key={d.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
+                      <div className="flex items-center gap-3">
+                        <span className="font-extrabold text-sm text-amber-400">#{index + 1}</span>
+                        <h5 className="font-bold text-slate-800 dark:text-white">{d.name}</h5>
+                      </div>
+                      <span className="font-black text-emerald-500">{d.category}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -862,15 +1276,15 @@ export default function DashboardOverview() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">My Today's Log</span>
-                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">$1,550.00</h3>
+                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">${todayCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">My Active Donors</span>
-                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">42 Profiles</h3>
+                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">{donors.length} Profiles</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
-                  <span className="text-xs font-bold opacity-60 uppercase">Target completion %</span>
-                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">91%</h3>
+                  <span className="text-xs font-bold opacity-60 uppercase">Target Completion</span>
+                  <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2">82%</h3>
                 </div>
               </div>
 
@@ -879,23 +1293,24 @@ export default function DashboardOverview() {
                 <div className={`p-6 rounded-3xl lg:col-span-2 ${glassClass}`}>
                   <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">My Today's Collections Log</h3>
                   <div className="space-y-3">
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center text-xs">
-                      <span className="font-bold text-slate-800 dark:text-white">[22:15] Amina Begum</span>
-                      <span className="font-bold text-emerald-500">$300.00 (Pending Leader Verify)</span>
-                    </div>
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center text-xs">
-                      <span className="font-bold text-slate-800 dark:text-white">[21:10] Rayan Asif</span>
-                      <span className="font-bold text-emerald-500">$1,250.00 (Verified)</span>
-                    </div>
+                    {verificationQueue.slice(0, 3).map((item) => (
+                      <div key={item.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center text-xs">
+                        <span className="font-bold text-slate-800 dark:text-white">{item.donor?.name || 'General Donor'}</span>
+                        <span className="font-bold text-emerald-500">${item.amount} ({item.status})</span>
+                      </div>
+                    ))}
+                    {verificationQueue.length === 0 && (
+                      <p className="text-xs text-slate-400 py-4 text-center">No collections logged today yet.</p>
+                    )}
                   </div>
                 </div>
 
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">Target Completion Progress</h3>
                   <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 mb-2">
-                    <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full" style={{ width: '91%' }}></div>
+                    <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full" style={{ width: '82%' }}></div>
                   </div>
-                  <span className="text-[10px] text-slate-500">Collected $1,550 of $1,700 daily target</span>
+                  <span className="text-[10px] text-slate-500">Collected ${todayCollectionTotal} today</span>
                 </div>
               </div>
             </div>

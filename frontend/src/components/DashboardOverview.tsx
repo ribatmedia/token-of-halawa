@@ -7,7 +7,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -259,6 +259,7 @@ export default function DashboardOverview() {
   // Search filter query
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClassDashboard, setSelectedClassDashboard] = useState<string>('Plus one');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const barChartRef = useRef<HTMLCanvasElement | null>(null);
   const lineChartRef = useRef<HTMLCanvasElement | null>(null);

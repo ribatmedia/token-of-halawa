@@ -6,7 +6,7 @@ import {
   Heart, Users, CheckCircle, TrendingUp, Calendar, AlertCircle, 
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
-  UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, Search, 
+  UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
   Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
@@ -258,6 +258,7 @@ export default function DashboardOverview() {
 
   // Search filter query
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedClassDashboard, setSelectedClassDashboard] = useState<string>('Plus one');
 
   const barChartRef = useRef<HTMLCanvasElement | null>(null);
   const lineChartRef = useRef<HTMLCanvasElement | null>(null);
@@ -542,7 +543,7 @@ export default function DashboardOverview() {
         data: {
           labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
           datasets: [{
-            label: 'Collected ($)',
+            label: 'Collected (₹)',
             data: [14200, 18500, 24000, 31000, 29000, 42000],
             backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.85)' : 'rgba(37, 136, 75, 0.85)',
             borderColor: theme === 'dark' ? 'rgba(16, 185, 129, 1)' : 'rgba(37, 136, 75, 1)',
@@ -704,12 +705,15 @@ export default function DashboardOverview() {
   const sidebars = {
     admin: [
       { id: 'analytics', name: 'Analytics', icon: BarChart2 },
-      { id: 'donations', name: 'Donation Entries', icon: DollarSign },
+      { id: 'donations', name: 'Donation Entries', icon: IndianRupee },
       { id: 'verify', name: 'Verify Physical', icon: ShieldCheck },
       { id: 'campaigners', name: 'Manage Campaigners', icon: Users },
+      { id: 'campaigners-stats', name: 'Campaigners Stats', icon: FileText },
       { id: 'donors', name: 'Donors Directory', icon: UserCheck },
-      { id: 'add-donor', name: 'Add Donor Profile', icon: UserPlus },
-      { id: 'rankings', name: 'Class Rankings', icon: Trophy }
+      { id: 'rankings', name: 'Class Rankings', icon: Trophy },
+      { id: 'class-collections', name: 'Class Collections', icon: IndianRupee },
+      { id: 'class-dashboard', name: 'Class Dashboard', icon: Laptop },
+      { id: 'developer', name: 'Developer Tools', icon: KeyRound }
     ],
     leader: [
       { id: 'progress', name: 'Class Progress', icon: TrendingUp },
@@ -868,11 +872,11 @@ export default function DashboardOverview() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.todayCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">${todayCollectionTotal}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{todayCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.monthlyCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">${monthlyCollectionTotal}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{monthlyCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.pendingVerification}</span>
@@ -943,7 +947,7 @@ export default function DashboardOverview() {
               <div className="overflow-x-auto flex-1">
                 {verificationQueue.length === 0 ? (
                   <div className="text-center py-12 text-slate-400">
-                    <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p className="font-bold">No active collections logged in verification queue.</p>
                   </div>
                 ) : (
@@ -963,7 +967,7 @@ export default function DashboardOverview() {
                           <td className="py-4 px-4 font-mono text-xs truncate max-w-[150px]">{item.id}</td>
                           <td className="py-4 px-4">{item.donor?.name || 'General Donor'}</td>
                           <td className="py-4 px-4">{item.donationType}</td>
-                          <td className="py-4 px-4 text-right text-emerald-550 dark:text-emerald-450 font-bold">${item.amount}</td>
+                          <td className="py-4 px-4 text-right text-emerald-550 dark:text-emerald-450 font-bold">₹{item.amount}</td>
                           <td className="py-4 px-4">
                             <span className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">{item.status}</span>
                           </td>
@@ -1007,7 +1011,7 @@ export default function DashboardOverview() {
                         <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono text-xs truncate max-w-[120px]">{item.id}</td>
                           <td className="py-4 px-4 font-bold">{item.donor?.name || 'General Donor'}</td>
-                          <td className="py-4 px-4 text-emerald-500 font-bold">${item.amount}</td>
+                          <td className="py-4 px-4 text-emerald-500 font-bold">₹{item.amount}</td>
                           <td className="py-4 px-4 text-xs">{new Date(item.createdAt).toLocaleDateString()}</td>
                           <td className="py-4 px-4 text-right flex justify-end gap-2">
                             <button 
@@ -1512,6 +1516,209 @@ export default function DashboardOverview() {
             );
           })()}
 
+          {/* VIEW: Campaigners Stats */}
+          {activeTab === 'campaigners-stats' && (
+            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                    <FileText className="w-5 h-5 text-emerald-400" />
+                    Campaigners Stats
+                  </h3>
+                  <p className="text-xs opacity-60 mt-1">Detailed breakdown of all active campaigners, targets, and collections.</p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto flex-1 max-h-[500px]">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
+                      <th className="py-3 px-4">HN</th>
+                      <th className="py-3 px-4">Name</th>
+                      <th className="py-3 px-4">Class</th>
+                      <th className="py-3 px-4">Collected</th>
+                      <th className="py-3 px-4">Receipts</th>
+                      <th className="py-3 px-4">Target Progress</th>
+                      <th className="py-3 px-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {campaignersList.map((item) => {
+                      const collected = item.hn * 450 + 1200;
+                      const target = 10000;
+                      const percent = Math.min(100, Math.round((collected / target) * 100));
+                      const receiptsCount = (item.hn % 4) + 1;
+                      return (
+                        <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
+                          <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
+                          <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
+                          <td className="py-4 px-4">{item.class}</td>
+                          <td className="py-4 px-4 font-bold text-emerald-500">₹{collected.toLocaleString()}</td>
+                          <td className="py-4 px-4 font-bold">{receiptsCount}</td>
+                          <td className="py-4 px-4 min-w-[150px]">
+                            <div className="flex items-center gap-2">
+                              <div className="w-full bg-slate-200/50 dark:bg-black/30 h-2 rounded-full overflow-hidden">
+                                <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${percent}%` }} />
+                              </div>
+                              <span className="text-[10px] font-bold">{percent}%</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Active</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW: Class Collections Directory */}
+          {activeTab === 'class-collections' && (
+            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                    <IndianRupee className="w-5 h-5 text-emerald-400" />
+                    Class Collections Directory
+                  </h3>
+                  <p className="text-xs opacity-60 mt-1">Consolidated collections, targets, and progress analysis grouped by classes.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map((className) => {
+                  const classCampaigners = campaignersList.filter(c => c.class === className);
+                  const totalCampaigners = classCampaigners.length;
+                  const collected = classCampaigners.reduce((acc, c) => acc + (c.hn * 450 + 1200), 0);
+                  const target = totalCampaigners * 10000;
+                  const percent = Math.min(100, Math.round((collected / target) * 100));
+                  return (
+                    <div key={className} className="p-5 rounded-3xl bg-white/5 border border-white/10 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-extrabold text-slate-800 dark:text-white">{className}</h4>
+                          <p className="text-[10px] opacity-60 mt-0.5">{totalCampaigners} Active Campaigners</p>
+                        </div>
+                        <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Live</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="opacity-50 text-[10px] uppercase font-bold">Collected</span>
+                          <p className="font-extrabold text-emerald-500 mt-0.5">₹{collected.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <span className="opacity-50 text-[10px] uppercase font-bold">Target</span>
+                          <p className="font-bold text-slate-500 dark:text-slate-400 mt-0.5">₹{target.toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span>Target Completion</span>
+                          <span>{percent}%</span>
+                        </div>
+                        <div className="w-full bg-slate-200/50 dark:bg-black/35 h-2 rounded-full overflow-hidden">
+                          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all" style={{ width: `${percent}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* VIEW: Class Dashboard */}
+          {activeTab === 'class-dashboard' && (
+            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                    <Laptop className="w-5 h-5 text-emerald-400" />
+                    Class Dashboard
+                  </h3>
+                  <p className="text-xs opacity-60 mt-1">Specific metrics, performance leaderboards, and progress statistics by class.</p>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold opacity-60">Select Class:</span>
+                  <select 
+                    value={selectedClassDashboard}
+                    onChange={(e) => setSelectedClassDashboard(e.target.value)}
+                    className="bg-white/10 border border-white/10 rounded-2xl px-4 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/40 text-slate-800 dark:text-white"
+                  >
+                    {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(name => (
+                      <option key={name} value={name} className="text-slate-800">{name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {(() => {
+                const classCampaigners = campaignersList.filter(c => c.class === selectedClassDashboard);
+                const totalCampaigners = classCampaigners.length;
+                const collected = classCampaigners.reduce((acc, c) => acc + (c.hn * 450 + 1200), 0);
+                const avgCollected = totalCampaigners > 0 ? Math.round(collected / totalCampaigners) : 0;
+                
+                return (
+                  <div className="space-y-6">
+                    {/* Class mini-stats cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
+                        <span className="text-[10px] font-bold opacity-50 uppercase">Total Class Collection</span>
+                        <h4 className="text-2xl font-black text-emerald-500 mt-1">₹{collected.toLocaleString()}</h4>
+                      </div>
+                      <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
+                        <span className="text-[10px] font-bold opacity-50 uppercase">Active Campaigners</span>
+                        <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">{totalCampaigners} Students</h4>
+                      </div>
+                      <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
+                        <span className="text-[10px] font-bold opacity-50 uppercase">Average Student Collection</span>
+                        <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">₹{avgCollected.toLocaleString()}</h4>
+                      </div>
+                    </div>
+
+                    {/* Class leaderboard table */}
+                    <div>
+                      <h4 className="font-extrabold text-sm uppercase tracking-wider mb-3">Class Performance Leaderboard</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                          <thead>
+                            <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
+                              <th className="py-2.5 px-4">Class Rank</th>
+                              <th className="py-2.5 px-4">HN</th>
+                              <th className="py-2.5 px-4">Name</th>
+                              <th className="py-2.5 px-4">Collected</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[...classCampaigners]
+                              .sort((a, b) => (b.hn * 450 + 1200) - (a.hn * 450 + 1200))
+                              .map((item, index) => {
+                                const amount = item.hn * 450 + 1200;
+                                return (
+                                  <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
+                                    <td className="py-3.5 px-4 font-extrabold text-slate-500">#{index + 1}</td>
+                                    <td className="py-3.5 px-4 font-bold text-emerald-500">#{item.hn}</td>
+                                    <td className="py-3.5 px-4 font-bold uppercase">{item.name}</td>
+                                    <td className="py-3.5 px-4 font-extrabold text-emerald-500">₹{amount.toLocaleString()}</td>
+                                  </tr>
+                                );
+                              })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
           {/* VIEW: Donors Directory */}
           {activeTab === 'donors' && (
             <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
@@ -1605,7 +1812,7 @@ export default function DashboardOverview() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Receipt Notification Template</h4>
-                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of ${{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
+                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of ₹{{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>
@@ -1613,7 +1820,7 @@ export default function DashboardOverview() {
 
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Renewal Reminder Template</h4>
-                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of ${{amount}} is due. Click here to pay: {{pay_url}}."}</p>
+                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of ₹{{amount}} is due. Click here to pay: {{pay_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>

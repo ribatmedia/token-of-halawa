@@ -220,7 +220,7 @@ export default function HomePage() {
       <section className="pt-20 pb-24 text-center px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 mb-4 px-4.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 font-bold text-xs uppercase tracking-wide">
-            <Sparkles className="w-3.5 h-3.5" /> Managed by Ihyaussunna
+            <Sparkles className="w-3.5 h-3.5" /> Managed by RIBAT Students Union
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6">
             Connecting Hearts<br />
@@ -387,7 +387,7 @@ export default function HomePage() {
                 <h2 className="text-2xl font-black tracking-tight text-white">Token of Halawa</h2>
               </div>
               <p className="text-sm text-slate-400 max-w-sm leading-relaxed mb-6">
-                Managed by IHYAUSSUNNA MARKAZ STUDENTS' UNION. Bringing modern tools to community donation drives, tracking budgets, and ensuring transparency.
+                Managed by RIBAT Students Union. Bringing modern tools to community donation drives, tracking budgets, and ensuring transparency.
               </p>
             </div>
             
@@ -406,7 +406,7 @@ export default function HomePage() {
               <ul className="space-y-4 text-sm text-slate-400">
                 <li className="flex items-start gap-3">
                   <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Ihyaussunna Markaz Campus,<br />Kerala, India</span>
+                  <span>Green Valley, Pantheerankavu,<br />Kozhikode-19</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -414,7 +414,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>info@ihyaussunna.in</span>
+                  <span>info@hidayaonline.org</span>
                 </li>
               </ul>
             </div>
@@ -423,7 +423,7 @@ export default function HomePage() {
           
           <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
             <p className="text-center md:text-left mb-4 md:mb-0">
-              &copy; 2026 Ihyaussunna Markaz Students' Union. All rights reserved.
+              &copy; 2026 RIBAT Students Union. All rights reserved.
             </p>
             <p>
               Designed & Developed by <a href="#" className="hover:text-emerald-400 transition font-bold">ahrazdesign.com</a>

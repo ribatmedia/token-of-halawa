@@ -630,7 +630,7 @@ export default function DashboardOverview() {
                 required 
                 value={authEmail}
                 onChange={(e) => setAuthEmail(e.target.value)}
-                placeholder="e.g. info@ihyaussunna.in"
+                placeholder="e.g. info@hidayaonline.org"
                 className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>

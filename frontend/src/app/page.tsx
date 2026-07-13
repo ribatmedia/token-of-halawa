@@ -110,8 +110,8 @@ export default function HomePage() {
         <p className="font-extrabold text-slate-800 text-sm md:text-base uppercase truncate leading-tight">{item.name}</p>
         <p className="text-xs text-slate-500 truncate mt-0.5">{item.unit} · {item.donors} donors</p>
       </div>
-      <div className="font-black text-emerald-650 text-base md:text-lg shrink-0 ml-1">
-        ${item.total}
+      <div className="font-black text-emerald-600 text-base md:text-lg shrink-0 ml-1">
+        ₹{item.total}
       </div>
     </div>
   );
@@ -139,8 +139,8 @@ export default function HomePage() {
           <p className="font-extrabold text-slate-800 text-base md:text-lg uppercase truncate">{cls.className}</p>
           <p className="text-xs text-slate-500 truncate">{cls.donors} donors {isLive ? 'today' : ''}</p>
         </div>
-        <div className="font-black text-emerald-650 text-base md:text-lg shrink-0 ml-2">
-          ${cls.total}
+        <div className="font-black text-emerald-600 text-base md:text-lg shrink-0 ml-2">
+          ₹{cls.total}
         </div>
       </div>
     );

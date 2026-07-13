@@ -22,8 +22,8 @@ interface ClassData {
 
 export default function HomePage() {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [studentView, setStudentView] = useState<'overall' | 'today' | 'expected'>('overall');
-  const [classView, setClassView] = useState<'classes' | 'today' | 'muthawwal'>('classes');
+  const [studentView, setStudentView] = useState<'overall' | 'today'>('overall');
+  const [classView, setClassView] = useState<'classes' | 'today'>('classes');
 
   // Slider slides
   const slides = [
@@ -58,11 +58,11 @@ export default function HomePage() {
   // Leaderboard rotation
   useEffect(() => {
     const studentTimer = setInterval(() => {
-      setStudentView(prev => prev === 'overall' ? 'today' : (prev === 'today' ? 'expected' : 'overall'));
+      setStudentView(prev => prev === 'overall' ? 'today' : 'overall');
     }, 5000);
 
     const classTimer = setInterval(() => {
-      setClassView(prev => prev === 'classes' ? 'today' : (prev === 'today' ? 'muthawwal' : 'classes'));
+      setClassView(prev => prev === 'classes' ? 'today' : 'classes');
     }, 5000);
 
     return () => {
@@ -85,11 +85,7 @@ export default function HomePage() {
     { name: "Muhammed Melattoor", unit: "Degree first year", total: 1200, donors: 4 }
   ];
 
-  const expectedVolunteers = [
-    { name: "Asif ali", unit: "Final year", total: 14200, donors: 48 },
-    { name: "Bishrul wafa", unit: "Final year", total: 11100, donors: 36 },
-    { name: "Muhammed Falil", unit: "Final year", total: 9400, donors: 32 }
-  ];
+
 
   const topClasses = [
     { className: "Final year", total: 34200, donors: 104 },
@@ -103,10 +99,7 @@ export default function HomePage() {
     { className: "Degree Third year", total: 1850, donors: 6 }
   ];
 
-  const muthawwalStandings = [
-    { className: "Muthawwal Final Year", total: 48500, donors: 145 },
-    { className: "Muthawwal Degree Third Year", total: 39200, donors: 120 }
-  ];
+
 
   const renderLeaderboardItem = (item: VolunteerData, index: number, rankColor: string) => (
     <div key={index} className="flex items-center gap-3 md:gap-4 rounded-2xl bg-white/70 border border-slate-200/60 px-4 md:px-5 py-4 backdrop-blur hover:bg-slate-100/50 transition-all duration-300 shadow-sm">
@@ -296,16 +289,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Top Overall Expected */}
-              <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${studentView === 'expected' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-black text-slate-800">Top Expected</h3>
-                  <Award className="w-7 h-7 text-emerald-500" />
-                </div>
-                <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
-                  {expectedVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-emerald-500'))}
-                </div>
-              </div>
+
 
             </div>
 
@@ -340,33 +324,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Muthawwal Standings */}
-              <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${classView === 'muthawwal' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
-                <div className="flex items-center justify-between mb-8 text-left">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Special Batches</span>
-                    <h3 className="text-2xl font-black text-slate-800 mt-0.5">Muthawwal Standing</h3>
-                  </div>
-                  <Award className="w-7 h-7 text-amber-500" />
-                </div>
-                <div className="space-y-5 flex-1 flex flex-col justify-center">
-                  {muthawwalStandings.map((cls, i) => (
-                    <div key={i} className="flex items-center gap-4 rounded-3xl bg-slate-50/90 border border-slate-200/80 px-6 py-6 hover:bg-slate-100/90 transition-all duration-300 shadow-sm">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-extrabold shadow-lg shrink-0">
-                        <Award className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0 text-left">
-                        <p className="font-extrabold text-slate-800 text-lg uppercase truncate">{cls.className}</p>
-                        <p className="text-xs text-slate-500 mt-1">{cls.donors} donors</p>
-                      </div>
-                      <div className="flex flex-col items-end shrink-0">
-                        <span className="text-[9px] uppercase font-bold tracking-wider text-slate-500">Collected</span>
-                        <span className="font-black text-emerald-650 text-xl">${cls.total}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+
 
             </div>
 

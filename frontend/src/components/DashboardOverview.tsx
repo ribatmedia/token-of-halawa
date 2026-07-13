@@ -143,6 +143,8 @@ const translations = {
     liveRankings: 'நேரடி தரவரிசை',
     expectedTotal: 'எதிர்பார்க்கப்படும் மொத்தம்'
   }
+};
+
 const campaignersList = [
   // Final year
   { hn: 1, name: "Asif ali", class: "Final year" },

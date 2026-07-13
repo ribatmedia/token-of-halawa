@@ -728,7 +728,7 @@ export default function DashboardOverview() {
       { id: 'v-add', name: 'Add Donation', icon: PlusCircle },
       { id: 'v-history', name: 'My Collections', icon: Clock },
       { id: 'v-leaderboard', name: 'Leaderboard', icon: Trophy },
-      { id: 'v-messages', name: 'Broadcast Messages', icon: MessageSquare }
+      { id: 'v-messages', name: 'Messages', icon: MessageSquare }
     ]
   };
 

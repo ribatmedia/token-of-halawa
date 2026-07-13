@@ -237,6 +237,17 @@ export default function DashboardOverview() {
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState('');
 
+  // Extended form fields from legacy screen
+  const [donationTab, setDonationTab] = useState<'new' | 'renew'>('new');
+  const [donorNameInput, setDonorNameInput] = useState('');
+  const [donorPhoneInput, setDonorPhoneInput] = useState('');
+  const [donorWhatsAppInput, setDonorWhatsAppInput] = useState('');
+  const [donorAddressInput, setDonorAddressInput] = useState('');
+  const [donationMonthInput, setDonationMonthInput] = useState('July');
+  const [donationDateInput, setDonationDateInput] = useState('2026-07-13');
+  const [amountStatusInput, setAmountStatusInput] = useState<'RECEIVED' | 'PENDING'>('RECEIVED');
+  const [monthPlanInput, setMonthPlanInput] = useState('100/month');
+
   // Input states for Register Donor form
   const [newDonorName, setNewDonorName] = useState('');
   const [newDonorEmail, setNewDonorEmail] = useState('');
@@ -373,12 +384,50 @@ export default function DashboardOverview() {
     setFormError('');
     setFormSuccess(false);
 
-    if (!donorIdInput || !donationAmount) {
-      setFormError('Please fill out donor and amount');
+    if (!donorIdInput && donationTab === 'renew') {
+      setFormError('Please select an existing donor');
+      return;
+    }
+    if (!donorNameInput && donationTab === 'new') {
+      setFormError('Please enter a donor name');
+      return;
+    }
+    if (!donationAmount) {
+      setFormError('Please enter an amount');
       return;
     }
 
     try {
+      let donorId = donorIdInput;
+
+      // Auto-create donor if new tab selected
+      if (donationTab === 'new') {
+        const cleanNameSlug = donorNameInput.toLowerCase().replace(/\s+/g, '');
+        const generatedEmail = donorPhoneInput ? `${donorPhoneInput}@hidayaonline.org` : `${cleanNameSlug}-${Date.now()}@hidayaonline.org`;
+        
+        const donorRes = await fetch(`${API_URL}/donors`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            name: donorNameInput,
+            email: generatedEmail,
+            phone: donorPhoneInput || undefined,
+            category: donationType
+          })
+        });
+        
+        const donorData = await donorRes.json();
+        if (!donorRes.ok) {
+          setFormError(donorData.message || 'Failed to create new donor profile first.');
+          return;
+        }
+        donorId = donorData.id;
+      }
+
+      // Submit the donation entry
       const res = await fetch(`${API_URL}/donations`, {
         method: 'POST',
         headers: {
@@ -386,11 +435,11 @@ export default function DashboardOverview() {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          donorId: donorIdInput,
+          donorId,
           campaignId: campaignIdInput || undefined,
           donationType,
           amount: Number(donationAmount),
-          notes,
+          notes: notes || `Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
           paymentMethod
         })
       });
@@ -398,7 +447,10 @@ export default function DashboardOverview() {
       if (res.ok) {
         setFormSuccess(true);
         setDonorIdInput('');
-        setCampaignIdInput('');
+        setDonorNameInput('');
+        setDonorPhoneInput('');
+        setDonorWhatsAppInput('');
+        setDonorAddressInput('');
         setDonationAmount('');
         setNotes('');
         fetchDatabaseData(); // refresh list
@@ -995,118 +1047,317 @@ export default function DashboardOverview() {
           {/* VIEW: Add Donation Form */}
           {activeTab === 'v-add' && (
             <div className={`p-6 md:p-8 rounded-3xl max-w-2xl mx-auto flex-1 flex flex-col ${glassClass}`}>
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-white">Log Donation Entry</h3>
-                <p className="text-xs opacity-60 mt-1">Log a new contribution. The workflow will verify this transaction dynamically.</p>
+              
+              {/* Header */}
+              <div className="flex items-center gap-3.5 mb-6 border-b border-slate-300/40 dark:border-white/5 pb-4">
+                <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-md">
+                  <FileText className="w-6 h-6 text-emerald-500" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-white">Upload Donation Data</h3>
+                  <p className="text-xs opacity-60 mt-0.5">Generate an instant premium receipt for the donor.</p>
+                </div>
+              </div>
+
+              {/* Collections target grid counters at the top */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="p-3.5 rounded-2xl bg-slate-200/50 dark:bg-black/10 border border-slate-300 dark:border-white/5 text-center">
+                  <span className="text-[9px] uppercase font-bold opacity-60 block">New Collection</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{todayCollectionTotal || 0}.00</span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50/5 dark:bg-emerald-500/5 border border-emerald-500/15 text-center">
+                  <span className="text-[9px] uppercase font-bold opacity-60 block">Renew Collection</span>
+                  <span className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-1 block">₹0.00</span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-slate-200/50 dark:bg-black/10 border border-slate-300 dark:border-white/5 text-center">
+                  <span className="text-[9px] uppercase font-bold opacity-60 block">Total Collection</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{todayCollectionTotal || 0}.00</span>
+                </div>
+              </div>
+
+              {/* Donation Toggle Buttons (New Donor vs Renew) */}
+              <div className="grid grid-cols-2 gap-3 mb-6 p-1 bg-slate-200/50 dark:bg-black/20 rounded-2xl border border-slate-350 dark:border-white/5">
+                <button 
+                  type="button" 
+                  onClick={() => setDonationTab('new')}
+                  className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    donationTab === 'new' 
+                      ? 'bg-emerald-500 text-slate-950 shadow' 
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" /> New Donor
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setDonationTab('renew')}
+                  className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    donationTab === 'renew' 
+                      ? 'bg-emerald-500 text-slate-950 shadow' 
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                  }`}
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Renew (Existing)
+                </button>
               </div>
 
               {formSuccess && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
+                <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
                   <Check className="w-4 h-4" />
                   <span>Donation entry logged successfully! Pending leader verification.</span>
                 </div>
               )}
 
               {formError && (
-                <div className="bg-red-500/10 border border-red-500/25 text-red-400 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
+                <div className="bg-red-500/10 border border-red-500/25 text-red-500 p-4 rounded-2xl text-sm font-semibold mb-6 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   <span>{formError}</span>
                 </div>
               )}
 
-              <form onSubmit={handleAddDonation} className="space-y-4">
+              <form onSubmit={handleAddDonation} className="space-y-5">
+                {/* Received Amount Input field */}
                 <div>
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Donor Name (Select Profile)</label>
-                  <select 
-                    required 
-                    value={donorIdInput}
-                    onChange={(e) => setDonorIdInput(e.target.value)}
-                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                  >
-                    <option value="" disabled className="text-slate-800">Select a Donor profile</option>
-                    {donors.map(d => (
-                      <option key={d.id} value={d.id} className="text-slate-800">{d.name} ({d.email})</option>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Received Amount (₹) *</label>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">ലഭിച്ച തുക നൽകുക</span>
+                  </div>
+                  
+                  {/* Amount presets */}
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {[100, 200, 313].map((val) => (
+                      <button 
+                        key={val} 
+                        type="button" 
+                        onClick={() => setDonationAmount(val.toString())} 
+                        className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all ${
+                          donationAmount === val.toString() 
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-500' 
+                            : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-200/50'
+                        }`}
+                      >
+                        ₹{val}
+                      </button>
                     ))}
-                  </select>
-                </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setDonationAmount('')} 
+                      className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all ${
+                        !['100', '200', '313'].includes(donationAmount) && donationAmount !== '' 
+                          ? 'bg-emerald-500 text-slate-950 border-emerald-500' 
+                          : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      Custom
+                    </button>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Amount ($)</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-3 text-slate-500 font-bold">₹</span>
                     <input 
                       type="number" 
                       required 
                       value={donationAmount}
                       onChange={(e) => setDonationAmount(e.target.value)}
-                      placeholder="e.g. 150"
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      placeholder="0.00"
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-8 pr-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
                     />
                   </div>
+                </div>
+
+                {/* NEW DONOR FIELDS */}
+                {donationTab === 'new' && (
+                  <div className="space-y-4 pt-2 border-t border-slate-300/40 dark:border-white/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
+                          <span className="text-[9px] text-slate-400 block">വരിക്കാരന്റെ പേര്</span>
+                        </div>
+                        <input 
+                          type="text" 
+                          required={donationTab === 'new'} 
+                          value={donorNameInput}
+                          onChange={(e) => setDonorNameInput(e.target.value)}
+                          placeholder="Full name of donor"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        />
+                      </div>
+                      
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
+                          <span className="text-[9px] text-slate-400 block">ഫോൺ നമ്പർ</span>
+                        </div>
+                        <input 
+                          type="text" 
+                          required={donationTab === 'new'} 
+                          value={donorPhoneInput}
+                          onChange={(e) => setDonorPhoneInput(e.target.value)}
+                          placeholder="10-digit number"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">WhatsApp Number *</label>
+                          <span className="text-[9px] text-slate-400 block">രസീത് അയക്കാനുള്ള നമ്പർ</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            required={donationTab === 'new'} 
+                            value={donorWhatsAppInput}
+                            onChange={(e) => setDonorWhatsAppInput(e.target.value)}
+                            placeholder="For sending receipt"
+                            className="flex-1 bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                          />
+                          <button 
+                            type="button" 
+                            onClick={() => setDonorWhatsAppInput(donorPhoneInput)}
+                            className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs px-3 py-2.5 rounded-2xl font-bold hover:bg-emerald-500/20 transition whitespace-nowrap"
+                          >
+                            Same as phone
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Address / Place *</label>
+                          <span className="text-[9px] text-slate-400 block">വരിക്കാരന്റെ സ്ഥലം</span>
+                        </div>
+                        <input 
+                          type="text" 
+                          required={donationTab === 'new'} 
+                          value={donorAddressInput}
+                          onChange={(e) => setDonorAddressInput(e.target.value)}
+                          placeholder="City or Town"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* RENEW DONOR FIELDS */}
+                {donationTab === 'renew' && (
+                  <div className="space-y-4 pt-2 border-t border-slate-300/40 dark:border-white/5">
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Select Profile) *</label>
+                        <span className="text-[9px] text-slate-400 block">വരിക്കാരനെ തിരഞ്ഞെടുക്കുക</span>
+                      </div>
+                      <select 
+                        required={donationTab === 'renew'} 
+                        value={donorIdInput}
+                        onChange={(e) => setDonorIdInput(e.target.value)}
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
+                      >
+                        <option value="" disabled className="text-slate-800">Select a Donor profile</option>
+                        {donors.map(d => (
+                          <option key={d.id} value={d.id} className="text-slate-850">{d.name} ({d.phone || 'No phone'})</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* Month & Date selector row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Donation Category</label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">For Month *</label>
+                      <span className="text-[9px] text-slate-400 block">ഏത് മാസത്തെ വരിസംഖ്യ</span>
+                    </div>
                     <select 
-                      value={donationType}
-                      onChange={(e) => setDonationType(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                      value={donationMonthInput}
+                      onChange={(e) => setDonationMonthInput(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
                     >
-                      <option value="GENERAL">General</option>
-                      <option value="MONTHLY">Monthly Contribution</option>
-                      <option value="ZAKAT">Zakat</option>
-                      <option value="SADAQAH">Sadaqah</option>
-                      <option value="EMERGENCY">Emergency Fund</option>
-                      <option value="EDUCATION">Education Fund</option>
+                      <option value="July">July</option>
+                      <option value="August">August</option>
+                      <option value="September">September</option>
+                      <option value="October">October</option>
+                      <option value="One Time">One Time Payment</option>
                     </select>
+                    <span className="text-[9px] text-slate-400 mt-1 block">പ്രതിമാസ വരിസംഖ്യയായി നൽകാൻ താല്പര്യമില്ലാത്തവർക്ക് One Time Payment തിരഞ്ഞെടുക്കാം.</span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Date</label>
+                    <input 
+                      type="date" 
+                      required 
+                      value={donationDateInput}
+                      onChange={(e) => setDonationDateInput(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Campaign Target</label>
-                    <select 
-                      value={campaignIdInput}
-                      onChange={(e) => setCampaignIdInput(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                    >
-                      <option value="" className="text-slate-800">None / General Pool</option>
-                      {campaigns.map(c => (
-                        <option key={c.id} value={c.id} className="text-slate-800">{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Payment Method</label>
-                    <select 
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                    >
-                      <option value="CASH">Cash</option>
-                      <option value="UPI">UPI Payment</option>
-                      <option value="BANK_TRANSFER">Bank Transfer</option>
-                      <option value="CARD">Credit/Debit Card</option>
-                      <option value="CHEQUE">Cheque</option>
-                      <option value="WALLET">Wallet</option>
-                    </select>
-                  </div>
-                </div>
-
+                {/* Amount Status Toggle (Received vs Pending) */}
                 <div>
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Notes / Reminders</label>
-                  <textarea 
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Optional details or physical receipt reference number..."
-                    rows={3}
-                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                  />
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Amount Status *</label>
+                    <span className="text-[9px] text-slate-400 block">തുക കൈപ്പറ്റിയോ എന്ന് രേഖപ്പെടുത്തുക</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button 
+                      type="button"
+                      onClick={() => setAmountStatusInput('RECEIVED')}
+                      className={`flex items-center justify-center gap-2 p-3.5 border rounded-2xl text-xs font-bold transition-all ${
+                        amountStatusInput === 'RECEIVED' 
+                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400' 
+                          : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <input type="radio" checked={amountStatusInput === 'RECEIVED'} readOnly className="accent-emerald-500" />
+                      Received (In Hand)
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setAmountStatusInput('PENDING')}
+                      className={`flex items-center justify-center gap-2 p-3.5 border rounded-2xl text-xs font-bold transition-all ${
+                        amountStatusInput === 'PENDING' 
+                          ? 'bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400' 
+                          : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <input type="radio" checked={amountStatusInput === 'PENDING'} readOnly className="accent-amber-500" />
+                      Amount Pending (Not Given)
+                    </button>
+                  </div>
                 </div>
 
-                <button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-6 py-3.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition text-sm"
-                >
-                  Log Collection Entry
-                </button>
+                {/* Donor Month Plan Dropdown */}
+                {donationTab === 'new' && (
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Donor Month Plan *</label>
+                    <select 
+                      value={monthPlanInput}
+                      onChange={(e) => setMonthPlanInput(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="100/month">100/month</option>
+                      <option value="200/month">200/month</option>
+                      <option value="313/month">313/month</option>
+                      <option value="500/month">500/month</option>
+                    </select>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t border-slate-300/40 dark:border-white/5 flex justify-end">
+                  <button 
+                    type="submit" 
+                    className="bg-emerald-500 text-slate-950 px-8 py-3.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 active:scale-[0.98] hover:scale-[1.02] transition text-sm flex items-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" /> Generate Receipt
+                  </button>
+                </div>
               </form>
             </div>
           )}

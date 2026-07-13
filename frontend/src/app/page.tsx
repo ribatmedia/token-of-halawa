@@ -174,7 +174,7 @@ export default function HomePage() {
               <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 font-bold text-sm transition">
                 Live Stats
               </Link>
-              <Link href="/dashboard" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-5 py-2.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2 text-sm">
+              <Link href="/dashboard" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2 text-sm">
                 <LayoutDashboard className="w-4 h-4" /> Portal Login
               </Link>
             </div>
@@ -223,7 +223,7 @@ export default function HomePage() {
             Welcome to the Token of Halawa donation intelligence engine. Track live collections, verify receipts, and empower campaigns.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link href="/dashboard" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-base px-8 py-4 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2">
+            <Link href="/dashboard" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-base px-8 py-4 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2">
               Get Started <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="#leaderboard" className="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold text-base transition flex items-center justify-center gap-2 shadow-sm">

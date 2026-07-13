@@ -31,7 +31,7 @@ const translations = {
     registerDonor: 'Register Donor',
     verifyDonations: 'Verify Collections',
     whatsappReceipt: 'WhatsApp Broadcast',
-    topVolunteers: 'Top Volunteers Leaderboard',
+    topVolunteers: 'Top Campaigners Leaderboard',
     topClasses: 'Top Classes',
     recentActivity: 'Recent Security & System Logs',
     heatmap: 'Weekly Donation Velocity Heatmap',
@@ -62,7 +62,7 @@ const translations = {
     registerDonor: 'ദാതാവിനെ ചേർക്കുക',
     verifyDonations: 'ഡൊണേഷൻ വെриഫൈ ചെയ്യുക',
     whatsappReceipt: 'വാട്സാപ്പ് ബ്രോഡ്കാസ്റ്റ്',
-    topVolunteers: 'മികച്ച വളണ്ടിയർമാർ',
+    topVolunteers: 'മികച്ച ക്യാമ്പയിനർമാർ',
     topClasses: 'മികച്ച ക്ലാസുകൾ',
     recentActivity: 'സമീപകാല പ്രവർത്തനങ്ങൾ',
     heatmap: 'ഡൊണേഷൻ വെലോസിറ്റി ഹീറ്റ്മാപ്പ്',
@@ -93,7 +93,7 @@ const translations = {
     registerDonor: 'تسجيل متبرع',
     verifyDonations: 'التحقق من التبرعات',
     whatsappReceipt: 'بث واتساب',
-    topVolunteers: 'لوحة متطوعي الصدارة',
+    topVolunteers: 'قائمة المتصدرين من المنظمين',
     topClasses: 'أفضل الفصول الدراسية',
     recentActivity: 'سجلات النشاط الحديثة',
     heatmap: 'خريطة سرعة التبرع الأسبوعية',
@@ -124,7 +124,7 @@ const translations = {
     registerDonor: 'நன்கொடையாளர் பதிவு',
     verifyDonations: 'நன்கொடைகளை சரிபார்',
     whatsappReceipt: 'வாட்ஸ்அப் ஒளிபரப்பு',
-    topVolunteers: 'முன்னணி தன்னார்வலர்கள்',
+    topVolunteers: 'முன்னணி பிரச்சாரகர்கள்',
     topClasses: 'முன்னணி வகுப்புகள்',
     recentActivity: 'சமீபத்திய நடவடிக்கைகள்',
     heatmap: 'வாராந்திர நன்கொடை வெப்ப வரைபடம்',
@@ -760,7 +760,7 @@ export default function DashboardOverview() {
           >
             <option value="admin" className="text-slate-800">Super Administrator</option>
             <option value="leader" className="text-slate-800">Class Leader / Manager</option>
-            <option value="volunteer" className="text-slate-800">Volunteer / Campaigner</option>
+            <option value="volunteer" className="text-slate-800">Campaigner</option>
           </select>
         </div>
 
@@ -770,7 +770,7 @@ export default function DashboardOverview() {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-2xl shadow-lg mb-3">
               {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'VO'}
             </div>
-            <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Volunteer Campaigner'}</h3>
+            <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} · ID: {(user as any)?.hn || '001'}</p>
             <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
               Approved Active
@@ -1446,9 +1446,9 @@ export default function DashboardOverview() {
                   <div>
                     <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                       <Users className="w-5 h-5 text-emerald-400" />
-                      Campaigner Volunteers Directory
+                      Campaigners Directory
                     </h3>
-                    <p className="text-xs opacity-60 mt-1">Full list of registered volunteers, classes, and Hall Numbers (HN).</p>
+                    <p className="text-xs opacity-60 mt-1">Full list of registered campaigners, classes, and Hall Numbers (HN).</p>
                   </div>
                 </div>
 
@@ -1499,7 +1499,7 @@ export default function DashboardOverview() {
                           <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
                           <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
                           <td className="py-4 px-4">{item.class}</td>
-                          <td className="py-4 px-4 text-xs font-bold text-slate-500 uppercase">Volunteer</td>
+                          <td className="py-4 px-4 text-xs font-bold text-slate-500 uppercase">Campaigner</td>
                           <td className="py-4 px-4">
                             <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Active</span>
                           </td>

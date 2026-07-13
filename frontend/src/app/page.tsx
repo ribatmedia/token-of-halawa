@@ -126,7 +126,7 @@ export default function HomePage() {
   const renderClassItem = (cls: ClassData, index: number, isLive = false) => {
     const medalColors = [
       'from-amber-400 to-yellow-500 shadow-yellow-500/20',
-      'from-slate-350 to-slate-500 shadow-slate-500/20',
+      'from-slate-400 to-slate-500 shadow-slate-500/20',
       'from-amber-700 to-amber-900 shadow-amber-900/20'
     ];
 

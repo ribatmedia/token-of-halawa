@@ -356,7 +356,7 @@ export default function DashboardOverview() {
         if (res.ok) {
           setAuth(data.accessToken, data.refreshToken, data.user, data.organization);
         } else {
-          setAuthError(data.message || 'Login failed');
+          setAuthError(data.error || data.message || 'Login failed');
         }
       } else {
         const res = await fetch(`${API_URL}/auth/register`, {
@@ -374,7 +374,7 @@ export default function DashboardOverview() {
         if (res.ok) {
           setAuth(data.accessToken, data.refreshToken, data.user, data.organization);
         } else {
-          setAuthError(data.message || 'Registration failed');
+          setAuthError(data.error || data.message || 'Registration failed');
         }
       }
     } catch (err) {
@@ -427,10 +427,10 @@ export default function DashboardOverview() {
         
         const donorData = await donorRes.json();
         if (!donorRes.ok) {
-          setFormError(donorData.message || 'Failed to create new donor profile first.');
+          setFormError(donorData.error || donorData.message || 'Failed to create new donor profile first.');
           return;
         }
-        donorId = donorData.id;
+        donorId = donorData.donor?.id || donorData.id;
       }
 
       // Submit the donation entry
@@ -461,7 +461,7 @@ export default function DashboardOverview() {
         setNotes('');
         fetchDatabaseData(); // refresh list
       } else {
-        setFormError(data.message || 'Failed to log donation entry');
+        setFormError(data.error || data.message || 'Failed to log donation entry');
       }
     } catch (err) {
       setFormError('Error logging donation. Verify backend connections.');
@@ -501,7 +501,7 @@ export default function DashboardOverview() {
         setNewDonorPhone('');
         fetchDatabaseData(); // refresh list
       } else {
-        setDonorFormError(data.message || 'Failed to create donor');
+        setDonorFormError(data.error || data.message || 'Failed to create donor');
       }
     } catch (err) {
       setDonorFormError('Error saving donor profile.');

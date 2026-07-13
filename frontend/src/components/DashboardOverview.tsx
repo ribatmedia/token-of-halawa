@@ -285,6 +285,12 @@ export default function DashboardOverview() {
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('register') === 'true') {
+        setAuthMode('register');
+      }
+    }
     const timer = setTimeout(() => {
       setShowSyncAlert(true);
     }, 2000);
@@ -608,7 +614,7 @@ export default function DashboardOverview() {
               <Heart className="w-8 h-8 text-emerald-500 animate-pulse" />
             </div>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-white">Token of Halawa</h2>
-            <p className="text-xs opacity-60 mt-1.5">Enterprise Donation Management Portal</p>
+            <p className="text-xs opacity-60 mt-1.5">{authMode === 'register' ? 'Initialize Hub' : 'Campaigner Portal'}</p>
           </div>
 
           {authError && (
@@ -617,24 +623,6 @@ export default function DashboardOverview() {
               <span>{authError}</span>
             </div>
           )}
-
-          {/* Login/Register switch tabs */}
-          <div className="flex bg-slate-200/50 dark:bg-black/25 p-1 rounded-2xl mb-6">
-            <button 
-              type="button" 
-              onClick={() => { setAuthMode('login'); setAuthError(''); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${authMode === 'login' ? 'bg-white dark:bg-white/10 text-[#0f4c81] dark:text-emerald-400 shadow' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              Sign In
-            </button>
-            <button 
-              type="button" 
-              onClick={() => { setAuthMode('register'); setAuthError(''); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${authMode === 'register' ? 'bg-white dark:bg-white/10 text-[#0f4c81] dark:text-emerald-400 shadow' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              Register Admin
-            </button>
-          </div>
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             {authMode === 'register' && (

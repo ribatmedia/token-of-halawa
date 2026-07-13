@@ -836,7 +836,14 @@ export default function DashboardOverview() {
               return (
                 <button
                   key={item.id}
-                  onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
+                  onClick={() => { 
+                    if (item.id === 'developer') {
+                      window.location.href = '/developer';
+                    } else {
+                      setActiveTab(item.id); 
+                      setMobileMenuOpen(false); 
+                    }
+                  }}
                   className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl cursor-pointer text-left transition-all duration-200 ${
                     isActive 
                       ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold shadow-sm' 
@@ -1900,118 +1907,158 @@ export default function DashboardOverview() {
           )}
 
           {/* Fallback Viewport for Volunteer Overview dashboard */}
-          {activeTab === 'v-overview' && (
-            <div className="space-y-6 flex-1 flex flex-col">
-              
-              {/* Message from Admin banner */}
-              <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-slate-800 dark:text-slate-200 gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Bell className="w-4 h-4" /></div>
-                  <div>
-                    <span className="font-bold block">Message from Admin <span className="opacity-50 text-[10px] font-normal ml-2">13 Jul 2026, 04:30 PM</span></span>
-                    <span className="opacity-80">Campaign tracking active. Ensure all physical receipt uploads are verified.</span>
-                  </div>
-                </div>
-                <button className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">Mark as Read</button>
-              </div>
+          {activeTab === 'v-overview' && (() => {
+            // 1. Calculate stats for logged-in campaigner
+            const myCollections = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${user?.fullName || 'Campaigner'}`));
+            const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount), 0);
+            
+            // Expected collections of donors registered by this campaigner (defaults to a sensible base target like ₹5,000)
+            const myExpectedTotal = 5000; 
+            const myNotReceivedTotal = Math.max(0, myExpectedTotal - myCollectedTotal);
+            const myDonorsCount = new Set(myCollections.map(q => q.donorId)).size;
 
-              {/* Expected collection banner */}
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-650 text-white shadow-xl relative overflow-hidden">
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                  <div>
-                    <span className="text-xs uppercase font-extrabold tracking-wider opacity-75">Total Expected Collection</span>
-                    <h2 className="text-4xl font-black mt-2">₹15,000.00</h2>
-                  </div>
-                  <div className="flex gap-8 text-right">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold opacity-75 block">Collected</span>
-                      <span className="text-xl font-black text-emerald-300">₹{todayCollectionTotal || 0}.00</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase font-bold opacity-75 block">Not Received</span>
-                      <span className="text-xl font-black text-amber-300">₹{15000 - (todayCollectionTotal || 0)}.00</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            // 2. Calculate ranks dynamically
+            // Rank list of all campaigners sorted by their total collection
+            const allCampaignerStats = campaignersList.map(c => {
+              const total = verificationQueue
+                .filter(q => q.notes?.includes(`Logged by: ${c.name}`))
+                .reduce((acc, q) => acc + Number(q.amount), 0);
+              return { name: c.name, class: c.class, total };
+            }).sort((a, b) => b.total - a.total);
 
-              {/* personal stats metrics */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                  <span className="text-xs font-bold opacity-60 uppercase">Total Collected</span>
-                  <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{todayCollectionTotal || 0}.00</h3>
-                </div>
+            // Find index of current campaigner in overall list
+            const overallRankIndex = allCampaignerStats.findIndex(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
+            const overallRank = overallRankIndex !== -1 ? overallRankIndex + 1 : 1;
+
+            // Filter for current campaigner's class
+            const myClass = (user as any)?.class || 'Plus one';
+            const classCampaignerStats = allCampaignerStats.filter(c => c.class === myClass);
+            const classRankIndex = classCampaignerStats.findIndex(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
+            const classRank = classRankIndex !== -1 ? classRankIndex + 1 : 1;
+
+            // 3. Leading Collectors (Top 3 Campaigners overall)
+            const leadingCollectors = allCampaignerStats.slice(0, 3).map((item, i) => {
+              const count = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
+              return { ...item, donorsCount: count };
+            });
+
+            // 4. Top Batches (Top 3 Classes)
+            const topBatches = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
+              .map(className => {
+                const total = verificationQueue
+                  .filter(q => q.notes?.includes(`Class: ${className}`))
+                  .reduce((acc, q) => acc + Number(q.amount), 0);
+                const donorsCount = campaignersList.filter(c => c.class === className).length;
+                return { className, total, donorsCount };
+              })
+              .sort((a, b) => b.total - a.total)
+              .slice(0, 3);
+
+            return (
+              <div className="space-y-6 flex-1 flex flex-col">
                 
-                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold opacity-60 uppercase">Total Donors</span>
-                    <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-2.5 py-0.5 rounded-full">2 to go</span>
+                {/* Message from Admin banner */}
+                <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-slate-800 dark:text-slate-200 gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Bell className="w-4 h-4" /></div>
+                    <div>
+                      <span className="font-bold block">Message from Admin <span className="opacity-50 text-[10px] font-normal ml-2">13 Jul 2026, 04:30 PM</span></span>
+                      <span className="opacity-80">Campaign tracking active. Ensure all physical receipt uploads are verified.</span>
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">
-                    {donors.length} <span className="text-xs font-medium opacity-50">/ 2 minimum</span>
-                  </h3>
+                  <button className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">Mark as Read</button>
                 </div>
 
-                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                  <span className="text-xs font-bold opacity-60 uppercase">Overall Rank</span>
-                  <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">#1051</h3>
-                </div>
-
-                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                  <span className="text-xs font-bold opacity-60 uppercase">Class Rank</span>
-                  <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">1</h3>
-                </div>
-              </div>
-
-              {/* Bottom ranking boards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
-                  <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-amber-500" />
-                    Leading Collectors (Top Students)
-                  </h4>
-                  <div className="space-y-3">
-                    {[
-                      { name: "Muhammed Irshad", class: "S3", donors: 56, total: 46600 },
-                      { name: "Shahal K", class: "S2", donors: 42, total: 34200 },
-                      { name: "Asim Bin Anas", class: "S1", donors: 38, total: 29800 }
-                    ].map((item, i) => (
-                      <div key={i} className="p-4 rounded-xl bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/5 flex justify-between items-center text-xs">
-                        <div>
-                          <p className="font-extrabold uppercase text-slate-850 dark:text-white">{item.name}</p>
-                          <p className="opacity-60 text-[10px] mt-0.5">{item.class} · {item.donors} donors</p>
-                        </div>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.total.toLocaleString()}</span>
+                {/* Expected collection banner */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-650 text-white shadow-xl relative overflow-hidden">
+                  <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                      <span className="text-xs uppercase font-extrabold tracking-wider opacity-75">Total Expected Collection</span>
+                      <h2 className="text-4xl font-black mt-2">₹{myExpectedTotal.toLocaleString()}.00</h2>
+                    </div>
+                    <div className="flex gap-8 text-right">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold opacity-75 block">Collected</span>
+                        <span className="text-xl font-black text-emerald-300">₹{myCollectedTotal.toLocaleString()}.00</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
-                  <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                    <Star className="w-4 h-4 text-indigo-500" />
-                    Live Activity (Top Batches)
-                  </h4>
-                  <div className="space-y-3">
-                    {[
-                      { className: "Final year", total: 34200, donors: 104 },
-                      { className: "Degree Third year", total: 28900, donors: 88 },
-                      { className: "Degree second year", total: 22100, donors: 71 }
-                    ].map((item, i) => (
-                      <div key={i} className="p-4 rounded-xl bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/5 flex justify-between items-center text-xs">
-                        <div>
-                          <p className="font-extrabold uppercase text-slate-850 dark:text-white">{item.className}</p>
-                          <p className="opacity-60 text-[10px] mt-0.5">{item.donors} donors</p>
-                        </div>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.total.toLocaleString()}</span>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold opacity-75 block">Not Received</span>
+                        <span className="text-xl font-black text-amber-300">₹{myNotReceivedTotal.toLocaleString()}.00</span>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-            </div>
-          )}
+                {/* personal stats metrics */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Total Collected</span>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{myCollectedTotal.toLocaleString()}.00</h3>
+                  </div>
+                  
+                  <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold opacity-60 uppercase">Total Donors</span>
+                      <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-2.5 py-0.5 rounded-full">Active</span>
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">
+                      {myDonorsCount} <span className="text-xs font-medium opacity-50">profiles</span>
+                    </h3>
+                  </div>
+
+                  <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Overall Rank</span>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">#{overallRank}</h3>
+                  </div>
+
+                  <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Class Rank</span>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">#{classRank}</h3>
+                  </div>
+                </div>
+
+                {/* Bottom ranking boards */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
+                    <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                      <Trophy className="w-4 h-4 text-amber-500" />
+                      Leading Collectors (Top Students)
+                    </h4>
+                    <div className="space-y-3">
+                      {leadingCollectors.map((item, i) => (
+                        <div key={i} className="p-4 rounded-xl bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/5 flex justify-between items-center text-xs">
+                          <div>
+                            <p className="font-extrabold uppercase text-slate-850 dark:text-white">{item.name}</p>
+                            <p className="opacity-60 text-[10px] mt-0.5">{item.class} · {item.donorsCount} collections</p>
+                          </div>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.total.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
+                    <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                      <Star className="w-4 h-4 text-indigo-500" />
+                      Live Activity (Top Batches)
+                    </h4>
+                    <div className="space-y-3">
+                      {topBatches.map((item, i) => (
+                        <div key={i} className="p-4 rounded-xl bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/5 flex justify-between items-center text-xs">
+                          <div>
+                            <p className="font-extrabold uppercase text-slate-850 dark:text-white">{item.className}</p>
+                            <p className="opacity-60 text-[10px] mt-0.5">{item.donorsCount} active campaigners</p>
+                          </div>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">₹{item.total.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            );
+          })()}
 
         </div>
 

@@ -289,11 +289,11 @@ export default function DeveloperPage() {
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">Total Collected</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">${stats.totalAmount}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{stats.totalAmount}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">Verified Amount</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">${stats.verifiedAmount}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{stats.verifiedAmount}</h3>
                 </div>
               </div>
 

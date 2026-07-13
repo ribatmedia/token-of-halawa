@@ -349,10 +349,19 @@ export default function DashboardOverview() {
 
     try {
       if (authMode === 'login') {
+        let finalEmail = authEmail.trim();
+        if (!finalEmail.includes('@')) {
+          const slug = finalEmail.toLowerCase().replace(/\s+/g, '');
+          if (/^\d+$/.test(slug)) {
+            finalEmail = `hn${slug}@hidayaonline.org`;
+          } else {
+            finalEmail = `${slug}@hidayaonline.org`;
+          }
+        }
         const res = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: authEmail, password: authPassword })
+          body: JSON.stringify({ email: finalEmail, password: authPassword })
         });
         const data = await res.json();
         if (res.ok) {
@@ -687,13 +696,15 @@ export default function DashboardOverview() {
             )}
 
             <div>
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Email Address</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                {authMode === 'register' ? 'Email Address' : 'Campaigner ID / Email Address'}
+              </label>
               <input 
-                type="email" 
+                type="text" 
                 required 
                 value={authEmail}
                 onChange={(e) => setAuthEmail(e.target.value)}
-                placeholder="e.g. info@hidayaonline.org"
+                placeholder={authMode === 'register' ? "e.g. info@hidayaonline.org" : "e.g. HN Code, Username or Email"}
                 className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>

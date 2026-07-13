@@ -219,7 +219,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="pt-20 pb-24 text-center px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 mb-4 px-4.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 font-bold text-xs uppercase tracking-wide">
+          <div className="inline-flex items-center gap-2 mb-4 px-5 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 font-extrabold text-xs uppercase tracking-wide">
             <Sparkles className="w-3.5 h-3.5" /> Managed by RIBAT Students Union
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6">

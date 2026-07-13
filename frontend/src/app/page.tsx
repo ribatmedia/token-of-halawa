@@ -30,20 +30,20 @@ export default function HomePage() {
     {
       title: "Intelligent Campaign Collections",
       desc: "Raise funds dynamically with real-time analytics, goal tracking, and automated progress report boards.",
-      bg: "from-emerald-500/10 to-teal-500/5 border-emerald-500/20",
-      accent: "text-emerald-400"
+      bg: "bg-emerald-50/75 border border-emerald-200/80 shadow-md",
+      accent: "text-emerald-600 dark:text-emerald-400"
     },
     {
       title: "Smart Receipt & QR Verification",
       desc: "Instant digital receipt generation with unique serial codes, cryptographic signatures, and verification QR codes.",
-      bg: "from-amber-500/10 to-orange-500/5 border-amber-500/20",
-      accent: "text-amber-400"
+      bg: "bg-amber-50/75 border border-amber-200/80 shadow-md",
+      accent: "text-amber-600 dark:text-amber-400"
     },
     {
       title: "WhatsApp & Multi-Lingual Alerts",
       desc: "Broadcasting receipts, automated payment links, and renewal warnings in English, Malayalam, Arabic, and Tamil.",
-      bg: "from-indigo-500/10 to-blue-500/5 border-indigo-500/20",
-      accent: "text-indigo-400"
+      bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md",
+      accent: "text-indigo-600 dark:text-indigo-400"
     }
   ];
 
@@ -109,15 +109,15 @@ export default function HomePage() {
   ];
 
   const renderLeaderboardItem = (item: VolunteerData, index: number, rankColor: string) => (
-    <div key={index} className="flex items-center gap-3 md:gap-4 rounded-2xl bg-white/5 border border-white/10 px-4 md:px-5 py-4 backdrop-blur hover:bg-white/10 transition-all duration-300">
-      <div className={`w-9 h-9 md:w-11 md:h-11 rounded-full bg-white/10 ${rankColor} flex items-center justify-center font-extrabold shadow-md shrink-0 text-sm md:text-base`}>
+    <div key={index} className="flex items-center gap-3 md:gap-4 rounded-2xl bg-white/70 border border-slate-200/60 px-4 md:px-5 py-4 backdrop-blur hover:bg-slate-100/50 transition-all duration-300 shadow-sm">
+      <div className={`w-9 h-9 md:w-11 md:h-11 rounded-full bg-slate-200/50 ${rankColor} flex items-center justify-center font-extrabold shadow-sm shrink-0 text-sm md:text-base`}>
         #{index + 1}
       </div>
       <div className="flex-1 min-w-0 text-left">
-        <p className="font-extrabold text-white text-sm md:text-base uppercase truncate leading-tight">{item.name}</p>
-        <p className="text-xs text-slate-400 truncate mt-0.5">{item.unit} · {item.donors} donors</p>
+        <p className="font-extrabold text-slate-800 text-sm md:text-base uppercase truncate leading-tight">{item.name}</p>
+        <p className="text-xs text-slate-500 truncate mt-0.5">{item.unit} · {item.donors} donors</p>
       </div>
-      <div className="font-black text-emerald-400 text-base md:text-lg shrink-0 ml-1">
+      <div className="font-black text-emerald-650 text-base md:text-lg shrink-0 ml-1">
         ${item.total}
       </div>
     </div>
@@ -131,22 +131,22 @@ export default function HomePage() {
     ];
 
     return (
-      <div key={index} className="flex items-center gap-4 rounded-2xl bg-white/5 border border-white/10 px-5 py-4 hover:bg-white/10 transition-all duration-300">
+      <div key={index} className="flex items-center gap-4 rounded-2xl bg-white/70 border border-slate-200/60 px-5 py-4 hover:bg-slate-100/50 transition-all duration-300 shadow-sm">
         {index < 3 ? (
           <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${medalColors[index]} text-white flex items-center justify-center font-extrabold shadow-lg shrink-0`}>
             <Trophy className="w-5 h-5" />
           </div>
         ) : (
-          <div className="w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center font-extrabold shadow-sm shrink-0">
+          <div className="w-11 h-11 rounded-full bg-slate-200/50 text-slate-750 flex items-center justify-center font-extrabold shadow-sm shrink-0">
             #{index + 1}
           </div>
         )}
         
         <div className="flex-1 min-w-0 text-left">
-          <p className="font-extrabold text-white text-base md:text-lg uppercase truncate">{cls.className}</p>
-          <p className="text-xs text-slate-400 truncate">{cls.donors} donors {isLive ? 'today' : ''}</p>
+          <p className="font-extrabold text-slate-800 text-base md:text-lg uppercase truncate">{cls.className}</p>
+          <p className="text-xs text-slate-500 truncate">{cls.donors} donors {isLive ? 'today' : ''}</p>
         </div>
-        <div className="font-black text-emerald-400 text-base md:text-lg shrink-0 ml-2">
+        <div className="font-black text-emerald-650 text-base md:text-lg shrink-0 ml-2">
           ${cls.total}
         </div>
       </div>
@@ -154,23 +154,23 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#030712] text-slate-100 antialiased overflow-x-hidden">
+    <div className="relative min-h-screen bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
       
       {/* Background Glow Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 pointer-events-none" />
-      <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-2 pointer-events-none" />
-      <div className="absolute top-[40%] left-[30%] w-[45%] h-[45%] rounded-full ambient-glow-3 pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-1 pointer-events-none opacity-40" />
+      <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] rounded-full ambient-glow-2 pointer-events-none opacity-40" />
+      <div className="absolute top-[40%] left-[30%] w-[45%] h-[45%] rounded-full ambient-glow-3 pointer-events-none opacity-40" />
 
       {/* Navbar */}
-      <nav className="fixed w-full z-50 backdrop-blur-xl bg-[#030712]/75 border-b border-white/5 transition-all duration-300">
+      <nav className="fixed w-full z-50 backdrop-blur-xl bg-white/75 border-b border-slate-200/80 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-lg">
-                <Heart className="w-6 h-6 text-emerald-400" />
+                <Heart className="w-6 h-6 text-emerald-600" />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent leading-none">
+                <h1 className="text-xl font-black bg-gradient-to-r from-emerald-600 to-teal-650 bg-clip-text text-transparent leading-none">
                   Token of Halawa
                 </h1>
                 <p className="text-[8px] font-extrabold text-slate-500 tracking-widest mt-1 uppercase">Connecting Hearts Spreading Smiles</p>
@@ -178,7 +178,7 @@ export default function HomePage() {
             </div>
             
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-slate-300 hover:text-white font-bold text-sm transition">
+              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 font-bold text-sm transition">
                 Live Stats
               </Link>
               <Link href="/dashboard" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-5 py-2.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2 text-sm">
@@ -195,10 +195,10 @@ export default function HomePage() {
           <div className={`relative overflow-hidden rounded-3xl border backdrop-blur-xl p-8 md:p-12 transition-all duration-700 ${slides[activeSlide].bg}`}>
             <div className="relative z-10 max-w-2xl text-left">
               <span className={`text-xs uppercase font-extrabold tracking-wider ${slides[activeSlide].accent}`}>Campaign Slider</span>
-              <h2 className="text-2xl md:text-4xl font-extrabold text-white mt-2 mb-4 transition-all duration-500">
+              <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 mt-2 mb-4 transition-all duration-500">
                 {slides[activeSlide].title}
               </h2>
-              <p className="text-sm md:text-base text-slate-300 leading-relaxed">
+              <p className="text-sm md:text-base text-slate-650 leading-relaxed">
                 {slides[activeSlide].desc}
               </p>
             </div>
@@ -208,7 +208,7 @@ export default function HomePage() {
                 <button 
                   key={index} 
                   onClick={() => setActiveSlide(index)} 
-                  className={`w-2.5 h-2.5 rounded-full border border-white/50 transition-all ${activeSlide === index ? 'bg-white scale-125' : 'bg-white/20'}`}
+                  className={`w-2.5 h-2.5 rounded-full border border-slate-400/50 transition-all ${activeSlide === index ? 'bg-slate-900 scale-125' : 'bg-slate-300'}`}
                 />
               ))}
             </div>
@@ -219,22 +219,22 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="pt-20 pb-24 text-center px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 mb-4 px-4.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-bold text-xs uppercase tracking-wide">
+          <div className="inline-flex items-center gap-2 mb-4 px-4.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 font-bold text-xs uppercase tracking-wide">
             <Sparkles className="w-3.5 h-3.5" /> Managed by Ihyaussunna
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6">
             Connecting Hearts<br />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400 bg-clip-text text-transparent">Spreading Smiles</span>
+            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 bg-clip-text text-transparent">Spreading Smiles</span>
           </h1>
-          <p className="text-base md:text-xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed mb-10">
+          <p className="text-base md:text-xl text-slate-650 max-w-2xl mx-auto font-medium leading-relaxed mb-10">
             Welcome to the Token of Halawa donation intelligence engine. Track live collections, verify receipts, and empower campaigns.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link href="/dashboard" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-base px-8 py-4 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2">
               Get Started <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="#leaderboard" className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 px-8 py-4 rounded-2xl font-bold text-base transition flex items-center justify-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" /> View Leaderboard
+            <a href="#leaderboard" className="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold text-base transition flex items-center justify-center gap-2 shadow-sm">
+              <Trophy className="w-5 h-5 text-amber-500" /> View Leaderboard
             </a>
           </div>
         </div>
@@ -244,12 +244,12 @@ export default function HomePage() {
       <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-slate-950 py-3 overflow-hidden border-y border-emerald-400/30 shadow-lg">
         <div className="whitespace-nowrap overflow-hidden">
           <div className="inline-block animate-[scroll_25s_linear_infinite] text-xs font-black tracking-widest uppercase">
-            <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Direct WhatsApp verification now enabled for all volunteers</span>
+            <span className="mx-6"><span className="text-amber-355">★</span> Welcome to Token of Halawa donation program</span>
+            <span className="mx-6"><span className="text-amber-355">★</span> Live tracking of monthly targets and campaign approvals active</span>
+            <span className="mx-6"><span className="text-amber-355">★</span> Direct WhatsApp verification now enabled for all volunteers</span>
             {/* Repeat for looping effect */}
-            <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
+            <span className="mx-6"><span className="text-amber-355">★</span> Welcome to Token of Halawa donation program</span>
+            <span className="mx-6"><span className="text-amber-355">★</span> Live tracking of monthly targets and campaign approvals active</span>
           </div>
         </div>
       </div>
@@ -265,61 +265,61 @@ export default function HomePage() {
       <section id="leaderboard" className="py-20 px-6 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-white">Live Leaderboard</h2>
-            <p className="text-slate-400 mt-3 max-w-lg mx-auto">Real-time volunteer and class donation collections index</p>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900">Live Leaderboard</h2>
+            <p className="text-slate-500 mt-3 max-w-lg mx-auto">Real-time volunteer and class donation collections index</p>
           </div>
           
           <div className="grid lg:grid-cols-2 gap-8">
             
             {/* Volunteers Leaderboard Card */}
-            <div className="rounded-3xl apple-glass border border-white/10 p-6 md:p-8 flex flex-col min-h-[500px] relative overflow-hidden">
+            <div className="rounded-3xl bg-white/75 border border-slate-200/85 p-6 md:p-8 flex flex-col min-h-[500px] relative overflow-hidden shadow-xl backdrop-blur-xl">
               
               {/* Overall Top Volunteers */}
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${studentView === 'overall' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-black text-white">Top Volunteers</h3>
-                  <Trophy className="w-7 h-7 text-amber-400 animate-pulse" />
+                  <h3 className="text-2xl font-black text-slate-800">Top Volunteers</h3>
+                  <Trophy className="w-7 h-7 text-amber-500 animate-pulse" />
                 </div>
                 <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
-                  {topVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-amber-400'))}
+                  {topVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-amber-500'))}
                 </div>
               </div>
 
               {/* Today's Top Volunteers */}
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${studentView === 'today' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-black text-white">Today's Top</h3>
-                  <Flame className="w-7 h-7 text-orange-400 animate-bounce" />
+                  <h3 className="text-2xl font-black text-slate-800">Today's Top</h3>
+                  <Flame className="w-7 h-7 text-orange-500 animate-bounce" />
                 </div>
                 <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
-                  {todayVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-orange-400'))}
+                  {todayVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-orange-500'))}
                 </div>
               </div>
 
               {/* Top Overall Expected */}
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${studentView === 'expected' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-black text-white">Top Expected</h3>
-                  <Award className="w-7 h-7 text-emerald-400" />
+                  <h3 className="text-2xl font-black text-slate-800">Top Expected</h3>
+                  <Award className="w-7 h-7 text-emerald-500" />
                 </div>
                 <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
-                  {expectedVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-emerald-400'))}
+                  {expectedVolunteers.map((item, i) => renderLeaderboardItem(item, i, 'text-emerald-500'))}
                 </div>
               </div>
 
             </div>
 
             {/* Classes Leaderboard Card */}
-            <div className="rounded-3xl apple-glass border border-white/10 p-6 md:p-8 flex flex-col min-h-[500px] relative overflow-hidden">
+            <div className="rounded-3xl bg-white/75 border border-slate-200/85 p-6 md:p-8 flex flex-col min-h-[500px] relative overflow-hidden shadow-xl backdrop-blur-xl">
               
               {/* Top Classes View */}
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${classView === 'classes' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6 text-left">
                   <div>
                     <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Overall Ranking</span>
-                    <h3 className="text-2xl font-black text-white mt-0.5">Top Classes</h3>
+                    <h3 className="text-2xl font-black text-slate-800 mt-0.5">Top Classes</h3>
                   </div>
-                  <Star className="w-7 h-7 text-indigo-400" />
+                  <Star className="w-7 h-7 text-indigo-500" />
                 </div>
                 <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
                   {topClasses.map((cls, i) => renderClassItem(cls, i))}
@@ -330,10 +330,10 @@ export default function HomePage() {
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${classView === 'today' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-6 text-left">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">Live Activity</span>
-                    <h3 className="text-2xl font-black text-white mt-0.5">Today's Top Classes</h3>
+                    <span className="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">Live Activity</span>
+                    <h3 className="text-2xl font-black text-slate-800 mt-0.5">Today's Top Classes</h3>
                   </div>
-                  <Flame className="w-7 h-7 text-emerald-400 animate-pulse" />
+                  <Flame className="w-7 h-7 text-emerald-500 animate-pulse" />
                 </div>
                 <div className="space-y-3.5 flex-1 overflow-y-auto pr-1">
                   {todayClasses.map((cls, i) => renderClassItem(cls, i, true))}
@@ -344,24 +344,24 @@ export default function HomePage() {
               <div className={`absolute inset-0 p-6 md:p-8 flex flex-col transition-all duration-700 ${classView === 'muthawwal' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
                 <div className="flex items-center justify-between mb-8 text-left">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">Special Batches</span>
-                    <h3 className="text-2xl font-black text-white mt-0.5">Muthawwal Standing</h3>
+                    <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Special Batches</span>
+                    <h3 className="text-2xl font-black text-slate-800 mt-0.5">Muthawwal Standing</h3>
                   </div>
-                  <Award className="w-7 h-7 text-amber-400" />
+                  <Award className="w-7 h-7 text-amber-500" />
                 </div>
                 <div className="space-y-5 flex-1 flex flex-col justify-center">
                   {muthawwalStandings.map((cls, i) => (
-                    <div key={i} className="flex items-center gap-4 rounded-3xl bg-white/5 border border-white/10 px-6 py-6 hover:bg-white/10 transition-all duration-300">
+                    <div key={i} className="flex items-center gap-4 rounded-3xl bg-slate-50/90 border border-slate-200/80 px-6 py-6 hover:bg-slate-100/90 transition-all duration-300 shadow-sm">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-extrabold shadow-lg shrink-0">
                         <Award className="w-6 h-6" />
                       </div>
                       <div className="flex-1 min-w-0 text-left">
-                        <p className="font-extrabold text-white text-lg uppercase truncate">{cls.className}</p>
-                        <p className="text-xs text-slate-400 mt-1">{cls.donors} donors</p>
+                        <p className="font-extrabold text-slate-800 text-lg uppercase truncate">{cls.className}</p>
+                        <p className="text-xs text-slate-500 mt-1">{cls.donors} donors</p>
                       </div>
                       <div className="flex flex-col items-end shrink-0">
                         <span className="text-[9px] uppercase font-bold tracking-wider text-slate-500">Collected</span>
-                        <span className="font-black text-emerald-400 text-xl">${cls.total}</span>
+                        <span className="font-black text-emerald-650 text-xl">${cls.total}</span>
                       </div>
                     </div>
                   ))}

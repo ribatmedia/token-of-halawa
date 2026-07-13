@@ -309,7 +309,7 @@ export default function DashboardOverview() {
       });
       if (donorsRes.ok) {
         const donorsData = await donorsRes.json();
-        setDonors(donorsData);
+        setDonors(Array.isArray(donorsData) ? donorsData : donorsData.donors || []);
       }
 
       // 2. Fetch Campaigns
@@ -1825,26 +1825,36 @@ export default function DashboardOverview() {
             <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
               <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
-                Live Campaign Leaderboard Rankings
+                Live Class Leaderboard Rankings
               </h3>
 
               <div className="space-y-4 max-w-xl">
-                {donors.length === 0 ? (
-                  <div className="text-center py-12 text-slate-400">
-                    <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p className="font-bold">No ranking statistics available.</p>
-                  </div>
-                ) : (
-                  donors.slice(0, 5).map((d, index) => (
-                    <div key={d.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
+                {(() => {
+                  const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
+                    .map((className) => {
+                      const collected = verificationQueue
+                        .filter(q => q.notes?.includes(`Class: ${className}`))
+                        .reduce((acc, q) => acc + Number(q.amount), 0);
+                      return { className, collected };
+                    })
+                    .sort((a, b) => b.collected - a.collected);
+
+                  return rankedClasses.map((item, index) => (
+                    <div key={item.className} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
                       <div className="flex items-center gap-3">
-                        <span className="font-extrabold text-sm text-amber-400">#{index + 1}</span>
-                        <h5 className="font-bold text-slate-800 dark:text-white">{d.name}</h5>
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center font-black text-xs ${
+                          index === 0 ? 'bg-amber-500 text-slate-950' : 
+                          index === 1 ? 'bg-slate-300 text-slate-950' : 
+                          index === 2 ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'
+                        }`}>
+                          #{index + 1}
+                        </span>
+                        <h5 className="font-bold text-slate-800 dark:text-white uppercase">{item.className}</h5>
                       </div>
-                      <span className="font-black text-emerald-500">{d.category}</span>
+                      <span className="font-extrabold text-emerald-500">₹{item.collected.toLocaleString()}</span>
                     </div>
-                  ))
-                )}
+                  ));
+                })()}
               </div>
             </div>
           )}

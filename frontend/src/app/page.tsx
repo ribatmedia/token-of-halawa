@@ -198,7 +198,7 @@ export default function HomePage() {
               <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 mt-2 mb-4 transition-all duration-500">
                 {slides[activeSlide].title}
               </h2>
-              <p className="text-sm md:text-base text-slate-650 leading-relaxed">
+              <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
                 {slides[activeSlide].desc}
               </p>
             </div>
@@ -226,7 +226,7 @@ export default function HomePage() {
             Connecting Hearts<br />
             <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 bg-clip-text text-transparent">Spreading Smiles</span>
           </h1>
-          <p className="text-base md:text-xl text-slate-650 max-w-2xl mx-auto font-medium leading-relaxed mb-10">
+          <p className="text-base md:text-xl text-slate-600 max-w-2xl mx-auto font-semibold leading-relaxed mb-10">
             Welcome to the Token of Halawa donation intelligence engine. Track live collections, verify receipts, and empower campaigns.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -241,15 +241,15 @@ export default function HomePage() {
       </section>
 
       {/* Scrolling Announcement Banner */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-slate-950 py-3 overflow-hidden border-y border-emerald-400/30 shadow-lg">
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3.5 overflow-hidden border-y border-emerald-400/30 shadow-lg">
         <div className="whitespace-nowrap overflow-hidden">
           <div className="inline-block animate-[scroll_25s_linear_infinite] text-xs font-black tracking-widest uppercase">
-            <span className="mx-6"><span className="text-amber-355">★</span> Welcome to Token of Halawa donation program</span>
-            <span className="mx-6"><span className="text-amber-355">★</span> Live tracking of monthly targets and campaign approvals active</span>
-            <span className="mx-6"><span className="text-amber-355">★</span> Direct WhatsApp verification now enabled for all volunteers</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> Direct WhatsApp verification now enabled for all volunteers</span>
             {/* Repeat for looping effect */}
-            <span className="mx-6"><span className="text-amber-355">★</span> Welcome to Token of Halawa donation program</span>
-            <span className="mx-6"><span className="text-amber-355">★</span> Live tracking of monthly targets and campaign approvals active</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, config.jwt.secret) as {
+    const decoded = jwt.verify(token, config.jwt.secret as string) as {
       userId: string;
       orgId: string;
       email: string;

@@ -182,14 +182,14 @@ export class AuthService {
   private static generateTokens(userId: string, orgId: string, email: string) {
     const accessToken = jwt.sign(
       { userId, orgId, email },
-      config.jwt.secret,
-      { expiresIn: config.jwt.accessExpiry }
+      config.jwt.secret as string,
+      { expiresIn: config.jwt.accessExpiry as any }
     );
 
     const refreshToken = jwt.sign(
       { userId, orgId },
-      config.jwt.refreshSecret,
-      { expiresIn: config.jwt.refreshExpiry }
+      config.jwt.refreshSecret as string,
+      { expiresIn: config.jwt.refreshExpiry as any }
     );
 
     return { accessToken, refreshToken };

@@ -7,7 +7,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 

@@ -465,8 +465,9 @@ export default function DeveloperPage() {
             { id: 'dashboard', name: 'System Overview', icon: Laptop },
             { id: 'camp-dash-tester', name: 'Campaigner Tester', icon: UserCheck },
             { id: 'class-dash-tester', name: 'Class Tester', icon: Award },
+            { id: 'slider', name: 'Campaign Slider', icon: Sliders },
             { id: 'bulk', name: 'Bulk Campaigners', icon: Users },
-            { id: 'receipt', name: 'Receipt Settings', icon: Sliders },
+            { id: 'receipt', name: 'Receipt Settings', icon: FileText },
             { id: 'ui', name: 'UI & Banners', icon: Palette }
           ].map(tab => {
             const Icon = tab.icon;
@@ -511,6 +512,7 @@ export default function DeveloperPage() {
               {currentTab === 'dashboard' ? 'System Diagnostics' :
                currentTab === 'camp-dash-tester' ? 'Campaigner Dashboard Tester' :
                currentTab === 'class-dash-tester' ? 'Class Dashboard Tester' :
+               currentTab === 'slider' ? 'Campaign Slider Studio' :
                currentTab === 'bulk' ? 'Bulk Campaigners Management' :
                currentTab === 'receipt' ? 'Receipt Studio' : 'UI & Branding Settings'}
             </h2>
@@ -997,109 +999,111 @@ export default function DeveloperPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
 
-              {/* Campaign Slider Editor Section */}
-              <div className="border-t border-white/10 pt-8 mt-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                  <div>
-                    <h4 className="text-lg font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5" /> Campaign Slider Studio
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-1">Configure and localize homepage slides with real-time Malayalam font compilation</p>
-                  </div>
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <button 
-                      onClick={handleResetSlides}
-                      className="flex-1 sm:flex-none border border-slate-350 dark:border-white/10 hover:bg-slate-200/50 dark:hover:bg-white/5 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer"
-                    >
-                      Reset Defaults
-                    </button>
-                    <button 
-                      onClick={handleSaveSlides}
-                      className="flex-1 sm:flex-none bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold transition hover:bg-emerald-450 hover:shadow shadow-sm cursor-pointer flex items-center justify-center gap-1"
-                    >
-                      <Check className="w-3.5 h-3.5" /> Save Slider Configuration
-                    </button>
-                  </div>
+          {/* TAB: Campaign Slider Studio */}
+          {currentTab === 'slider' && (
+            <div className={`p-6 md:p-8 rounded-3xl ${glassClass} space-y-6 animate-in fade-in duration-350`}>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                  <h4 className="text-lg font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" /> Campaign Slider Studio
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1">Configure and localize homepage slides with real-time Malayalam font compilation</p>
                 </div>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button 
+                    onClick={handleResetSlides}
+                    className="flex-1 sm:flex-none border border-slate-350 dark:border-white/10 hover:bg-slate-200/50 dark:hover:bg-white/5 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button 
+                    onClick={handleSaveSlides}
+                    className="flex-1 sm:flex-none bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold transition hover:bg-emerald-450 hover:shadow shadow-sm cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Check className="w-3.5 h-3.5" /> Save Slider Configuration
+                  </button>
+                </div>
+              </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                  {devSlides.map((slide, index) => {
-                    const themes = [
-                      { name: 'Emerald (Green)', bg: "bg-emerald-50/75 border border-emerald-200/80 shadow-md", accent: "text-emerald-600 dark:text-emerald-400" },
-                      { name: 'Amber (Gold)', bg: "bg-amber-50/75 border border-amber-200/80 shadow-md", accent: "text-amber-600 dark:text-amber-400" },
-                      { name: 'Indigo (Blue)', bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md", accent: "text-indigo-600 dark:text-indigo-400" },
-                      { name: 'Violet (Purple)', bg: "bg-violet-50/75 border border-violet-200/80 shadow-md", accent: "text-violet-600 dark:text-violet-400" },
-                      { name: 'Rose (Red)', bg: "bg-rose-50/75 border border-rose-200/80 shadow-md", accent: "text-rose-600 dark:text-rose-400" }
-                    ];
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {devSlides.map((slide, index) => {
+                  const themes = [
+                    { name: 'Emerald (Green)', bg: "bg-emerald-50/75 border border-emerald-200/80 shadow-md", accent: "text-emerald-600 dark:text-emerald-400" },
+                    { name: 'Amber (Gold)', bg: "bg-amber-50/75 border border-amber-200/80 shadow-md", accent: "text-amber-600 dark:text-amber-400" },
+                    { name: 'Indigo (Blue)', bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md", accent: "text-indigo-600 dark:text-indigo-400" },
+                    { name: 'Violet (Purple)', bg: "bg-violet-50/75 border border-violet-200/80 shadow-md", accent: "text-violet-600 dark:text-violet-400" },
+                    { name: 'Rose (Red)', bg: "bg-rose-50/75 border border-rose-200/80 shadow-md", accent: "text-rose-600 dark:text-rose-400" }
+                  ];
 
-                    return (
-                      <div key={index} className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 text-left flex flex-col justify-between">
-                        <div className="space-y-3.5">
-                          <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Slide #{index + 1}</span>
-                            <span className="text-[10px] bg-slate-200/20 px-2 py-0.5 rounded font-mono text-slate-400">active</span>
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Color Theme</label>
-                            <select 
-                              value={slide.bg} 
-                              onChange={(e) => {
-                                const selected = themes.find(t => t.bg === e.target.value);
-                                if (selected) {
-                                  updateSlideField(index, 'bg', selected.bg);
-                                  updateSlideField(index, 'accent', selected.accent);
-                                }
-                              }}
-                              className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/40"
-                            >
-                              {themes.map(t => (
-                                <option key={t.bg} value={t.bg} className="text-slate-800">{t.name}</option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Slide Title</label>
-                            <input 
-                              type="text"
-                              value={slide.title}
-                              onChange={(e) => updateSlideField(index, 'title', e.target.value)}
-                              className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                              placeholder="Enter slide title..."
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Slide Description</label>
-                            <textarea 
-                              value={slide.desc}
-                              onChange={(e) => updateSlideField(index, 'desc', e.target.value)}
-                              rows={3}
-                              className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                              placeholder="Enter slide description..."
-                            />
-                          </div>
+                  return (
+                    <div key={index} className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 text-left flex flex-col justify-between">
+                      <div className="space-y-3.5">
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Slide #{index + 1}</span>
+                          <span className="text-[10px] bg-slate-200/20 px-2 py-0.5 rounded font-mono text-slate-400">active</span>
                         </div>
 
-                        {/* Visual Live Preview with Malayalam support */}
-                        <div className="pt-4 border-t border-white/5 mt-4">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Live Mockup View</span>
-                          <div className={`p-4 rounded-2xl border text-left transition-all ${slide.bg}`}>
-                            <span className={`text-[9px] uppercase font-black tracking-wider ${slide.accent}`}>Campaign Slider</span>
-                            <h5 className={`text-sm font-black text-slate-900 mt-1 leading-tight ${isMalayalam(slide.title) ? 'font-malayalam' : ''}`}>
-                              {slide.title || 'Untitled Slide'}
-                            </h5>
-                            <p className={`text-[10px] text-slate-650 mt-1 leading-relaxed font-semibold ${isMalayalam(slide.desc) ? 'font-malayalam' : ''}`}>
-                              {slide.desc || 'No description provided.'}
-                            </p>
-                          </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Color Theme</label>
+                          <select 
+                            value={slide.bg} 
+                            onChange={(e) => {
+                              const selected = themes.find(t => t.bg === e.target.value);
+                              if (selected) {
+                                updateSlideField(index, 'bg', selected.bg);
+                                  updateSlideField(index, 'accent', selected.accent);
+                              }
+                            }}
+                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/40"
+                          >
+                            {themes.map(t => (
+                              <option key={t.bg} value={t.bg} className="text-slate-800">{t.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Slide Title</label>
+                          <input 
+                            type="text"
+                            value={slide.title}
+                            onChange={(e) => updateSlideField(index, 'title', e.target.value)}
+                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                            placeholder="Enter slide title..."
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Slide Description</label>
+                          <textarea 
+                            value={slide.desc}
+                            onChange={(e) => updateSlideField(index, 'desc', e.target.value)}
+                            rows={3}
+                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                            placeholder="Enter slide description..."
+                          />
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      {/* Visual Live Preview with Malayalam support */}
+                      <div className="pt-4 border-t border-white/5 mt-4">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Live Mockup View</span>
+                        <div className={`p-4 rounded-2xl border text-left transition-all ${slide.bg}`}>
+                          <span className={`text-[9px] uppercase font-black tracking-wider ${slide.accent}`}>Campaign Slider</span>
+                          <h5 className={`text-sm font-black text-slate-900 mt-1 leading-tight ${isMalayalam(slide.title) ? 'font-malayalam' : ''}`}>
+                            {slide.title || 'Untitled Slide'}
+                          </h5>
+                          <p className={`text-[10px] text-slate-650 mt-1 leading-relaxed font-semibold ${isMalayalam(slide.desc) ? 'font-malayalam' : ''}`}>
+                            {slide.desc || 'No description provided.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

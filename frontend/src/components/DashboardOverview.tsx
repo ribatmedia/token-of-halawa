@@ -145,55 +145,6 @@ const translations = {
   }
 };
 
-const campaignersList = [
-  // Final year
-  { hn: 1, name: "Asif ali", class: "Final year" },
-  { hn: 2, name: "Bishrul wafa", class: "Final year" },
-  { hn: 3, name: "Muhammed Falil", class: "Final year" },
-  { hn: 4, name: "Sinan Cheekod", class: "Final year" },
-  { hn: 5, name: "Sinan rafi", class: "Final year" },
-  { hn: 6, name: "Ubayy Valliyad", class: "Final year" },
-  // Degree Third year
-  { hn: 7, name: "Adhil Ameen", class: "Degree Third year" },
-  { hn: 8, name: "Hashir puthoor", class: "Degree Third year" },
-  { hn: 9, name: "Muhammed shaheer", class: "Degree Third year" },
-  { hn: 10, name: "Muhammed Riswan", class: "Degree Third year" },
-  // Degree second year
-  { hn: 11, name: "Muhammed Ali", class: "Degree second year" },
-  { hn: 12, name: "Muhammed Fayis", class: "Degree second year" },
-  { hn: 13, name: "Sinan k", class: "Degree second year" },
-  { hn: 14, name: "Yaseen kondotty", class: "Degree second year" },
-  // Degree first year
-  { hn: 15, name: "Muhammed Melattoor", class: "Degree first year" },
-  { hn: 16, name: "Nihal valliyad", class: "Degree first year" },
-  // Plus two
-  { hn: 17, name: "Anas Rahman", class: "Plus two" },
-  { hn: 18, name: "Anas koduvally", class: "Plus two" },
-  { hn: 19, name: "Anwar", class: "Plus two" },
-  { hn: 20, name: "Adhil Nizar", class: "Plus two" },
-  { hn: 21, name: "Naseel", class: "Plus two" },
-  { hn: 22, name: "Sabith", class: "Plus two" },
-  { hn: 23, name: "Sanah", class: "Plus two" },
-  { hn: 24, name: "Savad", class: "Plus two" },
-  { hn: 25, name: "Hashir kannur", class: "Plus two" },
-  { hn: 26, name: "Yaseen c.k", class: "Plus two" },
-  // Plus one
-  { hn: 27, name: "Abdu Rahman", class: "Plus one" },
-  { hn: 28, name: "Adnan", class: "Plus one" },
-  { hn: 29, name: "Anas Mooniyur", class: "Plus one" },
-  { hn: 30, name: "Anees", class: "Plus one" },
-  { hn: 31, name: "Basith moosa", class: "Plus one" },
-  { hn: 32, name: "Farseen", class: "Plus one" },
-  { hn: 33, name: "Hafil", class: "Plus one" },
-  { hn: 34, name: "Mufeed", class: "Plus one" },
-  { hn: 35, name: "Muzammil", class: "Plus one" },
-  { hn: 36, name: "Rashal", class: "Plus one" },
-  { hn: 37, name: "Rayyan", class: "Plus one" },
-  { hn: 38, name: "Swalih", class: "Plus one" },
-  { hn: 39, name: "Aboobacker Sidheeque", class: "Plus one" },
-  { hn: 40, name: "Aneeb", class: "Plus one" }
-];
-
 export default function DashboardOverview() {
   const { theme, toggleTheme, token, user, organization, setAuth, clearAuth } = useAuthStore();
   const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>('en');
@@ -204,6 +155,27 @@ export default function DashboardOverview() {
   // Active Role and Menu Tab States
   const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>('admin');
   const [activeTab, setActiveTab] = useState<string>('analytics');
+
+  // Dynamically loaded campaigners list from API (replaces mock data)
+  const [campaignersList, setCampaignersList] = useState<any[]>([]);
+
+  // Fetch campaigners on component mount
+  useEffect(() => {
+    const fetchCampaigners = async () => {
+      try {
+        const res = await fetch(`${API_URL}/campaigners`);
+        if (res.ok) {
+          const data = await res.json();
+          setCampaignersList(data);
+        } else {
+          console.error('Failed to fetch campaigners list:', res.status);
+        }
+      } catch (error) {
+        console.error('Error fetching campaigners list:', error);
+      }
+    };
+    fetchCampaigners();
+  }, []);
 
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -2853,67 +2825,41 @@ export default function DashboardOverview() {
             const myNotReceivedTotal = Math.max(0, myExpectedTotal - myCollectedTotal);
             const myDonorsCount = new Set(myCollections.map(q => q.donorId)).size;
 
-            // 2. Calculate ranks dynamically
-            const defaultLeadingCollectors = [
-              { name: "MUHAMMED IRSHAD", class: "S3", donorsCount: 56, total: 46600 },
-              { name: "MUHAMMED ALIF N", class: "U1", donorsCount: 24, total: 17700 },
-              { name: "MUHAMMED ASHIF", class: "U2", donorsCount: 10, total: 9100 },
-              { name: "AZHAB N H", class: "U2", donorsCount: 61, total: 7900 },
-              { name: "MOHAMMED THOYYIB VP", class: "ID3", donorsCount: 15, total: 7900 }
-            ];
-
+            // 2. Calculate ranks dynamically from real data only
             const calculatedCampaignerStats = campaignersList.map(c => {
               const matches = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${c.name}`));
               const total = matches.reduce((acc, q) => acc + Number(q.amount), 0);
               return { name: c.name, class: c.class, donorsCount: matches.length, total };
-            }).filter(c => c.total > 0);
-
-            const allCampaignerStats = [...calculatedCampaignerStats];
-            defaultLeadingCollectors.forEach(fallbackItem => {
-              if (!allCampaignerStats.some(c => c.name.toLowerCase() === fallbackItem.name.toLowerCase())) {
-                allCampaignerStats.push(fallbackItem);
-              }
             });
-            allCampaignerStats.sort((a, b) => b.total - a.total);
+
+            const allCampaignerStats = [...calculatedCampaignerStats].sort((a, b) => b.total - a.total);
 
             // Find index of current campaigner in overall list
             const overallRankIndex = allCampaignerStats.findIndex(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
-            const overallRank = overallRankIndex !== -1 ? overallRankIndex + 1 : 1;
+            const overallRank = overallRankIndex !== -1 ? overallRankIndex + 1 : allCampaignerStats.length + 1;
 
             // Filter for current campaigner's class
-            const myClass = (user as any)?.class || 'Plus one';
+            const myClass = (user as any)?.class || '';
             const classCampaignerStats = allCampaignerStats.filter(c => c.class === myClass);
             const classRankIndex = classCampaignerStats.findIndex(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
-            const classRank = classRankIndex !== -1 ? classRankIndex + 1 : 1;
+            const classRank = classRankIndex !== -1 ? classRankIndex + 1 : classCampaignerStats.length + 1;
 
             // 3. Leading Collectors (Top 5 Campaigners overall)
             const leadingCollectors = allCampaignerStats.slice(0, 5);
 
-            // 4. Top Batches (Top 5 Classes)
-            const defaultTopBatches = [
-              { className: "S3", receivers: 88, donorsCount: 274, total: 77500 },
-              { className: "NF3", receivers: 135, donorsCount: 405, total: 60504 },
-              { className: "U2", receivers: 63, donorsCount: 232, total: 46893 },
-              { className: "UH3", receivers: 60, donorsCount: 113, total: 29230 },
-              { className: "UT3", receivers: 76, donorsCount: 156, total: 28777 }
-            ];
-
-            const calculatedClassStats = ['S3', 'NF3', 'U2', 'UH3', 'UT3', 'Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
+            // 4. Top Batches (Top 5 Classes) — real data only, no mock fallback
+            const classNames = Array.from(new Set(campaignersList.map(c => c.class)));
+            const calculatedClassStats = classNames
               .map(className => {
                 const total = verificationQueue
                   .filter(q => q.notes?.includes(`Class: ${className}`))
                   .reduce((acc, q) => acc + Number(q.amount), 0);
                 const activeCamps = campaignersList.filter(c => c.class === className).length;
-                return { className, total, receivers: activeCamps || 10, donorsCount: activeCamps * 4 || 25 };
-              }).filter(c => c.total > 0);
-
-            const combinedClasses = [...calculatedClassStats.map(c => ({ className: c.className, receivers: c.receivers, donorsCount: c.donorsCount, total: c.total }))];
-            defaultTopBatches.forEach(fallbackItem => {
-              if (!combinedClasses.some(c => c.className.toLowerCase() === fallbackItem.className.toLowerCase())) {
-                combinedClasses.push(fallbackItem);
-              }
-            });
-            const topBatches = combinedClasses.sort((a, b) => b.total - a.total).slice(0, 5);
+                const donorIds = new Set(verificationQueue.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId));
+                return { className, total, receivers: activeCamps, donorsCount: donorIds.size };
+              })
+              .sort((a, b) => b.total - a.total);
+            const topBatches = calculatedClassStats.slice(0, 5);
 
             return (
               <div className="space-y-6 flex-1 flex flex-col">

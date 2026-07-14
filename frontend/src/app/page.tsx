@@ -25,8 +25,8 @@ export default function HomePage() {
   const [studentView, setStudentView] = useState<'overall' | 'today'>('overall');
   const [classView, setClassView] = useState<'classes' | 'today'>('classes');
 
-  // Slider slides
-  const slides = [
+  // Slider slides state
+  const [slides, setSlides] = useState([
     {
       title: "Intelligent Campaign Collections",
       desc: "Raise funds dynamically with real-time analytics, goal tracking, and automated progress report boards.",
@@ -45,15 +45,38 @@ export default function HomePage() {
       bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md",
       accent: "text-indigo-600 dark:text-indigo-400"
     }
-  ];
+  ]);
+
+  const [tickerText, setTickerText] = useState('Welcome to Token of Halawa donation program ★ Live tracking of monthly targets and campaign approvals active ★ Direct WhatsApp verification now enabled for all campaigners');
+
+  // Load custom slides and ticker text from localStorage if present
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('campaign_slides');
+      if (saved) {
+        try {
+          setSlides(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to parse campaign_slides from localStorage", e);
+        }
+      }
+      const savedTicker = localStorage.getItem('notice_ticker_text');
+      if (savedTicker) {
+        setTickerText(savedTicker);
+      }
+    }
+  }, []);
+
+  // Helper to detect Malayalam characters
+  const isMalayalam = (text: string) => /[\u0D00-\u0D7F]/.test(text);
 
   // Rotate slides
   useEffect(() => {
     const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % slides.length);
+      setActiveSlide((prev) => (prev + 1) % (slides.length || 1));
     }, 4500);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   // Leaderboard rotation
   useEffect(() => {
@@ -156,26 +179,31 @@ export default function HomePage() {
 
       {/* Navbar */}
       <nav className="fixed w-full z-50 backdrop-blur-xl bg-white/75 border-b border-slate-200/80 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 shadow-lg">
-                <Heart className="w-6 h-6 text-emerald-600" />
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16 md:h-20">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="p-2 md:p-2.5 bg-emerald-500/10 rounded-xl md:rounded-2xl border border-emerald-500/20 shadow-md">
+                <Heart className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-xl font-black bg-gradient-to-r from-emerald-600 to-teal-650 bg-clip-text text-transparent leading-none">
+                <h1 className="text-base md:text-xl font-black bg-gradient-to-r from-emerald-600 to-teal-650 bg-clip-text text-transparent leading-none">
                   Token of Halawa
                 </h1>
-                <p className="text-[8px] font-extrabold text-slate-500 tracking-widest mt-1 uppercase">Connecting Hearts Spreading Smiles</p>
+                <p className="text-[7px] md:text-[8px] font-extrabold text-slate-500 tracking-wider md:tracking-widest mt-0.5 md:mt-1 uppercase hidden sm:block">
+                  Connecting Hearts Spreading Smiles
+                </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 font-bold text-sm transition">
-                Live Stats
+            <div className="flex items-center gap-2 md:gap-4">
+              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 font-bold text-xs md:text-sm transition px-2 py-1">
+                <span className="hidden sm:inline">Live Stats</span>
+                <span className="sm:hidden">Stats</span>
               </Link>
-              <Link href="/dashboard" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2.5 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2 text-sm">
-                <LayoutDashboard className="w-4 h-4" /> Campaigner Login
+              <Link href="/dashboard" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
+                <LayoutDashboard className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Campaigner Login</span>
+                <span className="sm:hidden">Login</span>
               </Link>
             </div>
           </div>
@@ -183,16 +211,16 @@ export default function HomePage() {
       </nav>
 
       {/* Web Banner Slider Card (CSS Styled slides) */}
-      <section className="pt-32 px-6">
+      <section className="pt-24 md:pt-32 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className={`relative overflow-hidden rounded-3xl border backdrop-blur-xl p-8 md:p-12 transition-all duration-700 ${slides[activeSlide].bg}`}>
+          <div className={`relative overflow-hidden rounded-3xl border backdrop-blur-xl p-8 md:p-12 transition-all duration-700 ${slides[activeSlide]?.bg || 'bg-slate-50'}`}>
             <div className="relative z-10 max-w-2xl text-left">
-              <span className={`text-xs uppercase font-extrabold tracking-wider ${slides[activeSlide].accent}`}>Campaign Slider</span>
-              <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 mt-2 mb-4 transition-all duration-500">
-                {slides[activeSlide].title}
+              <span className={`text-xs uppercase font-extrabold tracking-wider ${slides[activeSlide]?.accent || 'text-slate-600'}`}>Campaign Slider</span>
+              <h2 className={`text-2xl md:text-4xl font-extrabold text-slate-900 mt-2 mb-4 transition-all duration-500 ${slides[activeSlide] && isMalayalam(slides[activeSlide].title) ? 'font-malayalam' : ''}`}>
+                {slides[activeSlide]?.title}
               </h2>
-              <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-                {slides[activeSlide].desc}
+              <p className={`text-sm md:text-base text-slate-600 leading-relaxed font-medium ${slides[activeSlide] && isMalayalam(slides[activeSlide].desc) ? 'font-malayalam font-bold' : ''}`}>
+                {slides[activeSlide]?.desc}
               </p>
             </div>
             {/* Dots */}
@@ -234,15 +262,12 @@ export default function HomePage() {
       </section>
 
       {/* Scrolling Announcement Banner */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3.5 overflow-hidden border-y border-emerald-400/30 shadow-lg">
+      <div className={`bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold py-3.5 overflow-hidden border-y border-emerald-400/30 shadow-lg ${isMalayalam(tickerText) ? 'font-malayalam' : ''}`}>
         <div className="whitespace-nowrap overflow-hidden">
-          <div className="inline-block animate-[scroll_25s_linear_infinite] text-xs font-black tracking-widest uppercase">
-            <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Direct WhatsApp verification now enabled for all campaigners</span>
-            {/* Repeat for looping effect */}
-            <span className="mx-6"><span className="text-amber-300">★</span> Welcome to Token of Halawa donation program</span>
-            <span className="mx-6"><span className="text-amber-300">★</span> Live tracking of monthly targets and campaign approvals active</span>
+          <div className="inline-block animate-[scroll_50s_linear_infinite] text-xs font-black tracking-widest uppercase">
+            <span className="mx-6"><span className="text-amber-300">★</span> {tickerText}</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> {tickerText}</span>
+            <span className="mx-6"><span className="text-amber-300">★</span> {tickerText}</span>
           </div>
         </div>
       </div>
@@ -335,9 +360,9 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="relative z-10 bg-[#060a14]/90 border-t border-white/5 pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
             
-            <div className="col-span-2 text-left">
+            <div className="col-span-1 sm:col-span-2 text-left">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
                   <Heart className="w-6 h-6 text-emerald-400" />
@@ -352,8 +377,8 @@ export default function HomePage() {
             <div className="text-left">
               <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">Quick Links</h3>
               <ul className="space-y-3.5 text-sm text-slate-400">
-                <li><Link href="/dashboard" className="hover:text-white transition">Admin Portal</Link></li>
-                <li><Link href="/dashboard" className="hover:text-white transition">Campaigner Portal</Link></li>
+                <li><Link href="/dashboard?role=admin" className="hover:text-white transition">Admin Portal</Link></li>
+                <li><Link href="/dashboard?role=campaigner" className="hover:text-white transition">Campaigner Portal</Link></li>
                 <li><a href="#leaderboard" className="hover:text-white transition">Leaderboard</a></li>
                 <li><Link href="/dashboard" className="hover:text-white transition">Live Stats</Link></li>
               </ul>

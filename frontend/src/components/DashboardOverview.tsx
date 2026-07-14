@@ -7,7 +7,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -207,6 +207,9 @@ export default function DashboardOverview() {
 
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [loginRole, setLoginRole] = useState<'campaigner' | 'admin'>('campaigner');
+  const [selectedClass, setSelectedClass] = useState('Final year');
+  const [selectedHn, setSelectedHn] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authFullName, setAuthFullName] = useState('');
@@ -261,6 +264,36 @@ export default function DashboardOverview() {
   const [selectedClassDashboard, setSelectedClassDashboard] = useState<string>('Plus one');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Donors Directory Advanced States
+  const [donorSearchQuery, setDonorSearchQuery] = useState('');
+  const [donorFilterCategory, setDonorFilterCategory] = useState('ALL');
+  const [mergeSourceId, setMergeSourceId] = useState('');
+  const [mergeTargetId, setMergeTargetId] = useState('');
+  const [mergeReason, setMergeReason] = useState('');
+  const [mergeLoading, setMergeLoading] = useState(false);
+  const [mergeSuccess, setMergeSuccess] = useState('');
+  const [mergeError, setMergeError] = useState('');
+
+  // Advanced View Filters
+  const [donationClassFilter, setDonationClassFilter] = useState('ALL');
+  const [donationMonthFilter, setDonationMonthFilter] = useState('ALL');
+  const [donationStatusFilter, setDonationStatusFilter] = useState('ALL');
+  const [verifyClassFilter, setVerifyClassFilter] = useState('ALL');
+  const [verifySearchQuery, setVerifySearchQuery] = useState('');
+  const [campStatsClassFilter, setCampStatsClassFilter] = useState('ALL');
+  const [campStatsSearchQuery, setCampStatsSearchQuery] = useState('');
+
+  // Class Handovers States
+  const [classHandovers, setClassHandovers] = useState([
+    { id: 'MHB-HO-2026-9388', className: 'Plus two', leader: 'Zameel', phone: '9961592152', amount: 13000, month: 'June 2026', date: '21 Jun 2026, 06:40 PM' },
+    { id: 'MHB-HO-2026-6631', className: 'Plus one', leader: 'Uvais', phone: '7306676918', amount: 11350, month: 'June 2026', date: '21 Jun 2026, 06:38 PM' }
+  ]);
+  const [handoverClass, setHandoverClass] = useState('Plus one');
+  const [handoverMonth, setHandoverMonth] = useState('July 2026');
+  const [handoverAmount, setHandoverAmount] = useState('');
+  const [handoverLeader, setHandoverLeader] = useState('');
+  const [handoverPhone, setHandoverPhone] = useState('');
+
   const barChartRef = useRef<HTMLCanvasElement | null>(null);
   const lineChartRef = useRef<HTMLCanvasElement | null>(null);
   const barChartInst = useRef<Chart | null>(null);
@@ -285,12 +318,28 @@ export default function DashboardOverview() {
     if (selectedRole === 'volunteer') setActiveTab('v-overview');
   }, [selectedRole]);
 
+  // Synchronize first HN of class when changing class selector
+  useEffect(() => {
+    const listForClass = campaignersList.filter(c => c.class === selectedClass);
+    if (listForClass.length > 0) {
+      const exists = listForClass.some(c => String(c.hn) === selectedHn);
+      if (!exists) {
+        setSelectedHn(String(listForClass[0].hn));
+      }
+    }
+  }, [selectedClass]);
+
   useEffect(() => {
     setIsClient(true);
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('register') === 'true') {
         setAuthMode('register');
+      }
+      if (params.get('role') === 'admin') {
+        setLoginRole('admin');
+      } else if (params.get('role') === 'campaigner') {
+        setLoginRole('campaigner');
       }
     }
     const timer = setTimeout(() => {
@@ -350,14 +399,34 @@ export default function DashboardOverview() {
     try {
       if (authMode === 'login') {
         let finalEmail = authEmail.trim();
-        if (!finalEmail.includes('@')) {
-          const slug = finalEmail.toLowerCase().replace(/\s+/g, '');
-          if (/^\d+$/.test(slug)) {
-            finalEmail = `hn${slug}@hidayaonline.org`;
-          } else {
+
+        if (loginRole === 'campaigner') {
+          if (!selectedHn) {
+            setAuthError('Please select your HN code');
+            setAuthLoading(false);
+            return;
+          }
+          finalEmail = `hn${selectedHn}@hidayaonline.org`;
+        } else {
+          // Admin login check: prevent campaigners from logging in through admin portal
+          if (!finalEmail.includes('@')) {
+            const slug = finalEmail.toLowerCase().replace(/\s+/g, '');
+            if (/^\d+$/.test(slug)) {
+              setAuthError('Campaigners must use the Campaigner Login Portal.');
+              setAuthLoading(false);
+              return;
+            }
             finalEmail = `${slug}@hidayaonline.org`;
+          } else {
+            const localPart = finalEmail.split('@')[0].toLowerCase();
+            if (localPart.startsWith('hn') && /^\d+$/.test(localPart.slice(2))) {
+              setAuthError('Campaigners must use the Campaigner Login Portal.');
+              setAuthLoading(false);
+              return;
+            }
           }
         }
+
         const res = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -695,19 +764,69 @@ export default function DashboardOverview() {
               </>
             )}
 
-            <div>
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                {authMode === 'register' ? 'Email Address' : 'Campaigner ID / Email Address'}
-              </label>
-              <input 
-                type="text" 
-                required 
-                value={authEmail}
-                onChange={(e) => setAuthEmail(e.target.value)}
-                placeholder={authMode === 'register' ? "e.g. info@hidayaonline.org" : "e.g. HN Code, Username or Email"}
-                className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-              />
-            </div>
+            {authMode === 'login' && loginRole === 'campaigner' ? (
+              <>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select Class</label>
+                  <select
+                    value={selectedClass}
+                    onChange={(e) => {
+                      setSelectedClass(e.target.value);
+                      const listForClass = campaignersList.filter(c => c.class === e.target.value);
+                      if (listForClass.length > 0) {
+                        setSelectedHn(String(listForClass[0].hn));
+                      }
+                    }}
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
+                  >
+                    {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
+                      <option key={c} value={c} className="text-slate-800">{c}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select HN Code</label>
+                  <select
+                    value={selectedHn}
+                    onChange={(e) => setSelectedHn(e.target.value)}
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
+                  >
+                    <option value="" disabled className="text-slate-850">Select HN Code</option>
+                    {campaignersList.filter(c => c.class === selectedClass).map(c => (
+                      <option key={c.hn} value={c.hn} className="text-slate-800">HN {c.hn} ({c.name})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {(() => {
+                  const activeCampaigner = campaignersList.find(c => String(c.hn) === selectedHn && c.class === selectedClass);
+                  return activeCampaigner ? (
+                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-left transition-all duration-300">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Resolved Campaigner Profile</span>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400">{activeCampaigner.name}</span>
+                        <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold">Class: {selectedClass}</span>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
+              </>
+            ) : (
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  {authMode === 'register' ? 'Email Address' : 'Admin Email / Username'}
+                </label>
+                <input 
+                  type="text" 
+                  required 
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  placeholder={authMode === 'register' ? "e.g. info@hidayaonline.org" : "e.g. admin@hidayaonline.org"}
+                  className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
+                />
+              </div>
+            )}
 
             <div>
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Password</label>
@@ -724,10 +843,34 @@ export default function DashboardOverview() {
             <button 
               type="submit" 
               disabled={authLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-6 py-3 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition text-sm flex justify-center items-center gap-2 mt-6"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-6 py-3 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 active:scale-95 transition text-sm flex justify-center items-center gap-2 mt-6 cursor-pointer"
             >
-              {authLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : authMode === 'login' ? 'Access Console' : 'Initialize Hub'}
+              {authLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 
+               authMode === 'register' ? 'Initialize Hub' : 
+               loginRole === 'admin' ? 'Access Admin Console' : 'Access Campaigner Console'}
             </button>
+
+            {authMode === 'login' && (
+              <div className="mt-6 pt-4 border-t border-white/5 text-center">
+                {loginRole === 'campaigner' ? (
+                  <button 
+                    type="button" 
+                    onClick={() => { setLoginRole('admin'); setAuthError(''); }}
+                    className="text-xs text-slate-400 hover:text-emerald-400 font-bold transition underline cursor-pointer"
+                  >
+                    Are you an Admin? Admin Portal Login
+                  </button>
+                ) : (
+                  <button 
+                    type="button" 
+                    onClick={() => { setLoginRole('campaigner'); setAuthError(''); }}
+                    className="text-xs text-slate-400 hover:text-emerald-400 font-bold transition underline cursor-pointer"
+                  >
+                    Are you a Campaigner? Campaigner Portal Login
+                  </button>
+                )}
+              </div>
+            )}
           </form>
         </div>
       </div>
@@ -983,57 +1126,212 @@ export default function DashboardOverview() {
           )}
 
           {/* VIEW: Donation Entries / My Collections History Table */}
-          {(activeTab === 'donations' || activeTab === 'v-history') && (
-            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                  <input 
-                    type="text" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search transaction reference, donor name or ID..."
-                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
-                  />
+          {(activeTab === 'donations' || activeTab === 'v-history') && (() => {
+            // 1. Calculate Stats
+            const newCollectionTotal = verificationQueue
+              .filter(item => !item.notes?.includes('Renew'))
+              .reduce((acc, item) => acc + Number(item.amount), 0);
+            
+            const renewCollectionTotal = verificationQueue
+              .filter(item => item.notes?.includes('Renew'))
+              .reduce((acc, item) => acc + Number(item.amount), 0);
+
+            const totalCollection = newCollectionTotal + renewCollectionTotal;
+
+            // 2. Filter logic
+            const filteredEntries = verificationQueue.filter(item => {
+              const query = searchQuery.toLowerCase().trim();
+              const matchesSearch = !query ||
+                item.id.toLowerCase().includes(query) ||
+                (item.donor?.name || '').toLowerCase().includes(query) ||
+                (item.donor?.phone || '').includes(query) ||
+                (item.notes || '').toLowerCase().includes(query);
+
+              // Extract Class, Campaigner, and Month from notes
+              const itemClass = item.notes?.match(/Class:\s*([^\.]+)/)?.[1] || '';
+              const itemCamp = item.notes?.match(/Logged by:\s*([^\.]+)/)?.[1] || '';
+              const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '';
+
+              const matchesClass = donationClassFilter === 'ALL' || itemClass.trim() === donationClassFilter;
+              const matchesMonth = donationMonthFilter === 'ALL' || itemMonth.trim() === donationMonthFilter;
+              const matchesStatus = donationStatusFilter === 'ALL' || item.status === donationStatusFilter;
+
+              return matchesSearch && matchesClass && matchesMonth && matchesStatus;
+            });
+
+            return (
+              <div className="space-y-6 flex-1 flex flex-col">
+                
+                {/* Stats row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Total New Collection</span>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{newCollectionTotal.toLocaleString()}.00</h3>
+                  </div>
+                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Total Renew Collection</span>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{renewCollectionTotal.toLocaleString()}.00</h3>
+                  </div>
+                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Total Collection</span>
+                    <h3 className="text-2xl font-black text-emerald-500 mt-2">₹{totalCollection.toLocaleString()}.00</h3>
+                  </div>
+                </div>
+
+                {/* Filters row */}
+                <div className={`p-5 rounded-3xl ${glassClass} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-center`}>
+                  <div>
+                    <select
+                      value={donationClassFilter}
+                      onChange={(e) => setDonationClassFilter(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Classes</option>
+                      {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <select
+                      value={donationMonthFilter}
+                      onChange={(e) => setDonationMonthFilter(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Months</option>
+                      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'One Time'].map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <select
+                      value={donationStatusFilter}
+                      onChange={(e) => setDonationStatusFilter(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Entries</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="APPROVED">Verified</option>
+                      <option value="REJECTED">Rejected</option>
+                    </select>
+                  </div>
+
+                  <div className="relative md:col-span-2">
+                    <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search donor, receiver, receipt, phone..."
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Ledger Table */}
+                <div className={`p-6 rounded-3xl ${glassClass} overflow-x-auto flex-1`}>
+                  {filteredEntries.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400">
+                      <IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p className="font-bold">No matching collection entries found.</p>
+                    </div>
+                  ) : (
+                    <table className="w-full text-left text-xs sm:text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10 text-slate-400 text-[10px] uppercase font-extrabold">
+                          <th className="py-3 px-4">Receipt</th>
+                          <th className="py-3 px-4">Donor</th>
+                          <th className="py-3 px-4">Receiver</th>
+                          <th className="py-3 px-4">Amount</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredEntries.map((item) => {
+                          const isRenew = item.notes?.includes('Renew');
+                          const itemClass = item.notes?.match(/Class:\s*([^\.]+)/)?.[1] || '';
+                          const itemCamp = item.notes?.match(/Logged by:\s*([^\.]+)/)?.[1] || 'Unknown';
+                          
+                          return (
+                            <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
+                              <td className="py-4 px-4 font-mono text-xs">
+                                <span className="font-bold block text-slate-900 dark:text-white">TOH-{item.id.slice(0, 5)}</span>
+                                <span className="opacity-50 text-[9px] block mt-0.5">{new Date(item.createdAt).toLocaleDateString()}</span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-bold block text-slate-900 dark:text-white">{item.donor?.name || 'General Donor'}</span>
+                                  <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${
+                                    isRenew ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                                  }`}>
+                                    {isRenew ? 'Renew' : 'New'}
+                                  </span>
+                                </div>
+                                <span className="opacity-50 text-[9px] block mt-0.5">{item.donor?.phone || 'No phone'}</span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <span className="font-bold block text-slate-900 dark:text-white uppercase">{itemCamp}</span>
+                                <span className="opacity-50 text-[9px] block mt-0.5 uppercase">{itemClass}</span>
+                              </td>
+                              <td className="py-4 px-4 font-bold text-emerald-500">₹{Number(item.amount).toLocaleString()}.00</td>
+                              <td className="py-4 px-4">
+                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                                  item.status === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                                  item.status === 'REJECTED' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                                  'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                                }`}>
+                                  {item.status === 'APPROVED' ? 'Verified' : item.status === 'REJECTED' ? 'Rejected' : 'Pending'}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4 text-right">
+                                <div className="flex justify-end gap-2">
+                                  {item.status === 'PENDING' && (
+                                    <button
+                                      onClick={() => handleApproveDonation(item.id, 'APPROVED')}
+                                      className="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 rounded-lg transition"
+                                      title="Approve / Verify"
+                                    >
+                                      <Check className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      const text = `*Receipt from Token of Halawa*\n\n` +
+                                        `Receipt No: TOH-${item.id.slice(0,5)}\n` +
+                                        `Donor: ${item.donor?.name || 'General Donor'}\n` +
+                                        `Amount: ₹${item.amount}\n` +
+                                        `Status: ${item.status}\n` +
+                                        `Date: ${new Date(item.createdAt).toLocaleDateString()}`;
+                                      navigator.clipboard.writeText(text);
+                                      alert("Receipt details copied! You can now send it on WhatsApp.");
+                                    }}
+                                    className="p-1.5 bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-400 rounded-lg transition"
+                                    title="Share Receipt"
+                                  >
+                                    <Share2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleApproveDonation(item.id, 'REJECTED')}
+                                    className="p-1.5 bg-red-500/10 hover:bg-red-500/25 text-red-600 dark:text-red-400 rounded-lg transition"
+                                    title="Reject Entry"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </div>
-
-              {/* Transactions Ledger Table */}
-              <div className="overflow-x-auto flex-1">
-                {verificationQueue.length === 0 ? (
-                  <div className="text-center py-12 text-slate-400">
-                    <IndianRupee className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p className="font-bold">No active collections logged in verification queue.</p>
-                  </div>
-                ) : (
-                  <table className="w-full text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                        <th className="py-3 px-4">Receipt ID</th>
-                        <th className="py-3 px-4">Donor Name</th>
-                        <th className="py-3 px-4">Category</th>
-                        <th className="py-3 px-4 text-right">Amount</th>
-                        <th className="py-3 px-4">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {verificationQueue.map((item) => (
-                        <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
-                          <td className="py-4 px-4 font-mono text-xs truncate max-w-[150px]">{item.id}</td>
-                          <td className="py-4 px-4">{item.donor?.name || 'General Donor'}</td>
-                          <td className="py-4 px-4">{item.donationType}</td>
-                          <td className="py-4 px-4 text-right text-emerald-550 dark:text-emerald-450 font-bold">₹{item.amount}</td>
-                          <td className="py-4 px-4">
-                            <span className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">{item.status}</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          )}
+            )})()}
 
           {/* VIEW: Verify Physical (Pending verification queue) */}
           {activeTab === 'verify' && (
@@ -1320,17 +1618,25 @@ export default function DashboardOverview() {
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">For Month *</label>
                       <span className="text-[9px] text-slate-400 block">ഏത് മാസത്തെ വരിസംഖ്യ</span>
                     </div>
-                    <select 
-                      value={donationMonthInput}
-                      onChange={(e) => setDonationMonthInput(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
-                    >
-                      <option value="July">July</option>
-                      <option value="August">August</option>
-                      <option value="September">September</option>
-                      <option value="October">October</option>
-                      <option value="One Time">One Time Payment</option>
-                    </select>
+                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'One Time'].map((m) => {
+                        const isSel = donationMonthInput === m;
+                        return (
+                          <button
+                            type="button"
+                            key={m}
+                            onClick={() => setDonationMonthInput(m)}
+                            className={`py-2 px-1 text-center rounded-xl text-[10px] font-bold border transition-all duration-200 ${
+                              isSel 
+                                ? 'bg-emerald-500 text-slate-950 border-emerald-500 shadow-md scale-95' 
+                                : 'bg-slate-200/50 dark:bg-black/20 text-slate-800 dark:text-slate-200 border-slate-350 dark:border-white/10 hover:border-emerald-500/50'
+                            }`}
+                          >
+                            {m}
+                          </button>
+                        );
+                      })}
+                    </div>
                     <span className="text-[9px] text-slate-400 mt-1 block">പ്രതിമാസ വരിസംഖ്യയായി നൽകാൻ താല്പര്യമില്ലാത്തവർക്ക് One Time Payment തിരഞ്ഞെടുക്കാം.</span>
                   </div>
 
@@ -1632,64 +1938,209 @@ export default function DashboardOverview() {
             </div>
           )}
 
-          {/* VIEW: Class Collections Directory */}
-          {activeTab === 'class-collections' && (
-            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div>
-                  <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                    <IndianRupee className="w-5 h-5 text-emerald-400" />
-                    Class Collections Directory
-                  </h3>
-                  <p className="text-xs opacity-60 mt-1">Consolidated collections, targets, and progress analysis grouped by classes.</p>
-                </div>
-              </div>
+          {/* VIEW: Class Collections (Handovers Form & Recent list) */}
+          {activeTab === 'class-collections' && (() => {
+            const handleAddHandover = (e: React.FormEvent) => {
+              e.preventDefault();
+              if (!handoverAmount || !handoverLeader) {
+                alert('Please fill out the Amount and Leader Name.');
+                return;
+              }
+              const newHO = {
+                id: `TOH-HO-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+                className: handoverClass,
+                leader: handoverLeader,
+                phone: handoverPhone || 'N/A',
+                amount: Number(handoverAmount),
+                month: handoverMonth,
+                date: new Date().toLocaleString()
+              };
+              setClassHandovers([newHO, ...classHandovers]);
+              setHandoverAmount('');
+              setHandoverLeader('');
+              setHandoverPhone('');
+              alert('Class handover logged successfully!');
+            };
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map((className) => {
-                  const classCampaigners = campaignersList.filter(c => c.class === className);
-                  const totalCampaigners = classCampaigners.length;
-                  const collected = verificationQueue
-                    .filter(q => q.notes?.includes(`Class: ${className}`))
-                    .reduce((acc, q) => acc + Number(q.amount), 0);
-                  const target = totalCampaigners * 10000;
-                  const percent = target > 0 ? Math.min(100, Math.round((collected / target) * 100)) : 0;
-                  return (
-                    <div key={className} className="p-5 rounded-3xl bg-white/5 border border-white/10 space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-extrabold text-slate-800 dark:text-white">{className}</h4>
-                          <p className="text-[10px] opacity-60 mt-0.5">{totalCampaigners} Active Campaigners</p>
-                        </div>
-                        <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Live</span>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="opacity-50 text-[10px] uppercase font-bold">Collected</span>
-                          <p className="font-extrabold text-emerald-500 mt-0.5">₹{collected.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <span className="opacity-50 text-[10px] uppercase font-bold">Target</span>
-                          <p className="font-bold text-slate-500 dark:text-slate-400 mt-0.5">₹{target.toLocaleString()}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] font-bold">
-                          <span>Target Completion</span>
-                          <span>{percent}%</span>
-                        </div>
-                        <div className="w-full bg-slate-200/50 dark:bg-black/35 h-2 rounded-full overflow-hidden">
-                          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all" style={{ width: `${percent}%` }} />
-                        </div>
-                      </div>
+            const handlePrintHO = (ho: any) => {
+              const printWin = window.open('', '_blank');
+              if (!printWin) return;
+              printWin.document.write(`
+                <html>
+                  <head>
+                    <title>Class Handover Receipt - ${ho.id}</title>
+                    <style>
+                      body { font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+                      .receipt-card { border: 2px dashed #10b981; padding: 30px; border-radius: 12px; max-width: 500px; margin: 0 auto; }
+                      h2 { text-align: center; color: #10b981; margin-top: 0; }
+                      .item-row { display: flex; justify-content: space-between; border-b: 1px solid #eee; padding: 8px 0; font-size: 14px; }
+                      .label { font-weight: bold; color: #666; }
+                      .val { font-weight: bold; }
+                      .total { font-size: 18px; color: #10b981; border-top: 2px solid #10b981; padding-top: 10px; margin-top: 10px; }
+                      .footer-note { text-align: center; font-size: 11px; color: #999; margin-top: 20px; }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="receipt-card">
+                      <h2>CLASS HANDOVER RECEIPT</h2>
+                      <div class="item-row"><span class="label">Receipt No:</span><span class="val">${ho.id}</span></div>
+                      <div class="item-row"><span class="label">Class:</span><span class="val">${ho.className}</span></div>
+                      <div class="item-row"><span class="val">${ho.leader}</span></div>
+                      <div class="item-row"><span class="label">Leader Phone:</span><span class="val">${ho.phone}</span></div>
+                      <div class="item-row"><span class="label">Month:</span><span class="val">${ho.month}</span></div>
+                      <div class="item-row"><span class="label">Logged Date:</span><span class="val">${ho.date}</span></div>
+                      <div class="item-row total"><span class="label">Amount Received:</span><span class="val">₹${ho.amount.toLocaleString()}.00</span></div>
+                      <p class="footer-note">Generated by Token of Halawa Admin Portal</p>
                     </div>
-                  );
-                })}
+                    <script>
+                      window.onload = function() { window.print(); window.close(); }
+                    </script>
+                  </body>
+                </html>
+              `);
+              printWin.document.close();
+            };
+
+            return (
+              <div className="space-y-6 flex-1 flex flex-col">
+                
+                {/* Form Card */}
+                <div className={`p-6 md:p-8 rounded-3xl ${glassClass} space-y-4`}>
+                  <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                      <IndianRupee className="w-5 h-5 text-emerald-400" />
+                      Class Collections Handover
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Manage handovers and approve amounts received from Class Leaders.</p>
+                  </div>
+
+                  <form onSubmit={handleAddHandover} className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Class Name</label>
+                      <select 
+                        value={handoverClass}
+                        onChange={(e) => setHandoverClass(e.target.value)}
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                      >
+                        {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
+                          <option key={c} value={c} className="text-slate-800">{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Handover Month</label>
+                      <input 
+                        type="text"
+                        value={handoverMonth}
+                        onChange={(e) => setHandoverMonth(e.target.value)}
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Amount Received (₹)</label>
+                      <input 
+                        type="number"
+                        required
+                        value={handoverAmount}
+                        onChange={(e) => setHandoverAmount(e.target.value)}
+                        placeholder="Enter amount"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Leader Name</label>
+                      <input 
+                        type="text"
+                        required
+                        value={handoverLeader}
+                        onChange={(e) => setHandoverLeader(e.target.value)}
+                        placeholder="Name of leader"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Leader Phone</label>
+                      <input 
+                        type="text"
+                        value={handoverPhone}
+                        onChange={(e) => setHandoverPhone(e.target.value)}
+                        placeholder="WhatsApp number"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Admin Name</label>
+                      <input 
+                        type="text"
+                        readOnly
+                        value="Admin"
+                        className="w-full bg-slate-250/50 dark:bg-white/5 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-400 outline-none cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3 pt-2">
+                      <button 
+                        type="submit"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-6 py-3 rounded-2xl font-black text-sm transition flex items-center justify-center gap-2"
+                      >
+                        <Check className="w-4 h-4" /> Save & Generate Receipt
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Recent Handovers List */}
+                <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
+                  <h4 className="font-bold text-slate-800 dark:text-white">Recent Class Handovers</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
+                          <th className="py-3 px-4">Receipt No</th>
+                          <th className="py-3 px-4">Class Details</th>
+                          <th className="py-3 px-4">Leader</th>
+                          <th className="py-3 px-4">Amount & Month</th>
+                          <th className="py-3 px-4">Date</th>
+                          <th className="py-3 px-4 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {classHandovers.map(ho => (
+                          <tr key={ho.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
+                            <td className="py-4 px-4 font-mono text-xs">{ho.id}</td>
+                            <td className="py-4 px-4"><span className="bg-indigo-500/10 text-indigo-500 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">{ho.className}</span></td>
+                            <td className="py-4 px-4">
+                              <span className="font-bold block text-slate-900 dark:text-white">{ho.leader}</span>
+                              <span className="opacity-50 text-[9px] block mt-0.5">{ho.phone}</span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className="font-bold block text-emerald-500">₹{ho.amount.toLocaleString()}.00</span>
+                              <span className="opacity-50 text-[9px] block mt-0.5">For {ho.month}</span>
+                            </td>
+                            <td className="py-4 px-4 text-xs opacity-65">{ho.date}</td>
+                            <td className="py-4 px-4 text-right">
+                              <button 
+                                onClick={() => handlePrintHO(ho)}
+                                className="bg-slate-200/50 dark:bg-white/5 border border-slate-350 dark:border-white/10 hover:bg-slate-300/50 dark:hover:bg-white/10 text-slate-800 dark:text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ml-auto"
+                              >
+                                Print
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* VIEW: Class Dashboard */}
           {activeTab === 'class-dashboard' && (
@@ -1787,95 +2238,419 @@ export default function DashboardOverview() {
           )}
 
           {/* VIEW: Donors Directory */}
-          {activeTab === 'donors' && (
-            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-emerald-400" />
-                  Donors Registry Directory
-                </h3>
-                <button 
-                  onClick={() => setActiveTab('add-donor')}
-                  className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-2xl text-xs font-bold"
-                >
-                  <UserPlus className="w-4 h-4" /> Add Donor Profile
-                </button>
-              </div>
+          {activeTab === 'donors' && (() => {
+            const filteredDonors = donors.filter(d => {
+              const query = donorSearchQuery.toLowerCase().trim();
+              const matchesSearch = !query || 
+                d.name.toLowerCase().includes(query) ||
+                d.phone.includes(query) ||
+                d.id.toLowerCase().includes(query) ||
+                (d.uniqueId && d.uniqueId.toLowerCase().includes(query));
 
-              <div className="overflow-x-auto">
-                {donors.length === 0 ? (
-                  <div className="text-center py-12 text-slate-400">
-                    <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p className="font-bold">No donor profiles registered in the database yet.</p>
+              const matchesCategory = donorFilterCategory === 'ALL' || 
+                d.category === donorFilterCategory;
+
+              return matchesSearch && matchesCategory;
+            });
+
+            const handleExportCSV = () => {
+              const headers = ['Unique ID,Name,Email,Phone,Category,Donation Plan\n'];
+              const rows = filteredDonors.map(d => `"${d.uniqueId || d.id}","${d.name}","${d.email || ''}","${d.phone}","${d.category || 'GENERAL'}","${d.donationPlan || 'MONTHLY'}"`);
+              const blob = new Blob([headers.concat(rows.join('\n')).join('')], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.setAttribute('download', `donors_registry_${new Date().toISOString().split('T')[0]}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            };
+
+            const handleExportPDF = () => {
+              const printWin = window.open('', '_blank');
+              if (!printWin) return;
+              printWin.document.write(`
+                <html>
+                  <head>
+                    <title>Donors Registry Directory</title>
+                    <style>
+                      body { font-family: sans-serif; padding: 20px; color: #333; }
+                      h1 { text-align: center; color: #10b981; }
+                      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                      th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 11px; }
+                      th { background-color: #f3f4f6; font-weight: bold; }
+                    </style>
+                  </head>
+                  <body>
+                    <h1>Donors Registry Directory</h1>
+                    <p>Total Records: ${filteredDonors.length} | Generated on: ${new Date().toLocaleDateString()}</p>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Unique ID</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Phone</th>
+                          <th>Category</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${filteredDonors.map(d => `
+                          <tr>
+                            <td>${d.uniqueId || d.id}</td>
+                            <td><b>${d.name}</b></td>
+                            <td>${d.email || 'N/A'}</td>
+                            <td>${d.phone}</td>
+                            <td>${d.category || 'GENERAL'}</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                    <script>
+                      window.onload = function() { window.print(); window.close(); }
+                    </script>
+                  </body>
+                </html>
+              `);
+              printWin.document.close();
+            };
+
+            const handleWhatsAppText = () => {
+              const text = `*Donors Registry Directory*\n\n` + filteredDonors.map((d, i) => `${i+1}. ${d.name} (${d.uniqueId || d.id}) - Phone: ${d.phone} [${d.category || 'GENERAL'}]`).join('\n');
+              navigator.clipboard.writeText(text);
+              alert("WhatsApp share text copied to clipboard! You can paste it into any WhatsApp chat.");
+            };
+
+            const handleMergeSubmit = async (e: React.FormEvent) => {
+              e.preventDefault();
+              if (!mergeSourceId || !mergeTargetId) {
+                setMergeError('Please select both source and target profiles.');
+                return;
+              }
+              if (mergeSourceId === mergeTargetId) {
+                setMergeError('Source and target profiles cannot be the same.');
+                return;
+              }
+              setMergeLoading(true);
+              setMergeError('');
+              setMergeSuccess('');
+              try {
+                const res = await fetch(`${API_URL}/donors/merge`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    sourceId: mergeSourceId,
+                    targetId: mergeTargetId,
+                    reason: mergeReason || 'Consolidation'
+                  })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  setMergeSuccess('Profiles merged successfully!');
+                  setMergeSourceId('');
+                  setMergeTargetId('');
+                  setMergeReason('');
+                  fetchDatabaseData();
+                } else {
+                  setMergeError(data.message || data.error || 'Merge failed');
+                }
+              } catch (err) {
+                setMergeError('Failed to connect to API server.');
+              } finally {
+                setMergeLoading(false);
+              }
+            };
+
+            return (
+              <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+                
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2">
+                      <UserCheck className="w-5 h-5 text-emerald-400" />
+                      Donors Registry Directory
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Manage, search, export and merge donor profiles registered under your hub.</p>
                   </div>
-                ) : (
-                  <table className="w-full text-left text-sm">
+                  <button 
+                    onClick={() => setActiveTab('add-donor')}
+                    className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2.5 rounded-2xl text-xs font-bold shrink-0 self-start md:self-center"
+                  >
+                    <UserPlus className="w-4 h-4" /> Add Donor Profile
+                  </button>
+                </div>
+
+                {/* Filters & Search Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <input 
+                      type="text"
+                      placeholder="Search by name, phone or ID..."
+                      value={donorSearchQuery}
+                      onChange={(e) => setDonorSearchQuery(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-11 pr-4 py-3 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <select
+                      value={donorFilterCategory}
+                      onChange={(e) => setDonorFilterCategory(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Categories</option>
+                      <option value="GENERAL">General</option>
+                      <option value="PREMIUM">Premium</option>
+                      <option value="WIDOW">Widow</option>
+                      <option value="ORPHAN">Orphan</option>
+                      <option value="POOR">Poor</option>
+                    </select>
+                  </div>
+                  
+                  {/* Export Buttons */}
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={handleExportCSV}
+                      className="flex-1 bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-350 py-2.5 rounded-2xl text-xs font-bold hover:bg-slate-300/50 dark:hover:bg-white/10 transition flex items-center justify-center gap-1.5"
+                    >
+                      Excel
+                    </button>
+                    <button 
+                      onClick={handleExportPDF}
+                      className="flex-1 bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-350 py-2.5 rounded-2xl text-xs font-bold hover:bg-slate-300/50 dark:hover:bg-white/10 transition flex items-center justify-center gap-1.5"
+                    >
+                      PDF
+                    </button>
+                    <button 
+                      onClick={handleWhatsAppText}
+                      className="flex-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-2xl text-xs font-bold hover:bg-emerald-500/20 transition flex items-center justify-center gap-1.5"
+                    >
+                      Share WA
+                    </button>
+                  </div>
+                </div>
+
+                {/* Collapsible Profile Merger */}
+                <details className="mb-6 bg-slate-250/20 dark:bg-black/10 border border-slate-350 dark:border-white/5 rounded-2xl p-4 text-xs">
+                  <summary className="font-bold text-slate-700 dark:text-slate-300 cursor-pointer outline-none select-none">
+                    Profile Merging Studio (Mahabba Merge)
+                  </summary>
+                  
+                  <form onSubmit={handleMergeSubmit} className="mt-4 space-y-4 max-w-2xl">
+                    {mergeError && <div className="text-red-500 font-semibold">{mergeError}</div>}
+                    {mergeSuccess && <div className="text-emerald-500 font-semibold">{mergeSuccess}</div>}
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block mb-1 font-bold text-slate-400">Duplicate Profile (To Merge/Delete)</label>
+                        <select 
+                          value={mergeSourceId}
+                          onChange={(e) => setMergeSourceId(e.target.value)}
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                        >
+                          <option value="">Select profile...</option>
+                          {donors.map(d => (
+                            <option key={d.id} value={d.id}>{d.name} ({d.uniqueId || d.id.slice(0,8)}) - {d.phone}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block mb-1 font-bold text-slate-400">Primary Profile (To Keep)</label>
+                        <select 
+                          value={mergeTargetId}
+                          onChange={(e) => setMergeTargetId(e.target.value)}
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                        >
+                          <option value="">Select profile...</option>
+                          {donors.map(d => (
+                            <option key={d.id} value={d.id}>{d.name} ({d.uniqueId || d.id.slice(0,8)}) - {d.phone}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block mb-1 font-bold text-slate-400">Reason for consolidation</label>
+                      <input 
+                        type="text"
+                        value={mergeReason}
+                        onChange={(e) => setMergeReason(e.target.value)}
+                        placeholder="e.g. Duplicate registration codes found"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                      />
+                    </div>
+
+                    <button 
+                      type="submit"
+                      disabled={mergeLoading}
+                      className="bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 px-4 py-2 rounded-xl font-bold transition disabled:opacity-50"
+                    >
+                      {mergeLoading ? 'Consolidating...' : 'Execute Merge'}
+                    </button>
+                  </form>
+                </details>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  {filteredDonors.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400">
+                      <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p className="font-bold">No matching donor profiles found.</p>
+                    </div>
+                  ) : (
+                    <table className="w-full text-left text-xs sm:text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
+                          <th className="py-3 px-4">Unique ID</th>
+                          <th className="py-3 px-4">Name</th>
+                          <th className="py-3 px-4">Phone Number</th>
+                          <th className="py-3 px-4">Category</th>
+                          <th className="py-3 px-4">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredDonors.map((d) => (
+                          <tr key={d.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
+                            <td className="py-4 px-4 font-mono text-xs text-amber-500 truncate max-w-[120px]">{d.uniqueId || d.id.slice(0,10)}</td>
+                            <td className="py-4 px-4 font-bold">{d.name}</td>
+                            <td className="py-4 px-4">{d.phone || 'N/A'}</td>
+                            <td className="py-4 px-4">
+                              <span className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">{d.category || 'GENERAL'}</span>
+                            </td>
+                            <td className="py-4 px-4">
+                              <button 
+                                onClick={() => {
+                                  setDonorPhoneInput(d.phone);
+                                  setDonorNameInput(d.name);
+                                  setDonorIdInput(d.uniqueId || d.id);
+                                  setActiveTab('add-donation');
+                                }}
+                                className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-xl text-[10px] font-black transition"
+                              >
+                                Add Receipt
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* VIEW: Class Rankings / Leaderboard */}
+          {(activeTab === 'rankings' || activeTab === 'v-leaderboard') && (() => {
+            const handleExportRankings = () => {
+              const headers = ['Rank,Class Name,Campaigners,Target Donors,Achieved Donors,Collected Amount\n'];
+              const rows = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
+                .map((className) => {
+                  const campaigners = campaignersList.filter(c => c.class === className).length;
+                  const collected = verificationQueue
+                    .filter(q => q.notes?.includes(`Class: ${className}`))
+                    .reduce((acc, q) => acc + Number(q.amount), 0);
+                  const achieved = new Set(verificationQueue.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId)).size;
+                  return { className, campaigners, collected, achieved };
+                })
+                .sort((a, b) => b.collected - a.collected)
+                .map((c, i) => `"#${i+1}","${c.className}","${c.campaigners}","${c.campaigners * 5}","${c.achieved}","₹${c.collected}"`);
+
+              const blob = new Blob([headers.concat(rows.join('\n')).join('')], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.setAttribute('download', `class_rankings_${new Date().toISOString().split('T')[0]}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            };
+
+            const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
+              .map((className) => {
+                const campaigners = campaignersList.filter(c => c.class === className).length;
+                const collected = verificationQueue
+                  .filter(q => q.notes?.includes(`Class: ${className}`))
+                  .reduce((acc, q) => acc + Number(q.amount), 0);
+                const achieved = new Set(verificationQueue.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId)).size;
+                return { className, campaigners, collected, achieved };
+              })
+              .sort((a, b) => b.collected - a.collected);
+
+            return (
+              <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+                
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                      <Trophy className="w-5 h-5 text-amber-500" />
+                      Class Rankings & Progress
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Real-time target leaderboard sorted by class collections.</p>
+                  </div>
+                  <button 
+                    onClick={handleExportRankings}
+                    className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2.5 rounded-2xl text-xs font-bold self-start md:self-center shrink-0"
+                  >
+                    <Download className="w-4 h-4" /> Download Report
+                  </button>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs sm:text-sm">
                     <thead>
-                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                        <th className="py-3 px-4">Unique ID</th>
-                        <th className="py-3 px-4">Name</th>
-                        <th className="py-3 px-4">Email</th>
-                        <th className="py-3 px-4">Phone Number</th>
-                        <th className="py-3 px-4">Category</th>
+                      <tr className="border-b border-white/10 text-slate-400 text-[10px] uppercase font-extrabold">
+                        <th className="py-3 px-4">Rank</th>
+                        <th className="py-3 px-4">Class Name</th>
+                        <th className="py-3 px-4">Campaigners</th>
+                        <th className="py-3 px-4">Target Donors</th>
+                        <th className="py-3 px-4">Achieved %</th>
+                        <th className="py-3 px-4 text-right">Collected Amount</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {donors.map((d) => (
-                        <tr key={d.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
-                          <td className="py-4 px-4 font-mono text-xs text-amber-500 truncate max-w-[120px]">{d.id}</td>
-                          <td className="py-4 px-4 font-bold">{d.name}</td>
-                          <td className="py-4 px-4">{d.email}</td>
-                          <td className="py-4 px-4">{d.phone || 'N/A'}</td>
-                          <td className="py-4 px-4">
-                            <span className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">{d.category || 'GENERAL'}</span>
-                          </td>
-                        </tr>
-                      ))}
+                      {rankedClasses.map((item, index) => {
+                        const targetDonors = item.campaigners * 5;
+                        const percent = targetDonors > 0 ? Math.min(100, Math.round((item.achieved / targetDonors) * 100)) : 0;
+                        
+                        return (
+                          <tr key={item.className} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium">
+                            <td className="py-4 px-4 font-mono font-bold text-amber-500">#{index + 1}</td>
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-900 dark:text-white uppercase">{item.className}</span>
+                                <span className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase border border-yellow-500/20">Min Target</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 font-bold opacity-75">{item.campaigners}</td>
+                            <td className="py-4 px-4 font-bold opacity-75">{targetDonors} (Max)</td>
+                            <td className="py-4 px-4 min-w-[150px]">
+                              <div className="flex items-center gap-2">
+                                <div className="w-full bg-slate-200/50 dark:bg-black/30 h-2 rounded-full overflow-hidden">
+                                  <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${percent}%` }} />
+                                </div>
+                                <span className="text-[10px] font-bold shrink-0">{percent}% max</span>
+                              </div>
+                              <span className="text-[8px] opacity-50 block mt-0.5">{item.achieved} / {targetDonors} Donors</span>
+                            </td>
+                            <td className="py-4 px-4 text-right font-black text-emerald-500 text-sm">₹{item.collected.toLocaleString()}.00</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
-                )}
+                </div>
+
               </div>
-            </div>
-          )}
-
-          {/* VIEW: Class Rankings / Leaderboard */}
-          {(activeTab === 'rankings' || activeTab === 'v-leaderboard') && (
-            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-500" />
-                Live Class Leaderboard Rankings
-              </h3>
-
-              <div className="space-y-4 max-w-xl">
-                {(() => {
-                  const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
-                    .map((className) => {
-                      const collected = verificationQueue
-                        .filter(q => q.notes?.includes(`Class: ${className}`))
-                        .reduce((acc, q) => acc + Number(q.amount), 0);
-                      return { className, collected };
-                    })
-                    .sort((a, b) => b.collected - a.collected);
-
-                  return rankedClasses.map((item, index) => (
-                    <div key={item.className} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-3">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center font-black text-xs ${
-                          index === 0 ? 'bg-amber-500 text-slate-950' : 
-                          index === 1 ? 'bg-slate-300 text-slate-950' : 
-                          index === 2 ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'
-                        }`}>
-                          #{index + 1}
-                        </span>
-                        <h5 className="font-bold text-slate-800 dark:text-white uppercase">{item.className}</h5>
-                      </div>
-                      <span className="font-extrabold text-emerald-500">₹{item.collected.toLocaleString()}</span>
-                    </div>
-                  ));
-                })()}
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* VIEW: Broadcast Messages (Volunteer notifications) */}
           {activeTab === 'v-messages' && (

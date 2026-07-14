@@ -7,7 +7,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -241,6 +241,8 @@ export default function DashboardOverview() {
   const [formError, setFormError] = useState('');
   const [showInstructions, setShowInstructions] = useState(false);
   const [customSelectedMonths, setCustomSelectedMonths] = useState<string[]>([]);
+  const [campaignerAvatar, setCampaignerAvatar] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Extended form fields from legacy screen
   const [donationTab, setDonationTab] = useState<'new' | 'renew'>('new');
@@ -342,6 +344,33 @@ export default function DashboardOverview() {
       }
     }
   }, [selectedRole]);
+
+  // Load avatar from local storage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedAvatar = localStorage.getItem('toh_campaigner_avatar');
+      if (savedAvatar) {
+        setCampaignerAvatar(savedAvatar);
+      }
+    }
+  }, []);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Please select an image smaller than 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setCampaignerAvatar(base64String);
+        localStorage.setItem('toh_campaigner_avatar', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Synchronize first HN of class when changing class selector
   useEffect(() => {
@@ -986,8 +1015,33 @@ export default function DashboardOverview() {
           {/* Dynamic Sidebar Links */}
           {selectedRole === 'volunteer' && (
             <div className="p-4 rounded-3xl bg-slate-200/50 dark:bg-black/20 border border-slate-300/80 dark:border-white/5 text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-2xl shadow-lg mb-3">
-                {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'VO'}
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept="image/*" 
+                onChange={handleAvatarChange} 
+                className="hidden" 
+              />
+              <div className="relative mb-3">
+                {campaignerAvatar ? (
+                  <img 
+                    src={campaignerAvatar} 
+                    alt="Profile" 
+                    className="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-emerald-500" 
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+                    {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'VO'}
+                  </div>
+                )}
+                <button 
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute -bottom-1 -right-1 p-1.5 bg-[#0f4c81] text-white hover:bg-[#135c9b] rounded-full shadow border border-white/20 transition-all duration-200 cursor-pointer"
+                  title="Upload Profile Picture"
+                >
+                  <Camera className="w-3 h-3" />
+                </button>
               </div>
               <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} · ID: {(user as any)?.hn || '001'}</p>

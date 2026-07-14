@@ -94,33 +94,54 @@ export default function HomePage() {
     };
   }, []);
 
-  // Static mockup data mirroring the Mahabba structure with actual campaigners
-  const topVolunteers = [
-    { name: "Asif ali", unit: "Final year", total: 12400, donors: 42 },
-    { name: "Bishrul wafa", unit: "Final year", total: 9850, donors: 31 },
-    { name: "Muhammed Falil", unit: "Final year", total: 8900, donors: 28 },
-    { name: "Adhil Ameen", unit: "Degree Third year", total: 7200, donors: 22 },
-    { name: "Muhammed Ali", unit: "Degree second year", total: 6150, donors: 19 }
-  ];
+  // Campaigner stats states initialized to zero
+  const [topVolunteers, setTopVolunteers] = useState<VolunteerData[]>([
+    { name: "Asif ali", unit: "Final year", total: 0, donors: 0 },
+    { name: "Bishrul wafa", unit: "Final year", total: 0, donors: 0 },
+    { name: "Muhammed Falil", unit: "Final year", total: 0, donors: 0 },
+    { name: "Adhil Ameen", unit: "Degree Third year", total: 0, donors: 0 },
+    { name: "Muhammed Ali", unit: "Degree second year", total: 0, donors: 0 }
+  ]);
 
-  const todayVolunteers = [
-    { name: "Sinan Cheekod", unit: "Final year", total: 1550, donors: 6 },
-    { name: "Muhammed Melattoor", unit: "Degree first year", total: 1200, donors: 4 }
-  ];
+  const [todayVolunteers, setTodayVolunteers] = useState<VolunteerData[]>([
+    { name: "Sinan Cheekod", unit: "Final year", total: 0, donors: 0 },
+    { name: "Muhammed Melattoor", unit: "Degree first year", total: 0, donors: 0 }
+  ]);
 
+  const [topClasses, setTopClasses] = useState<ClassData[]>([
+    { className: "Final year", total: 0, donors: 0 },
+    { className: "Degree Third year", total: 0, donors: 0 },
+    { className: "Degree second year", total: 0, donors: 0 },
+    { className: "Plus two", total: 0, donors: 0 }
+  ]);
 
+  const [todayClasses, setTodayClasses] = useState<ClassData[]>([
+    { className: "Final year", total: 0, donors: 0 },
+    { className: "Degree Third year", total: 0, donors: 0 }
+  ]);
 
-  const topClasses = [
-    { className: "Final year", total: 34200, donors: 104 },
-    { className: "Degree Third year", total: 28900, donors: 88 },
-    { className: "Degree second year", total: 22100, donors: 71 },
-    { className: "Plus two", total: 19500, donors: 60 }
-  ];
-
-  const todayClasses = [
-    { className: "Final year", total: 2400, donors: 9 },
-    { className: "Degree Third year", total: 1850, donors: 6 }
-  ];
+  // Fetch live stats from public backend endpoint
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const fetchHomeStats = async () => {
+      try {
+        const res = await fetch(`${API_URL}/public/home-stats`);
+        if (res.ok) {
+          const result = await res.json();
+          if (result.success && result.data) {
+            const { topVolunteers: tv, todayVolunteers: tdyV, topClasses: tc, todayClasses: tdyC } = result.data;
+            if (tv && tv.length > 0) setTopVolunteers(tv);
+            if (tdyV && tdyV.length > 0) setTodayVolunteers(tdyV);
+            if (tc && tc.length > 0) setTopClasses(tc);
+            if (tdyC && tdyC.length > 0) setTodayClasses(tdyC);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load live landing page statistics:', err);
+      }
+    };
+    fetchHomeStats();
+  }, []);
 
 
 

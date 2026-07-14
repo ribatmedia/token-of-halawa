@@ -10,6 +10,7 @@ import authRoutes from './routes/auth';
 import donorRoutes from './routes/donor';
 import donationRoutes from './routes/donation';
 import campaignRoutes from './routes/campaign';
+import publicRoutes from './routes/public';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/donors', donorRoutes);
 app.use('/api/v1/donations', donationRoutes);
 app.use('/api/v1/campaigns', campaignRoutes);
+app.use('/api/v1/public', publicRoutes);
 
 // Error Handling Middleware
 app.use(errorHandler);

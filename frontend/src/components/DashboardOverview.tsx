@@ -2744,26 +2744,6 @@ export default function DashboardOverview() {
                   <button className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">Mark as Read</button>
                 </div>
 
-                {/* Expected collection banner */}
-                <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-650 text-white shadow-xl relative overflow-hidden">
-                  <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                      <span className="text-xs uppercase font-extrabold tracking-wider opacity-75">Total Expected Collection</span>
-                      <h2 className="text-4xl font-black mt-2">₹{myExpectedTotal.toLocaleString()}.00</h2>
-                    </div>
-                    <div className="flex gap-8 text-right">
-                      <div>
-                        <span className="text-[10px] uppercase font-bold opacity-75 block">Collected</span>
-                        <span className="text-xl font-black text-emerald-300">₹{myCollectedTotal.toLocaleString()}.00</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase font-bold opacity-75 block">Not Received</span>
-                        <span className="text-xl font-black text-amber-300">₹{myNotReceivedTotal.toLocaleString()}.00</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* personal stats metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>

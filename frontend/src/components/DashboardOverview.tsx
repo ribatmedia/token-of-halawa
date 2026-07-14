@@ -2640,40 +2640,198 @@ export default function DashboardOverview() {
                       <p className="font-bold">No matching donor profiles found.</p>
                     </div>
                   ) : (
-                    <table className="w-full text-left text-xs sm:text-sm">
+                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
                       <thead>
-                        <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                          <th className="py-3 px-4">Unique ID</th>
-                          <th className="py-3 px-4">Name</th>
-                          <th className="py-3 px-4">Phone Number</th>
-                          <th className="py-3 px-4">Category</th>
-                          <th className="py-3 px-4">Actions</th>
+                        <tr className="border-b border-white/10 text-slate-400 text-[10px] uppercase font-extrabold tracking-wider">
+                          <th className="py-4 px-4 text-center"># / Reg ID</th>
+                          <th className="py-4 px-4">Donor Details</th>
+                          <th className="py-4 px-4 text-center">Subscription & Months</th>
+                          <th className="py-4 px-4">Location</th>
+                          <th className="py-4 px-4">Managed By</th>
+                          <th className="py-4 px-4 text-right">Collected</th>
+                          <th className="py-4 px-4 text-center">Status & Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredDonors.map((d) => (
-                          <tr key={d.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
-                            <td className="py-4 px-4 font-mono text-xs text-amber-500 truncate max-w-[120px]">{d.uniqueId || d.id.slice(0,10)}</td>
-                            <td className="py-4 px-4 font-bold">{d.name}</td>
-                            <td className="py-4 px-4">{d.phone || 'N/A'}</td>
-                            <td className="py-4 px-4">
-                              <span className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">{d.category || 'GENERAL'}</span>
-                            </td>
-                            <td className="py-4 px-4">
-                              <button 
-                                onClick={() => {
-                                  setDonorPhoneInput(d.phone);
-                                  setDonorNameInput(d.name);
-                                  setDonorIdInput(d.uniqueId || d.id);
-                                  setActiveTab('add-donation');
-                                }}
-                                className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-xl text-[10px] font-black transition"
-                              >
-                                Add Receipt
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                        {filteredDonors.map((d, index) => {
+                          // 1. Get donor donations
+                          const donorDonations = verificationQueue.filter(q => q.donorId === d.id);
+                          const lastDonation = donorDonations[0];
+                          
+                          // 2. Extract donation plan
+                          let detectedPlan = 'CUSTOM';
+                          if (lastDonation?.notes) {
+                            const planMatch = lastDonation.notes.match(/Plan:\s*([^.]+)/);
+                            if (planMatch) {
+                              detectedPlan = planMatch[1].trim().toUpperCase();
+                            }
+                          } else if (d.category) {
+                            detectedPlan = d.category.toUpperCase();
+                          }
+
+                          // 3. Extract paid months
+                          const paidMonths = donorDonations
+                            .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
+                            .map(q => {
+                              const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
+                              return monthMatch ? monthMatch[1].trim() : '';
+                            })
+                            .filter(Boolean);
+
+                          // 4. Extract total collected amount
+                          const totalCollected = donorDonations
+                            .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
+                            .reduce((acc, q) => acc + Number(q.amount), 0);
+
+                          // 5. Extract Campaigner details
+                          let campaignerName = 'Admin';
+                          let campaignerClass = 'NF3';
+                          
+                          const donationWithLogger = donorDonations.find(q => q.notes?.includes('Logged by:'));
+                          if (donationWithLogger?.notes) {
+                            const nameMatch = donationWithLogger.notes.match(/Logged by:\s*([^.]+)/i);
+                            if (nameMatch) campaignerName = nameMatch[1].trim();
+                            
+                            const classMatch = donationWithLogger.notes.match(/Class:\s*([^.]+)/i);
+                            if (classMatch) campaignerClass = classMatch[1].trim();
+                          } else {
+                            const matchedCamp = campaignersList.find(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
+                            if (matchedCamp) {
+                              campaignerName = matchedCamp.name;
+                              campaignerClass = matchedCamp.class;
+                            }
+                          }
+
+                          const campRecord = campaignersList.find(c => c.name.toLowerCase() === campaignerName.toLowerCase());
+                          if (campRecord) {
+                            campaignerClass = campRecord.class;
+                          }
+
+                          // 6. Format registration date
+                          const regDate = new Date(d.createdAt).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                          });
+
+                          return (
+                            <tr key={d.id} className="border-b border-white/5 text-slate-800 dark:text-slate-350 hover:bg-slate-500/5 transition-colors font-medium">
+                              {/* Index & Registration ID */}
+                              <td className="py-4 px-4 text-center">
+                                <div className="flex flex-col items-center gap-1.5">
+                                  <span className="font-extrabold text-slate-400 dark:text-slate-600 text-xs">{index + 1}</span>
+                                  <span className="font-mono text-[10px] text-slate-900 dark:text-slate-200 bg-slate-200/60 dark:bg-black/30 px-2 py-0.5 rounded border border-slate-300/40 dark:border-white/5 uppercase tracking-tighter">
+                                    {d.uniqueId || `MHB-2026-${index + 1001}`}
+                                  </span>
+                                  <span className="text-[9px] text-slate-400 font-bold block">{regDate}</span>
+                                </div>
+                              </td>
+
+                              {/* Donor Details */}
+                              <td className="py-4 px-4">
+                                <div className="flex flex-col gap-1 max-w-[200px]">
+                                  <span className="font-bold text-slate-900 dark:text-white text-sm tracking-wide">{d.name}</span>
+                                  <div className="flex flex-col gap-0.5 text-xs text-slate-500">
+                                    <a href={`tel:${d.phone}`} className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-white transition">
+                                      <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                      {d.phone}
+                                    </a>
+                                    <a 
+                                      href={`https://wa.me/${d.whatsApp || d.phone}`} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="flex items-center gap-1 text-emerald-500 hover:text-emerald-400 font-bold transition mt-0.5"
+                                    >
+                                      <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.403.002 9.803-4.392 9.807-9.809.002-2.624-1.01-5.092-2.859-6.944-1.848-1.85-4.316-2.868-6.945-2.87-5.407 0-9.81 4.403-9.814 9.818-.002 1.714.453 3.39 1.317 4.873L1.758 22.24l4.889-1.286zm11.393-7.61c-.244-.122-1.447-.714-1.67-.796-.223-.082-.387-.122-.55.122-.162.244-.63.796-.772.957-.143.163-.285.183-.528.061-.243-.122-1.026-.378-1.954-1.206-.723-.645-1.212-1.442-1.354-1.686-.143-.244-.015-.376.107-.497.11-.11.244-.285.366-.427.122-.143.163-.244.244-.407.082-.163.041-.306-.02-.427-.062-.122-.55-1.324-.753-1.812-.198-.48-.399-.415-.55-.422-.143-.008-.306-.01-.469-.01-.163 0-.427.061-.65.306-.223.244-.854.835-.854 2.037 0 1.201.874 2.362.996 2.525.122.163 1.721 2.628 4.17 3.687.582.252 1.036.402 1.39.515.585.186 1.117.16 1.538.098.469-.069 1.447-.591 1.65-.163.203-.57.203-1.06.143-1.14-.06-.083-.223-.123-.467-.245z" />
+                                      </svg>
+                                      {d.phone}
+                                    </a>
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Subscription Plan & Payment Month Buttons */}
+                              <td className="py-4 px-4">
+                                <div className="flex flex-col items-center gap-1.5 min-w-[210px]">
+                                  <span className="text-[10px] font-black text-blue-500 dark:text-blue-400 tracking-wider uppercase bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">
+                                    {detectedPlan}
+                                  </span>
+                                  <div className="grid grid-cols-5 gap-1 text-[9px] font-bold">
+                                    {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'].map(month => {
+                                      const isPaid = paidMonths.includes(month);
+                                      const shortName = month.substring(0, 3);
+                                      return (
+                                        <span 
+                                          key={month} 
+                                          title={isPaid ? `Paid for ${month}` : `Unpaid for ${month}`}
+                                          className={`px-1.5 py-0.5 rounded text-center transition-all min-w-[34px] uppercase select-none ${
+                                            isPaid 
+                                              ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm shadow-emerald-500/20' 
+                                              : 'bg-slate-200/50 dark:bg-black/25 text-slate-400 dark:text-slate-500 border border-slate-350 dark:border-white/5'
+                                          }`}
+                                        >
+                                          {shortName}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Location */}
+                              <td className="py-4 px-4">
+                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                  {d.fatherName || 'General'}
+                                </span>
+                              </td>
+
+                              {/* Managed by (Campaigner) */}
+                              <td className="py-4 px-4">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="font-extrabold text-slate-900 dark:text-white text-xs uppercase tracking-wide">
+                                    {campaignerName}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-bold uppercase">
+                                    Class: {campaignerClass}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* Total Collected Amount */}
+                              <td className="py-4 px-4 text-right">
+                                <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">
+                                  ₹{totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                              </td>
+
+                              {/* Status & Actions */}
+                              <td className="py-4 px-4">
+                                <div className="flex flex-col items-center gap-1.5">
+                                  <div className="flex items-center gap-1">
+                                    <span className="bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-black px-2 py-0.5 rounded border border-blue-500/25 uppercase shrink-0">
+                                      Received
+                                    </span>
+                                    <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-2 py-0.5 rounded border border-emerald-500/25 flex items-center gap-0.5 uppercase shrink-0">
+                                      <Check className="w-2.5 h-2.5" /> Verified
+                                    </span>
+                                  </div>
+                                  <button 
+                                    onClick={() => {
+                                      setDonorPhoneInput(d.phone);
+                                      setDonorNameInput(d.name);
+                                      setDonorIdInput(d.uniqueId || d.id);
+                                      setActiveTab('add-donation');
+                                    }}
+                                    className="w-full bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-3 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase"
+                                  >
+                                    Add Receipt
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   )}

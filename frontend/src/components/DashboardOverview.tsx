@@ -7,7 +7,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -243,6 +243,7 @@ export default function DashboardOverview() {
   const [customSelectedMonths, setCustomSelectedMonths] = useState<string[]>([]);
   const [campaignerAvatar, setCampaignerAvatar] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [copiedHn, setCopiedHn] = useState<number | null>(null);
 
   // Extended form fields from legacy screen
   const [donationTab, setDonationTab] = useState<'new' | 'renew'>('new');
@@ -488,7 +489,19 @@ export default function DashboardOverview() {
         });
         const data = await res.json();
         if (res.ok) {
-          setAuth(data.accessToken, data.refreshToken, data.user, data.organization);
+          let userObj = data.user;
+          if (loginRole === 'campaigner') {
+            const matched = campaignersList.find(c => String(c.hn) === selectedHn);
+            if (matched) {
+              userObj = {
+                ...userObj,
+                fullName: matched.name,
+                class: matched.class,
+                hn: String(matched.hn)
+              };
+            }
+          }
+          setAuth(data.accessToken, data.refreshToken, userObj, data.organization);
         } else {
           setAuthError(data.error || data.message || 'Login failed');
         }
@@ -1971,6 +1984,7 @@ export default function DashboardOverview() {
                         <th className="py-3 px-4">Name</th>
                         <th className="py-3 px-4">Class / Batch</th>
                         <th className="py-3 px-4">Role</th>
+                        <th className="py-3 px-4">Login Password</th>
                         <th className="py-3 px-4">Status</th>
                       </tr>
                     </thead>
@@ -1981,6 +1995,28 @@ export default function DashboardOverview() {
                           <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
                           <td className="py-4 px-4">{item.class}</td>
                           <td className="py-4 px-4 text-xs font-bold text-slate-500 uppercase">Campaigner</td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs bg-slate-200/60 dark:bg-white/5 border border-slate-350 dark:border-white/10 px-2 py-1 rounded-lg text-slate-800 dark:text-slate-200 select-all">
+                                halawa{item.hn}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(`halawa${item.hn}`);
+                                  setCopiedHn(item.hn);
+                                  setTimeout(() => setCopiedHn(null), 1500);
+                                }}
+                                className="p-1 bg-[#0f4c81]/10 hover:bg-[#0f4c81]/25 text-[#0f4c81] dark:text-[#9cd4ff] rounded transition duration-200 cursor-pointer"
+                                title="Copy Password"
+                              >
+                                {copiedHn === item.hn ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+                          </td>
                           <td className="py-4 px-4">
                             <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Active</span>
                           </td>

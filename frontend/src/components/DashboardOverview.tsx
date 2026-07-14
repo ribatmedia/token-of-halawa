@@ -502,6 +502,9 @@ export default function DashboardOverview() {
             }
           }
           setAuth(data.accessToken, data.refreshToken, userObj, data.organization);
+          if (loginRole === 'campaigner') {
+            setSelectedRole('volunteer');
+          }
         } else {
           setAuthError(data.error || data.message || 'Login failed');
         }
@@ -1011,19 +1014,25 @@ export default function DashboardOverview() {
 
         {/* Collapsible Mobile Menu Wrapper */}
         <div className={`${mobileMenuOpen ? 'block' : 'hidden'} lg:block space-y-6 lg:space-y-8 flex-1 flex flex-col`}>
-          {/* Unified Role Switcher Dropdown */}
-          <div>
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Switch Dashboard view</label>
-            <select 
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as any)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-200/50 dark:bg-black/35 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
-            >
-              <option value="admin" className="text-slate-800">Super Administrator</option>
-              <option value="leader" className="text-slate-800">Class Leader / Manager</option>
-              <option value="volunteer" className="text-slate-800">Campaigner</option>
-            </select>
-          </div>
+          {/* Unified Role Switcher Dropdown — hidden for campaigners */}
+          {!(user as any)?.hn ? (
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Switch Dashboard view</label>
+              <select 
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value as any)}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-200/50 dark:bg-black/35 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
+              >
+                <option value="admin" className="text-slate-800">Super Administrator</option>
+                <option value="leader" className="text-slate-800">Class Leader / Manager</option>
+                <option value="volunteer" className="text-slate-800">Campaigner</option>
+              </select>
+            </div>
+          ) : (
+            <div className="px-4 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-center">
+              <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Campaigner Dashboard</span>
+            </div>
+          )}
 
           {/* Dynamic Sidebar Links */}
           {selectedRole === 'volunteer' && (

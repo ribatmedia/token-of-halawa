@@ -1569,7 +1569,88 @@ export default function DashboardOverview() {
               )}
 
               <form onSubmit={handleAddDonation} className="space-y-5">
-                {/* Amount / Plan Dropdown Selector */}
+
+                {/* RENEW: Donor Profile Select FIRST (above amount) */}
+                {donationTab === 'renew' && (
+                  <div className="space-y-4 pt-2 border-t border-slate-300/40 dark:border-white/5">
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Select Profile) *</label>
+                        <span className="text-[9px] text-slate-400 block">വരിക്കാരനെ തിരഞ്ഞെടുക്കുക</span>
+                      </div>
+                      <select 
+                        required={donationTab === 'renew'} 
+                        value={donorIdInput}
+                        onChange={(e) => {
+                          const selectedId = e.target.value;
+                          setDonorIdInput(selectedId);
+                          // Auto-detect donor's plan from previous donations
+                          const previousDonation = verificationQueue.find(q => q.donorId === selectedId);
+                          if (previousDonation?.notes) {
+                            const planMatch = previousDonation.notes.match(/Plan:\s*([^.]+)/);
+                            if (planMatch) {
+                              const detectedPlan = planMatch[1].trim();
+                              setMonthPlanInput(detectedPlan);
+                              // Extract amount from plan
+                              const amountMatch = detectedPlan.match(/^(\d+)/);
+                              if (amountMatch) {
+                                setDonationAmount(amountMatch[1]);
+                              }
+                            }
+                          }
+                          // Also auto-fill name and phone from the donor record
+                          const selectedDonor = donors.find(d => d.id === selectedId);
+                          if (selectedDonor) {
+                            setDonorNameInput(selectedDonor.name || '');
+                            setDonorPhoneInput(selectedDonor.phone || '');
+                          }
+                        }}
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
+                      >
+                        <option value="" disabled className="text-slate-800">Select a Donor profile</option>
+                        {donors.map(d => (
+                          <option key={d.id} value={d.id} className="text-slate-850">{d.name} ({d.phone || 'No phone'})</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Auto-detected Plan & Amount display */}
+                    {donorIdInput && (
+                      <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 space-y-2 animate-in fade-in duration-300">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Auto-detected Plan</span>
+                          <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">സ്വയം കണ്ടെത്തിയ പ്ലാൻ</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black">
+                            ₹{donationAmount || '0'}/month
+                          </div>
+                          <span className="text-xs text-slate-400">Plan: {monthPlanInput}</span>
+                        </div>
+                        <p className="text-[10px] text-sky-600 dark:text-sky-400 font-bold flex items-start gap-1 mt-1">
+                          <span>ⓘ</span>
+                          <span>ഡോണറുടെ മുൻ പ്ലാൻ അനുസരിച്ച് തുക സ്വയം സെറ്റ് ആയി. മാറ്റം വേണമെങ്കിൽ താഴെ എഡിറ്റ് ചെയ്യാം.</span>
+                        </p>
+                        {/* Allow manual override */}
+                        <div className="flex items-center gap-2 mt-2">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase">Override Amount:</label>
+                          <div className="relative flex-1">
+                            <span className="absolute left-3 top-2 text-slate-500 font-bold text-sm">₹</span>
+                            <input 
+                              type="number" 
+                              value={donationAmount}
+                              onChange={(e) => setDonationAmount(e.target.value)}
+                              className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl pl-7 pr-3 py-2 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Amount / Plan Dropdown Selector — only for NEW DONOR tab */}
+                {donationTab === 'new' && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Amount *</label>
@@ -1599,9 +1680,10 @@ export default function DashboardOverview() {
                     <option value="Custom Amount" className="text-slate-800">Custom Amount</option>
                   </select>
                 </div>
+                )}
 
-                {/* Conditional Custom Amount Input */}
-                {(monthPlanInput === 'Custom Amount' || monthPlanInput === 'No specific plan') && (
+                {/* Conditional Custom Amount Input — only for NEW DONOR tab */}
+                {donationTab === 'new' && (monthPlanInput === 'Custom Amount' || monthPlanInput === 'No specific plan') && (
                   <div className="animate-in slide-in-from-top-2 duration-200">
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Custom Amount (₹) *</label>
@@ -1617,107 +1699,6 @@ export default function DashboardOverview() {
                         placeholder="0.00"
                         className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-8 pr-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
                       />
-                    </div>
-                  </div>
-                )}
-
-                {/* NEW DONOR FIELDS */}
-                {donationTab === 'new' && (
-                  <div className="space-y-4 pt-2 border-t border-slate-300/40 dark:border-white/5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
-                          <span className="text-[9px] text-slate-400 block">വരിക്കാരന്റെ പേര്</span>
-                        </div>
-                        <input 
-                          type="text" 
-                          required={donationTab === 'new'} 
-                          value={donorNameInput}
-                          onChange={(e) => setDonorNameInput(e.target.value)}
-                          placeholder="Full name of donor"
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        />
-                      </div>
-                      
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
-                          <span className="text-[9px] text-slate-400 block">ഫോൺ നമ്പർ</span>
-                        </div>
-                        <input 
-                          type="text" 
-                          required={donationTab === 'new'} 
-                          value={donorPhoneInput}
-                          onChange={(e) => setDonorPhoneInput(e.target.value)}
-                          placeholder="10-digit number"
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">WhatsApp Number *</label>
-                          <span className="text-[9px] text-slate-400 block">രസീത് അയക്കാനുള്ള നമ്പർ</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <input 
-                            type="text" 
-                            required={donationTab === 'new'} 
-                            value={donorWhatsAppInput}
-                            onChange={(e) => setDonorWhatsAppInput(e.target.value)}
-                            placeholder="For sending receipt"
-                            className="flex-1 bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                          />
-                          <button 
-                            type="button" 
-                            onClick={() => setDonorWhatsAppInput(donorPhoneInput)}
-                            className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs px-3 py-2.5 rounded-2xl font-bold hover:bg-emerald-500/20 transition whitespace-nowrap"
-                          >
-                            Same as phone
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Address / Place *</label>
-                          <span className="text-[9px] text-slate-400 block">വരിക്കാരന്റെ സ്ഥലം</span>
-                        </div>
-                        <input 
-                          type="text" 
-                          required={donationTab === 'new'} 
-                          value={donorAddressInput}
-                          onChange={(e) => setDonorAddressInput(e.target.value)}
-                          placeholder="City or Town"
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* RENEW DONOR FIELDS */}
-                {donationTab === 'renew' && (
-                  <div className="space-y-4 pt-2 border-t border-slate-300/40 dark:border-white/5">
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Select Profile) *</label>
-                        <span className="text-[9px] text-slate-400 block">വരിക്കാരനെ തിരഞ്ഞെടുക്കുക</span>
-                      </div>
-                      <select 
-                        required={donationTab === 'renew'} 
-                        value={donorIdInput}
-                        onChange={(e) => setDonorIdInput(e.target.value)}
-                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
-                      >
-                        <option value="" disabled className="text-slate-800">Select a Donor profile</option>
-                        {donors.map(d => (
-                          <option key={d.id} value={d.id} className="text-slate-850">{d.name} ({d.phone || 'No phone'})</option>
-                        ))}
-                      </select>
                     </div>
                   </div>
                 )}
@@ -1741,9 +1722,32 @@ export default function DashboardOverview() {
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/40"
                     >
                       <option value="" disabled className="text-slate-800">Select Month</option>
-                      {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March', '10 Months', 'One Time Payment', 'Custom Selection'].map(m => (
-                        <option key={m} value={m} className="text-slate-800">{m}</option>
-                      ))}
+                      {(() => {
+                        const allMonths = ['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+                        
+                        if (donationTab === 'renew') {
+                          // Find months this donor already paid for
+                          const paidMonths = donorIdInput 
+                            ? verificationQueue
+                                .filter(q => q.donorId === donorIdInput)
+                                .map(q => {
+                                  const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
+                                  return monthMatch ? monthMatch[1].trim() : '';
+                                })
+                                .filter(Boolean)
+                            : [];
+                          // Filter out paid months; no '10 Months' or 'One Time Payment' for renew
+                          const availableMonths = allMonths.filter(m => !paidMonths.includes(m));
+                          return [...availableMonths, 'Custom Selection'].map(m => (
+                            <option key={m} value={m} className="text-slate-800">{m}</option>
+                          ));
+                        } else {
+                          // New donor: show all options including 10 Months and One Time Payment
+                          return [...allMonths, '10 Months', 'One Time Payment', 'Custom Selection'].map(m => (
+                            <option key={m} value={m} className="text-slate-800">{m}</option>
+                          ));
+                        }
+                      })()}
                     </select>
                     
                     {/* Information Tip */}

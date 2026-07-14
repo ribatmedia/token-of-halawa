@@ -7,7 +7,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X
 } from 'lucide-react';
 import { Chart, registerables } from 'chart.js';
 
@@ -233,12 +233,14 @@ export default function DashboardOverview() {
   // Input states for Log Donation form
   const [donorIdInput, setDonorIdInput] = useState('');
   const [campaignIdInput, setCampaignIdInput] = useState('');
-  const [donationAmount, setDonationAmount] = useState('');
+  const [donationAmount, setDonationAmount] = useState('100');
   const [donationType, setDonationType] = useState('GENERAL');
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [notes, setNotes] = useState('');
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState('');
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [customSelectedMonths, setCustomSelectedMonths] = useState<string[]>([]);
 
   // Extended form fields from legacy screen
   const [donationTab, setDonationTab] = useState<'new' | 'renew'>('new');
@@ -285,10 +287,7 @@ export default function DashboardOverview() {
   const [campStatsSearchQuery, setCampStatsSearchQuery] = useState('');
 
   // Class Handovers States
-  const [classHandovers, setClassHandovers] = useState([
-    { id: 'MHB-HO-2026-9388', className: 'Plus two', leader: 'Zameel', phone: '9961592152', amount: 13000, month: 'June 2026', date: '21 Jun 2026, 06:40 PM' },
-    { id: 'MHB-HO-2026-6631', className: 'Plus one', leader: 'Uvais', phone: '7306676918', amount: 11350, month: 'June 2026', date: '21 Jun 2026, 06:38 PM' }
-  ]);
+  const [classHandovers, setClassHandovers] = useState<any[]>([]);
   const [handoverClass, setHandoverClass] = useState('Plus one');
   const [handoverMonth, setHandoverMonth] = useState('July 2026');
   const [handoverAmount, setHandoverAmount] = useState('');
@@ -317,6 +316,31 @@ export default function DashboardOverview() {
     if (selectedRole === 'admin') setActiveTab('analytics');
     if (selectedRole === 'leader') setActiveTab('progress');
     if (selectedRole === 'volunteer') setActiveTab('v-overview');
+  }, [selectedRole]);
+
+  // Load handovers from local storage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('toh_class_handovers');
+      if (saved) {
+        try {
+          setClassHandovers(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to parse toh_class_handovers", e);
+        }
+      }
+    }
+  }, []);
+
+  // Show instructions modal for campaigner on first load of session
+  useEffect(() => {
+    if (selectedRole === 'volunteer') {
+      const hasShown = sessionStorage.getItem('toh_instructions_shown');
+      if (!hasShown) {
+        setShowInstructions(true);
+        sessionStorage.setItem('toh_instructions_shown', 'true');
+      }
+    }
   }, [selectedRole]);
 
   // Synchronize first HN of class when changing class selector
@@ -1497,54 +1521,57 @@ export default function DashboardOverview() {
               )}
 
               <form onSubmit={handleAddDonation} className="space-y-5">
-                {/* Received Amount Input field */}
+                {/* Amount / Plan Dropdown Selector */}
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Received Amount (₹) *</label>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">ലഭിച്ച തുക നൽകുക</span>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Amount *</label>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">തുക തിരഞ്ഞെടുക്കുക</span>
                   </div>
-                  
-                  {/* Amount presets */}
-                  <div className="grid grid-cols-4 gap-2 mb-3">
-                    {[100, 200, 313].map((val) => (
-                      <button 
-                        key={val} 
-                        type="button" 
-                        onClick={() => setDonationAmount(val.toString())} 
-                        className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all ${
-                          donationAmount === val.toString() 
-                            ? 'bg-emerald-500 text-slate-950 border-emerald-500' 
-                            : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-200/50'
-                        }`}
-                      >
-                        ₹{val}
-                      </button>
-                    ))}
-                    <button 
-                      type="button" 
-                      onClick={() => setDonationAmount('')} 
-                      className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all ${
-                        !['100', '200', '313'].includes(donationAmount) && donationAmount !== '' 
-                          ? 'bg-emerald-500 text-slate-950 border-emerald-500' 
-                          : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      Custom
-                    </button>
-                  </div>
-
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-slate-500 font-bold">₹</span>
-                    <input 
-                      type="number" 
-                      required 
-                      value={donationAmount}
-                      onChange={(e) => setDonationAmount(e.target.value)}
-                      placeholder="0.00"
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-8 pr-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
-                    />
-                  </div>
+                  <select 
+                    value={monthPlanInput}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setMonthPlanInput(val);
+                      if (val === '100/month') setDonationAmount('100');
+                      else if (val === '200/month') setDonationAmount('200');
+                      else if (val === '250/month') setDonationAmount('250');
+                      else if (val === '313/month') setDonationAmount('313');
+                      else if (val === '500/month') setDonationAmount('500');
+                      else if (val === 'No specific plan') setDonationAmount('');
+                      else if (val === 'Custom Amount') setDonationAmount('');
+                    }}
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                  >
+                    <option value="No specific plan" className="text-slate-800">No specific plan</option>
+                    <option value="100/month" className="text-slate-800">100/month</option>
+                    <option value="200/month" className="text-slate-800">200/month</option>
+                    <option value="250/month" className="text-slate-800">250/month</option>
+                    <option value="313/month" className="text-slate-800">313/month</option>
+                    <option value="500/month" className="text-slate-800">500/month</option>
+                    <option value="Custom Amount" className="text-slate-800">Custom Amount</option>
+                  </select>
                 </div>
+
+                {/* Conditional Custom Amount Input */}
+                {(monthPlanInput === 'Custom Amount' || monthPlanInput === 'No specific plan') && (
+                  <div className="animate-in slide-in-from-top-2 duration-200">
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Custom Amount (₹) *</label>
+                      <span className="text-[9px] text-slate-400 block">തുക നൽകുക</span>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-4 top-3 text-slate-500 font-bold">₹</span>
+                      <input 
+                        type="number" 
+                        required 
+                        value={donationAmount}
+                        onChange={(e) => setDonationAmount(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-8 pr-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* NEW DONOR FIELDS */}
                 {donationTab === 'new' && (
@@ -1648,36 +1675,70 @@ export default function DashboardOverview() {
                 )}
 
                 {/* Month & Date selector row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="flex justify-between items-center mb-1.5">
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">For Month *</label>
-                      <span className="text-[9px] text-slate-400 block">ഏത് മാസത്തെ വരിസംഖ്യ</span>
+                      <span className="text-[9px] text-slate-400 block font-bold">ഏത് മാസത്തെ വരിസംഖ്യയാണെന്ന് തിരഞ്ഞെടുക്കുക</span>
                     </div>
-                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'One Time'].map((m) => {
-                        const isSel = donationMonthInput === m;
-                        return (
-                          <button
-                            type="button"
-                            key={m}
-                            onClick={() => setDonationMonthInput(m)}
-                            className={`py-2 px-1 text-center rounded-xl text-[10px] font-bold border transition-all duration-200 ${
-                              isSel 
-                                ? 'bg-emerald-500 text-slate-950 border-emerald-500 shadow-md scale-95' 
-                                : 'bg-slate-200/50 dark:bg-black/20 text-slate-800 dark:text-slate-200 border-slate-350 dark:border-white/10 hover:border-emerald-500/50'
-                            }`}
-                          >
-                            {m}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <span className="text-[9px] text-slate-400 mt-1 block">പ്രതിമാസ വരിസംഖ്യയായി നൽകാൻ താല്പര്യമില്ലാത്തവർക്ക് One Time Payment തിരഞ്ഞെടുക്കാം.</span>
+                    <select 
+                      value={donationMonthInput}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setDonationMonthInput(val);
+                        if (val !== 'Custom Selection') {
+                          setCustomSelectedMonths([]);
+                        }
+                      }}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/40"
+                    >
+                      <option value="" disabled className="text-slate-800">Select Month</option>
+                      {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March', '10 Months', 'One Time Payment', 'Custom Selection'].map(m => (
+                        <option key={m} value={m} className="text-slate-800">{m}</option>
+                      ))}
+                    </select>
+                    
+                    {/* Information Tip */}
+                    <p className="text-[10px] text-sky-600 dark:text-sky-400 font-bold mt-2 flex items-start gap-1">
+                      <span>ⓘ</span>
+                      <span>പ്രതിമാസ വരിസംഖ്യാ പ്ലാൻ തിരഞ്ഞെടുക്കാത്തവർക്ക് One Time Payment എന്ന ഓപ്ഷൻ തിരഞ്ഞെടുക്കാം.</span>
+                    </p>
+
+                    {/* Custom Selection Checkboxes Grid */}
+                    {donationMonthInput === 'Custom Selection' && (
+                      <div className="mt-4 p-4 bg-slate-200/40 dark:bg-black/10 border border-slate-350 dark:border-white/5 rounded-2xl space-y-3 animate-in fade-in duration-300">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Select Active Months</span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                          {['January', 'February', 'March', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(month => {
+                            const isChecked = customSelectedMonths.includes(month);
+                            return (
+                              <label key={month} className="flex items-center gap-2 cursor-pointer select-none">
+                                <input 
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => {
+                                    let updated;
+                                    if (isChecked) {
+                                      updated = customSelectedMonths.filter(m => m !== month);
+                                    } else {
+                                      updated = [...customSelectedMonths, month];
+                                    }
+                                    setCustomSelectedMonths(updated);
+                                    setDonationMonthInput(updated.length > 0 ? `Custom: ${updated.join(', ')}` : 'Custom Selection');
+                                  }}
+                                  className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-white/10 border-white/10"
+                                />
+                                <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{month}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Date</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Date</label>
                     <input 
                       type="date" 
                       required 
@@ -1688,56 +1749,21 @@ export default function DashboardOverview() {
                   </div>
                 </div>
 
-                {/* Amount Status Toggle (Received vs Pending) */}
+                {/* Amount Status Checkbox Toggle */}
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Amount Status *</label>
-                    <span className="text-[9px] text-slate-400 block">തുക കൈപ്പറ്റിയോ എന്ന് രേഖപ്പെടുത്തുക</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button 
-                      type="button"
-                      onClick={() => setAmountStatusInput('RECEIVED')}
-                      className={`flex items-center justify-center gap-2 p-3.5 border rounded-2xl text-xs font-bold transition-all ${
-                        amountStatusInput === 'RECEIVED' 
-                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400' 
-                          : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <input type="radio" checked={amountStatusInput === 'RECEIVED'} readOnly className="accent-emerald-500" />
-                      Received (In Hand)
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={() => setAmountStatusInput('PENDING')}
-                      className={`flex items-center justify-center gap-2 p-3.5 border rounded-2xl text-xs font-bold transition-all ${
-                        amountStatusInput === 'PENDING' 
-                          ? 'bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400' 
-                          : 'bg-white/5 border-slate-350 dark:border-white/10 text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <input type="radio" checked={amountStatusInput === 'PENDING'} readOnly className="accent-amber-500" />
+                  <div className="flex items-center gap-2.5 p-3.5 px-4 bg-amber-500/10 dark:bg-amber-950/20 border border-amber-500/20 dark:border-amber-900/30 rounded-2xl text-amber-700 dark:text-amber-400">
+                    <input 
+                      type="checkbox" 
+                      id="amountPendingCheckbox"
+                      checked={amountStatusInput === 'PENDING'} 
+                      onChange={(e) => setAmountStatusInput(e.target.checked ? 'PENDING' : 'RECEIVED')}
+                      className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 bg-white/10 border-white/10 cursor-pointer"
+                    />
+                    <label htmlFor="amountPendingCheckbox" className="text-xs font-black cursor-pointer select-none">
                       Amount Pending (Not Given)
-                    </button>
+                    </label>
                   </div>
                 </div>
-
-                {/* Donor Month Plan Dropdown */}
-                {donationTab === 'new' && (
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Donor Month Plan *</label>
-                    <select 
-                      value={monthPlanInput}
-                      onChange={(e) => setMonthPlanInput(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
-                    >
-                      <option value="100/month">100/month</option>
-                      <option value="200/month">200/month</option>
-                      <option value="313/month">313/month</option>
-                      <option value="500/month">500/month</option>
-                    </select>
-                  </div>
-                )}
 
                 <div className="pt-4 border-t border-slate-300/40 dark:border-white/5 flex justify-end">
                   <button 
@@ -2861,6 +2887,57 @@ export default function DashboardOverview() {
             <span>Connected to Neon PostgreSQL Cloud Database</span>
           </div>
         </footer>
+      {/* Important Instructions Modal popup */}
+      {showInstructions && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-[#0b3c5d] text-slate-100 border border-[#1d5c88] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col transform animate-in zoom-in-95 duration-350">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-white/10 bg-[#0d4771]">
+              <h3 className="text-lg font-black tracking-wide text-slate-105">Important Instructions</h3>
+              <button 
+                onClick={() => setShowInstructions(false)}
+                className="text-white/70 hover:text-white transition duration-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body content with Malayalam texts */}
+            <div className="p-6 md:p-8 space-y-6 font-medium text-sm md:text-base leading-relaxed text-left text-slate-200 overflow-y-auto max-h-[70vh]">
+              <div className="flex gap-3">
+                <span className="font-extrabold text-[#9cd4ff] shrink-0">1.</span>
+                <p className="font-malayalam text-slate-100 font-bold leading-relaxed">പൊതുജനങ്ങളിൽ നിന്നും വരിക്കാരിൽ നിന്നും ശേഖരിക്കുന്ന തുക നിങ്ങളുടെ ബാങ്ക് അക്കൗണ്ടിലോ കൈകളിലോ പൂർണ്ണ ഉത്തരവാദിത്തത്തോടെ ഭദ്രമായി സൂക്ഷിക്കേണ്ടതാണ്.</p>
+              </div>
+
+              <div className="flex gap-3">
+                <span className="font-extrabold text-[#9cd4ff] shrink-0">2.</span>
+                <div>
+                  <p className="font-extrabold text-[#9cd4ff] mb-1">Advance Collection:</p>
+                  <p className="font-malayalam text-slate-100 font-bold leading-relaxed">താൽപര്യമുള്ള വരിക്കാരിൽ നിന്നും ഒന്നിലധികം മാസങ്ങളിലെ വരിസംഖ്യ ഒന്നിച്ചു (മുൻകൂറായി) കൈപ്പറ്റാവുന്നതാണ്.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <span className="font-extrabold text-[#9cd4ff] shrink-0">3.</span>
+                <div>
+                  <p className="font-extrabold text-[#9cd4ff] mb-1">തുടർ ശേഖരണ സംവിധാനം:</p>
+                  <p className="font-malayalam text-slate-100 font-bold leading-relaxed">രണ്ടാം മാസം മുതൽ വരിക്കാരിൽ നിന്ന് വരിസംഖ്യ ശേഖരിക്കുന്നതിനായി പ്രത്യേക സമിതി പ്രവർത്തിക്കുന്നതാണ്. അതിനാൽ, തുക നേരിട്ട് ശേഖരിക്കുന്നതിൽ പ്രയാസം നേരിടുന്ന വിദ്യാർത്ഥികൾ ഇതുസംബന്ധിച്ച് ആശങ്കപ്പെടേണ്ടതില്ല.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer OK Button */}
+            <div className="p-6 pt-0 flex justify-center border-t border-white/5 bg-[#0b3c5d]">
+              <button
+                onClick={() => setShowInstructions(false)}
+                className="bg-[#0f4c81] hover:bg-[#135c9b] text-white border border-[#2370ae] px-12 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95 text-sm uppercase tracking-wider cursor-pointer"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       </main>
 

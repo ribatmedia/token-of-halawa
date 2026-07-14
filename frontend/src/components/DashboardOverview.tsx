@@ -145,6 +145,55 @@ const translations = {
   }
 };
 
+const campaignersList = [
+  // Final year
+  { hn: 1, name: "Asif ali", class: "Final year" },
+  { hn: 2, name: "Bishrul wafa", class: "Final year" },
+  { hn: 3, name: "Muhammed Falil", class: "Final year" },
+  { hn: 4, name: "Sinan Cheekod", class: "Final year" },
+  { hn: 5, name: "Sinan rafi", class: "Final year" },
+  { hn: 6, name: "Ubayy Valliyad", class: "Final year" },
+  // Degree Third year
+  { hn: 7, name: "Adhil Ameen", class: "Degree Third year" },
+  { hn: 8, name: "Hashir puthoor", class: "Degree Third year" },
+  { hn: 9, name: "Muhammed shaheer", class: "Degree Third year" },
+  { hn: 10, name: "Muhammed Riswan", class: "Degree Third year" },
+  // Degree second year
+  { hn: 11, name: "Muhammed Ali", class: "Degree second year" },
+  { hn: 12, name: "Muhammed Fayis", class: "Degree second year" },
+  { hn: 13, name: "Sinan k", class: "Degree second year" },
+  { hn: 14, name: "Yaseen kondotty", class: "Degree second year" },
+  // Degree first year
+  { hn: 15, name: "Muhammed Melattoor", class: "Degree first year" },
+  { hn: 16, name: "Nihal valliyad", class: "Degree first year" },
+  // Plus two
+  { hn: 17, name: "Anas Rahman", class: "Plus two" },
+  { hn: 18, name: "Anas koduvally", class: "Plus two" },
+  { hn: 19, name: "Anwar", class: "Plus two" },
+  { hn: 20, name: "Adhil Nizar", class: "Plus two" },
+  { hn: 21, name: "Naseel", class: "Plus two" },
+  { hn: 22, name: "Sabith", class: "Plus two" },
+  { hn: 23, name: "Sanah", class: "Plus two" },
+  { hn: 24, name: "Savad", class: "Plus two" },
+  { hn: 25, name: "Hashir kannur", class: "Plus two" },
+  { hn: 26, name: "Yaseen c.k", class: "Plus two" },
+  // Plus one
+  { hn: 27, name: "Abdu Rahman", class: "Plus one" },
+  { hn: 28, name: "Adnan", class: "Plus one" },
+  { hn: 29, name: "Anas Mooniyur", class: "Plus one" },
+  { hn: 30, name: "Anees", class: "Plus one" },
+  { hn: 31, name: "Basith moosa", class: "Plus one" },
+  { hn: 32, name: "Farseen", class: "Plus one" },
+  { hn: 33, name: "Hafil", class: "Plus one" },
+  { hn: 34, name: "Mufeed", class: "Plus one" },
+  { hn: 35, name: "Muzammil", class: "Plus one" },
+  { hn: 36, name: "Rashal", class: "Plus one" },
+  { hn: 37, name: "Rayyan", class: "Plus one" },
+  { hn: 38, name: "Swalih", class: "Plus one" },
+  { hn: 39, name: "Aboobacker Sidheeque", class: "Plus one" },
+  { hn: 40, name: "Aneeb", class: "Plus one" }
+];
+
 export default function DashboardOverview() {
   const { theme, toggleTheme, token, user, organization, setAuth, clearAuth } = useAuthStore();
   const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>('en');
@@ -155,27 +204,6 @@ export default function DashboardOverview() {
   // Active Role and Menu Tab States
   const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>('admin');
   const [activeTab, setActiveTab] = useState<string>('analytics');
-
-  // Dynamically loaded campaigners list from API (replaces mock data)
-  const [campaignersList, setCampaignersList] = useState<any[]>([]);
-
-  // Fetch campaigners on component mount
-  useEffect(() => {
-    const fetchCampaigners = async () => {
-      try {
-        const res = await fetch(`${API_URL}/campaigners`);
-        if (res.ok) {
-          const data = await res.json();
-          setCampaignersList(data);
-        } else {
-          console.error('Failed to fetch campaigners list:', res.status);
-        }
-      } catch (error) {
-        console.error('Error fetching campaigners list:', error);
-      }
-    };
-    fetchCampaigners();
-  }, []);
 
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');

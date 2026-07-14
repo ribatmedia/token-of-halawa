@@ -5,12 +5,61 @@ import Link from 'next/link';
 import { 
   Heart, Code, KeyRound, ArrowLeft, Sun, Moon, Laptop, ShieldCheck, 
   Database, RefreshCw, Users, FileText, CheckCircle2, AlertTriangle, 
-  Download, Trash2, Sliders, Type, Palette, Video, Settings, Sparkles, Check
+  Download, Trash2, Sliders, Type, Palette, Video, Settings, Sparkles, Check, UserCheck, Award
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
 // Fetch base endpoint URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
+const campaignersList = [
+  // Final year
+  { hn: 1, name: "Asif ali", class: "Final year" },
+  { hn: 2, name: "Bishrul wafa", class: "Final year" },
+  { hn: 3, name: "Muhammed Falil", class: "Final year" },
+  { hn: 4, name: "Sinan Cheekod", class: "Final year" },
+  { hn: 5, name: "Sinan rafi", class: "Final year" },
+  { hn: 6, name: "Ubayy Valliyad", class: "Final year" },
+  // Degree Third year
+  { hn: 7, name: "Adhil Ameen", class: "Degree Third year" },
+  { hn: 8, name: "Hashir puthoor", class: "Degree Third year" },
+  { hn: 9, name: "Muhammed shaheer", class: "Degree Third year" },
+  { hn: 10, name: "Muhammed Riswan", class: "Degree Third year" },
+  // Degree second year
+  { hn: 11, name: "Muhammed Ali", class: "Degree second year" },
+  { hn: 12, name: "Muhammed Fayis", class: "Degree second year" },
+  { hn: 13, name: "Sinan k", class: "Degree second year" },
+  { hn: 14, name: "Yaseen kondotty", class: "Degree second year" },
+  // Degree first year
+  { hn: 15, name: "Muhammed Melattoor", class: "Degree first year" },
+  { hn: 16, name: "Nihal valliyad", class: "Degree first year" },
+  // Plus two
+  { hn: 17, name: "Anas Rahman", class: "Plus two" },
+  { hn: 18, name: "Anas koduvally", class: "Plus two" },
+  { hn: 19, name: "Anwar", class: "Plus two" },
+  { hn: 20, name: "Adhil Nizar", class: "Plus two" },
+  { hn: 21, name: "Naseel", class: "Plus two" },
+  { hn: 22, name: "Sabith", class: "Plus two" },
+  { hn: 23, name: "Sanah", class: "Plus two" },
+  { hn: 24, name: "Savad", class: "Plus two" },
+  { hn: 25, name: "Hashir kannur", class: "Plus two" },
+  { hn: 26, name: "Yaseen c.k", class: "Plus two" },
+  // Plus one
+  { hn: 27, name: "Abdu Rahman", class: "Plus one" },
+  { hn: 28, name: "Adnan", class: "Plus one" },
+  { hn: 29, name: "Anas Mooniyur", class: "Plus one" },
+  { hn: 30, name: "Anees", class: "Plus one" },
+  { hn: 31, name: "Basith moosa", class: "Plus one" },
+  { hn: 32, name: "Farseen", class: "Plus one" },
+  { hn: 33, name: "Hafil", class: "Plus one" },
+  { hn: 34, name: "Mufeed", class: "Plus one" },
+  { hn: 35, name: "Muzammil", class: "Plus one" },
+  { hn: 36, name: "Rashal", class: "Plus one" },
+  { hn: 37, name: "Rayyan", class: "Plus one" },
+  { hn: 38, name: "Swalih", class: "Plus one" },
+  { hn: 39, name: "Aboobacker Sidheeque", class: "Plus one" },
+  { hn: 40, name: "Aneeb", class: "Plus one" }
+];
 
 export default function DeveloperPage() {
   const { theme, toggleTheme, token } = useAuthStore();
@@ -38,6 +87,19 @@ export default function DeveloperPage() {
   // UI Banner Notice Tickers
   const [tickerText, setTickerText] = useState('Welcome to Token of Halawa donation program ★ Live tracking active');
   const [loaderStyle, setLoaderStyle] = useState('Fade In Logo');
+
+  // Simulator Selector & Form States
+  const [selectedTestCampaigner, setSelectedTestCampaigner] = useState('Asif ali');
+  const [selectedTestClass, setSelectedTestClass] = useState('Final year');
+  const [donorsList, setDonorsList] = useState<any[]>([]);
+  const [donationQueue, setDonationQueue] = useState<any[]>([]);
+  const [simDonorName, setSimDonorName] = useState('');
+  const [simDonorPhone, setSimDonorPhone] = useState('');
+  const [simAmount, setSimAmount] = useState('');
+  const [simMonth, setSimMonth] = useState('July');
+  const [simFormSuccess, setSimFormSuccess] = useState('');
+  const [simFormError, setSimFormError] = useState('');
+  const [simLoading, setSimLoading] = useState(false);
 
   // Slider slides customization state
   const [devSlides, setDevSlides] = useState([
@@ -123,12 +185,14 @@ export default function DeveloperPage() {
             const donors = await donorsRes.json();
             const queue = await queueRes.json();
             
-            // Calculate mock aggregates or show database real size
+            setDonorsList(donors);
+            setDonationQueue(queue);
+            
             setStats({
               totalVolunteers: 40,
-              totalDonations: queue.length + 3,
-              totalAmount: queue.reduce((acc: number, item: any) => acc + Number(item.amount), 1150),
-              verifiedAmount: 1150
+              totalDonations: queue.length,
+              totalAmount: queue.reduce((acc: number, item: any) => acc + Number(item.amount), 0),
+              verifiedAmount: queue.filter((q: any) => q.status === 'APPROVED').reduce((acc: number, item: any) => acc + Number(item.amount), 0)
             });
           }
         } catch (e) {
@@ -139,6 +203,114 @@ export default function DeveloperPage() {
       fetchStats();
     }
   }, [isAuthenticated, token]);
+
+  const handleSimLogDonation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!simDonorName || !simDonorPhone || !simAmount) {
+      setSimFormError('Please fill out all required fields');
+      return;
+    }
+    setSimLoading(true);
+    setSimFormError('');
+    setSimFormSuccess('');
+
+    const campaigner = campaignersList.find(c => c.name === selectedTestCampaigner);
+    if (!campaigner) {
+      setSimFormError('Selected campaigner not found');
+      setSimLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Create or retrieve donor profile
+      const donorPayload = {
+        name: simDonorName,
+        phone: simDonorPhone,
+        email: `${simDonorName.toLowerCase().replace(/\s+/g, '')}@example.com`,
+        category: 'GENERAL',
+        donationPlan: 'MONTHLY'
+      };
+
+      const donorRes = await fetch(`${API_URL}/donors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(donorPayload)
+      });
+      const donorData = await donorRes.json();
+      let donorId = '';
+      
+      if (donorRes.ok) {
+        donorId = donorData.id;
+      } else {
+        const matched = donorsList.find(d => d.phone === simDonorPhone);
+        if (matched) {
+          donorId = matched.id;
+        } else {
+          donorId = donorData.id || '';
+        }
+      }
+
+      if (!donorId) {
+        donorId = `donor-${Math.floor(Math.random() * 100000)}`;
+      }
+
+      // 2. Log the donation
+      const donationPayload = {
+        donorId,
+        amount: Number(simAmount),
+        paymentMethod: 'CASH',
+        notes: `Logged by: ${campaigner.name}. Class: ${campaigner.class}. Month: ${simMonth}.`
+      };
+
+      const donationRes = await fetch(`${API_URL}/donations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(donationPayload)
+      });
+
+      if (donationRes.ok) {
+        setSimFormSuccess(`Donation logged successfully!`);
+        setSimDonorName('');
+        setSimDonorPhone('');
+        setSimAmount('');
+        
+        // Refresh stats
+        const donorsRes = await fetch(`${API_URL}/donors`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        const queueRes = await fetch(`${API_URL}/donations/queue`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        
+        if (donorsRes.ok && queueRes.ok) {
+          const donorsData = await donorsRes.json();
+          const queueData = await queueRes.json();
+          setDonorsList(donorsData);
+          setDonationQueue(queueData);
+          
+          setStats({
+            totalVolunteers: 40,
+            totalDonations: queueData.length,
+            totalAmount: queueData.reduce((acc: number, item: any) => acc + Number(item.amount), 0),
+            verifiedAmount: queueData.filter((q: any) => q.status === 'APPROVED').reduce((acc: number, item: any) => acc + Number(item.amount), 0)
+          });
+        }
+      } else {
+        const donationData = await donationRes.json();
+        setSimFormError(donationData.error || donationData.message || 'Failed to log donation');
+      }
+    } catch (err: any) {
+      setSimFormError(err.message || 'An unexpected error occurred');
+    } finally {
+      setSimLoading(false);
+    }
+  };
 
   // Bulk actions
   const handleClearData = async (actionType: string) => {
@@ -291,6 +463,8 @@ export default function DeveloperPage() {
         <nav className="flex-1 space-y-1.5">
           {[
             { id: 'dashboard', name: 'System Overview', icon: Laptop },
+            { id: 'camp-dash-tester', name: 'Campaigner Tester', icon: UserCheck },
+            { id: 'class-dash-tester', name: 'Class Tester', icon: Award },
             { id: 'bulk', name: 'Bulk Campaigners', icon: Users },
             { id: 'receipt', name: 'Receipt Settings', icon: Sliders },
             { id: 'ui', name: 'UI & Banners', icon: Palette }
@@ -335,6 +509,8 @@ export default function DeveloperPage() {
             </span>
             <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mt-1">
               {currentTab === 'dashboard' ? 'System Diagnostics' :
+               currentTab === 'camp-dash-tester' ? 'Campaigner Dashboard Tester' :
+               currentTab === 'class-dash-tester' ? 'Class Dashboard Tester' :
                currentTab === 'bulk' ? 'Bulk Campaigners Management' :
                currentTab === 'receipt' ? 'Receipt Studio' : 'UI & Branding Settings'}
             </h2>
@@ -409,6 +585,277 @@ export default function DeveloperPage() {
               </div>
             </div>
           )}
+
+          {/* TAB: Campaigner Dashboard Tester */}
+          {currentTab === 'camp-dash-tester' && (() => {
+            const campaigner = campaignersList.find(c => c.name === selectedTestCampaigner) || campaignersList[0];
+            const myCollections = donationQueue.filter(q => q.notes?.includes(`Logged by: ${campaigner.name}`));
+            const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount), 0);
+            const myVerifiedTotal = myCollections.filter(q => q.status === 'APPROVED').reduce((acc, q) => acc + Number(q.amount), 0);
+            const myPendingTotal = myCollections.filter(q => q.status === 'PENDING').reduce((acc, q) => acc + Number(q.amount), 0);
+            const myDonorsCount = new Set(myCollections.map(q => q.donorId)).size;
+
+            return (
+              <div className="space-y-6 flex-1 flex flex-col animate-in fade-in duration-350">
+                {/* Selector */}
+                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">Simulated Campaigner Dashboard</h4>
+                    <p className="text-xs opacity-60 mt-1">Select any campaigner to inspect what stats they see in their portal.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold opacity-60">Campaigner:</span>
+                    <select
+                      value={selectedTestCampaigner}
+                      onChange={(e) => setSelectedTestCampaigner(e.target.value)}
+                      className="bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold outline-none text-slate-800 dark:text-white"
+                    >
+                      {campaignersList.map(c => (
+                        <option key={c.name} value={c.name} className="text-slate-850">{c.name} ({c.class})</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Profile Card & Stats Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Profile info */}
+                  <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Campaigner Info</span>
+                      <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-2 uppercase">{campaigner.name}</h3>
+                      <p className="text-xs opacity-60 mt-1">Class: {campaigner.class} · HN Code: {campaigner.hn}</p>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-slate-350/30">
+                      <span className="text-[9px] font-bold text-slate-450 uppercase block">Compiled Email address</span>
+                      <span className="font-mono text-xs text-emerald-500 font-bold">hn{campaigner.hn}@hidayaonline.org</span>
+                    </div>
+                  </div>
+
+                  {/* Summary Metric Cards */}
+                  <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
+                      <span className="text-[9px] font-bold opacity-50 uppercase">Total Collected</span>
+                      <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">₹{myCollectedTotal.toLocaleString()}.00</h4>
+                    </div>
+                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
+                      <span className="text-[9px] font-bold opacity-50 uppercase">Total Donors</span>
+                      <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">{myDonorsCount} Donors</h4>
+                    </div>
+                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
+                      <span className="text-[9px] font-bold opacity-50 uppercase">Verified Amount</span>
+                      <h4 className="text-xl font-black text-emerald-500 mt-1">₹{myVerifiedTotal.toLocaleString()}.00</h4>
+                    </div>
+                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
+                      <span className="text-[9px] font-bold opacity-50 uppercase">Pending Amount</span>
+                      <h4 className="text-xl font-black text-amber-500 mt-1">₹{myPendingTotal.toLocaleString()}.00</h4>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form to log simulated donation */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Log Donation form */}
+                  <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
+                    <h4 className="text-md font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+                      Log Simulated Donation
+                    </h4>
+                    <p className="text-xs opacity-60">Log a donation directly on behalf of this campaigner for instant class leaderboard verification.</p>
+                    
+                    {simFormSuccess && <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 p-3 rounded-xl font-bold">{simFormSuccess}</div>}
+                    {simFormError && <div className="text-xs text-red-500 bg-red-500/10 p-3 rounded-xl font-bold">{simFormError}</div>}
+
+                    <form onSubmit={handleSimLogDonation} className="space-y-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Donor Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={simDonorName}
+                          onChange={(e) => setSimDonorName(e.target.value)}
+                          placeholder="e.g. Abrar"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Donor Phone *</label>
+                        <input
+                          type="text"
+                          required
+                          value={simDonorPhone}
+                          onChange={(e) => setSimDonorPhone(e.target.value)}
+                          placeholder="e.g. +91 97455 71286"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Amount (₹) *</label>
+                          <input
+                            type="number"
+                            required
+                            value={simAmount}
+                            onChange={(e) => setSimAmount(e.target.value)}
+                            placeholder="e.g. 200"
+                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Target Month</label>
+                          <select
+                            value={simMonth}
+                            onChange={(e) => setSimMonth(e.target.value)}
+                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                          >
+                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'One Time'].map(m => (
+                              <option key={m} value={m} className="text-slate-850">{m}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={simLoading}
+                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black py-2.5 rounded-xl text-xs hover:shadow-emerald-500/25 active:scale-95 transition cursor-pointer"
+                      >
+                        {simLoading ? 'Logging...' : 'Log Simulated Donation'}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Collections list */}
+                  <div className={`p-6 rounded-3xl ${glassClass} space-y-4 overflow-x-auto`}>
+                    <h4 className="text-md font-bold text-slate-800 dark:text-white">Logged Collections Log</h4>
+                    {myCollections.length === 0 ? (
+                      <p className="text-xs text-slate-500 py-6 text-center">No donations logged by this campaigner yet.</p>
+                    ) : (
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-white/10 text-slate-400 text-[9px] uppercase font-bold">
+                            <th className="py-2 px-1">Receipt</th>
+                            <th className="py-2 px-1">Donor</th>
+                            <th className="py-2 px-1">Amount</th>
+                            <th className="py-2 px-1 text-right">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {myCollections.map((item) => (
+                            <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-350 font-medium">
+                              <td className="py-3 px-1 font-mono text-[10px]">TOH-{item.id.slice(0, 4).toUpperCase()}</td>
+                              <td className="py-3 px-1">
+                                <span className="font-bold block">{item.donor?.name || 'General'}</span>
+                                <span className="opacity-55 text-[8px] block">{item.donor?.phone}</span>
+                              </td>
+                              <td className="py-3 px-1 font-bold text-emerald-500">₹{item.amount}</td>
+                              <td className="py-3 px-1 text-right">
+                                <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${
+                                  item.status === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-500' :
+                                  item.status === 'REJECTED' ? 'bg-red-500/10 text-red-500' :
+                                  'bg-amber-500/10 text-amber-500'
+                                }`}>
+                                  {item.status === 'APPROVED' ? 'Verified' : item.status === 'REJECTED' ? 'Rejected' : 'Pending'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* TAB: Class Dashboard Tester */}
+          {currentTab === 'class-dash-tester' && (() => {
+            const classCampaigners = campaignersList.filter(c => c.class === selectedTestClass);
+            const totalCampaigners = classCampaigners.length;
+
+            const collected = donationQueue
+              .filter(q => q.notes?.includes(`Class: ${selectedTestClass}`))
+              .reduce((acc, q) => acc + Number(q.amount), 0);
+            
+            const avgCollected = totalCampaigners > 0 ? Math.round(collected / totalCampaigners) : 0;
+
+            // Compute campaigner leaderboard in this class
+            const leaderboard = classCampaigners.map(camp => {
+              const campDonations = donationQueue.filter(q => q.notes?.includes(`Logged by: ${camp.name}`));
+              const totalAmount = campDonations.reduce((acc, q) => acc + Number(q.amount), 0);
+              const donorsCount = new Set(campDonations.map(q => q.donorId)).size;
+              return { ...camp, totalAmount, donorsCount };
+            }).sort((a, b) => b.totalAmount - a.totalAmount);
+
+            return (
+              <div className="space-y-6 flex-1 flex flex-col animate-in fade-in duration-350">
+                {/* Selector */}
+                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">Simulated Class Dashboard</h4>
+                    <p className="text-xs opacity-60 mt-1">Select any class to review class stats and campaigner rankings.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold opacity-60">Class:</span>
+                    <select
+                      value={selectedTestClass}
+                      onChange={(e) => setSelectedTestClass(e.target.value)}
+                      className="bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold outline-none text-slate-800 dark:text-white"
+                    >
+                      {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(name => (
+                        <option key={name} value={name} className="text-slate-850">{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Class Stats cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Total Class Collection</span>
+                    <h3 className="text-3xl font-extrabold tracking-tight text-emerald-500 mt-2">₹{collected.toLocaleString()}.00</h3>
+                  </div>
+                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Active Campaigners</span>
+                    <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{totalCampaigners} Students</h3>
+                  </div>
+                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase">Average Student Collection</span>
+                    <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{avgCollected.toLocaleString()}.00</h3>
+                  </div>
+                </div>
+
+                {/* Leaderboard */}
+                <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
+                  <h4 className="text-md font-bold text-slate-800 dark:text-white uppercase tracking-wider">Class Performance Leaderboard</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-white/10 text-slate-400 text-[10px] uppercase font-bold">
+                          <th className="py-3 px-2">Rank</th>
+                          <th className="py-3 px-2">Campaigner</th>
+                          <th className="py-3 px-2">HN Code</th>
+                          <th className="py-3 px-2">Donors Count</th>
+                          <th className="py-3 px-2 text-right">Total Collected</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leaderboard.map((item, index) => (
+                          <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-350 font-medium">
+                            <td className="py-3 px-2 font-bold">#{index + 1}</td>
+                            <td className="py-3 px-2 font-bold uppercase">{item.name}</td>
+                            <td className="py-3 px-2 font-mono">HN-{String(item.hn).padStart(3, '0')}</td>
+                            <td className="py-3 px-2">{item.donorsCount} active profiles</td>
+                            <td className="py-3 px-2 font-extrabold text-emerald-500 text-right">₹{item.totalAmount.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* TAB 2: Bulk Campaigners */}
           {currentTab === 'bulk' && (

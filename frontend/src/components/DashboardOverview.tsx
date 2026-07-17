@@ -558,6 +558,10 @@ export default function DashboardOverview() {
       setFormError('Please enter a donor name');
       return;
     }
+    if (!donorPhoneInput && donationTab === 'new') {
+      setFormError('Please enter a valid 10-digit phone number');
+      return;
+    }
     if (!donationAmount) {
       setFormError('Please enter an amount');
       return;
@@ -1647,19 +1651,35 @@ export default function DashboardOverview() {
 
                 {/* NEW DONOR: Donor Name Input */}
                 {donationTab === 'new' && (
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">പേര് നൽകുക</span>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">പേര് നൽകുക</span>
+                      </div>
+                      <input 
+                        type="text" 
+                        required={donationTab === 'new'}
+                        value={donorNameInput}
+                        onChange={(e) => setDonorNameInput(e.target.value)}
+                        placeholder="Enter Donor Name"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                      />
                     </div>
-                    <input 
-                      type="text" 
-                      required={donationTab === 'new'}
-                      value={donorNameInput}
-                      onChange={(e) => setDonorNameInput(e.target.value)}
-                      placeholder="Enter Donor Name"
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
-                    />
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">ഫോൺ നമ്പർ</span>
+                      </div>
+                      <input 
+                        type="tel" 
+                        required={donationTab === 'new'}
+                        value={donorPhoneInput}
+                        onChange={(e) => setDonorPhoneInput(e.target.value)}
+                        placeholder="Enter 10 digit Phone Number"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                      />
+                    </div>
                   </div>
                 )}
 

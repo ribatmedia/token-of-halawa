@@ -255,6 +255,10 @@ export default function DashboardOverview() {
   const [donationDateInput, setDonationDateInput] = useState('2026-07-13');
   const [amountStatusInput, setAmountStatusInput] = useState<'RECEIVED' | 'PENDING'>('RECEIVED');
   const [monthPlanInput, setMonthPlanInput] = useState('100/month');
+  
+  // Custom Donor Search State
+  const [renewSearchQuery, setRenewSearchQuery] = useState('');
+  const [isDonorDropdownOpen, setIsDonorDropdownOpen] = useState(false);
 
   // Input states for Register Donor form
   const [newDonorName, setNewDonorName] = useState('');
@@ -1598,48 +1602,103 @@ export default function DashboardOverview() {
 
               <form onSubmit={handleAddDonation} className="space-y-5">
 
+                {/* NEW DONOR: Donor Name Input */}
+                {donationTab === 'new' && (
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
+                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">പേര് നൽകുക</span>
+                    </div>
+                    <input 
+                      type="text" 
+                      required={donationTab === 'new'}
+                      value={donorNameInput}
+                      onChange={(e) => setDonorNameInput(e.target.value)}
+                      placeholder="Enter Donor Name"
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                    />
+                  </div>
+                )}
+
                 {/* RENEW: Donor Profile Select FIRST (above amount) */}
                 {donationTab === 'renew' && (
                   <div className="space-y-4 pt-2 border-t border-slate-300/40 dark:border-white/5">
-                    <div>
+                    <div className="relative">
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Select Profile) *</label>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Search & Select) *</label>
                         <span className="text-[9px] text-slate-400 block">വരിക്കാരനെ തിരഞ്ഞെടുക്കുക</span>
                       </div>
-                      <select 
-                        required={donationTab === 'renew'} 
-                        value={donorIdInput}
-                        onChange={(e) => {
-                          const selectedId = e.target.value;
-                          setDonorIdInput(selectedId);
-                          // Auto-detect donor's plan from previous donations
-                          const previousDonation = verificationQueue.find(q => q.donorId === selectedId);
-                          if (previousDonation?.notes) {
-                            const planMatch = previousDonation.notes.match(/Plan:\s*([^.]+)/);
-                            if (planMatch) {
-                              const detectedPlan = planMatch[1].trim();
-                              setMonthPlanInput(detectedPlan);
-                              // Extract amount from plan
-                              const amountMatch = detectedPlan.match(/^(\d+)/);
-                              if (amountMatch) {
-                                setDonationAmount(amountMatch[1]);
-                              }
+                      
+                      <div className="relative">
+                        <input
+                          type="text"
+                          required={donationTab === 'renew' && !donorIdInput}
+                          placeholder="Search donor name or phone..."
+                          value={isDonorDropdownOpen ? renewSearchQuery : (donors.find(d => d.id === donorIdInput)?.name || renewSearchQuery)}
+                          onFocus={() => {
+                            setIsDonorDropdownOpen(true);
+                            setRenewSearchQuery(''); // Clear query to show all on focus
+                          }}
+                          onBlur={() => setTimeout(() => setIsDonorDropdownOpen(false), 200)}
+                          onChange={(e) => {
+                            setRenewSearchQuery(e.target.value);
+                            setIsDonorDropdownOpen(true);
+                            // If user types, we clear the selected ID so they must select from list
+                            if (donorIdInput) {
+                              setDonorIdInput('');
                             }
-                          }
-                          // Also auto-fill name and phone from the donor record
-                          const selectedDonor = donors.find(d => d.id === selectedId);
-                          if (selectedDonor) {
-                            setDonorNameInput(selectedDonor.name || '');
-                            setDonorPhoneInput(selectedDonor.phone || '');
-                          }
-                        }}
-                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none cursor-pointer"
-                      >
-                        <option value="" disabled className="text-slate-800">Select a Donor profile</option>
-                        {donors.map(d => (
-                          <option key={d.id} value={d.id} className="text-slate-850">{d.name} ({d.phone || 'No phone'})</option>
-                        ))}
-                      </select>
+                          }}
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-805 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                        />
+                        
+                        {isDonorDropdownOpen && (
+                          <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl">
+                            {donors.filter(d => 
+                              !renewSearchQuery || 
+                              d.name?.toLowerCase().includes(renewSearchQuery.toLowerCase()) || 
+                              d.phone?.includes(renewSearchQuery)
+                            ).length === 0 ? (
+                              <div className="p-4 text-center text-sm text-slate-500">No donors found</div>
+                            ) : (
+                              donors.filter(d => 
+                                !renewSearchQuery || 
+                                d.name?.toLowerCase().includes(renewSearchQuery.toLowerCase()) || 
+                                d.phone?.includes(renewSearchQuery)
+                              ).map(d => (
+                                <div 
+                                  key={d.id}
+                                  onClick={() => {
+                                    setDonorIdInput(d.id);
+                                    setRenewSearchQuery(d.name || '');
+                                    setIsDonorDropdownOpen(false);
+                                    
+                                    // Auto-detect donor's plan from previous donations
+                                    const previousDonation = verificationQueue.find(q => q.donorId === d.id);
+                                    if (previousDonation?.notes) {
+                                      const planMatch = previousDonation.notes.match(/Plan:\s*([^.]+)/);
+                                      if (planMatch) {
+                                        const detectedPlan = planMatch[1].trim();
+                                        setMonthPlanInput(detectedPlan);
+                                        // Extract amount from plan
+                                        const amountMatch = detectedPlan.match(/^(\d+)/);
+                                        if (amountMatch) {
+                                          setDonationAmount(amountMatch[1]);
+                                        }
+                                      }
+                                    }
+                                    setDonorNameInput(d.name || '');
+                                    setDonorPhoneInput(d.phone || '');
+                                  }}
+                                  className="px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-white/5 last:border-0"
+                                >
+                                  <div className="text-sm font-bold text-slate-800 dark:text-slate-200">{d.name}</div>
+                                  <div className="text-xs text-slate-500">{d.phone || 'No phone'}</div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Auto-detected Plan & Amount display */}

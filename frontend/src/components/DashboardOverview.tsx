@@ -7,8 +7,10 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy,
+  Receipt
 } from 'lucide-react';
+import ReceiptModal from './ReceiptModal';
 import { Chart, registerables } from 'chart.js';
 
 if (typeof window !== 'undefined') {
@@ -255,6 +257,10 @@ export default function DashboardOverview() {
   const [donationDateInput, setDonationDateInput] = useState('2026-07-13');
   const [amountStatusInput, setAmountStatusInput] = useState<'RECEIVED' | 'PENDING'>('RECEIVED');
   const [monthPlanInput, setMonthPlanInput] = useState('100/month');
+  
+  // Receipt Modal State
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [selectedReceiptData, setSelectedReceiptData] = useState<any>(null);
   
   // Custom Donor Search State
   const [renewSearchQuery, setRenewSearchQuery] = useState('');
@@ -606,6 +612,26 @@ export default function DashboardOverview() {
       const data = await res.json();
       if (res.ok) {
         setFormSuccess(true);
+        
+        // Prepare data for ReceiptModal
+        const newDonationId = data.donation?.id || data.id || Math.floor(1000 + Math.random() * 9000).toString();
+        const cleanId = newDonationId.split('-')[0].slice(0, 4).toUpperCase();
+        
+        let finalDonorName = donorNameInput;
+        if (donationTab === 'renew' && donorIdInput) {
+          finalDonorName = donors.find(d => d.id === donorIdInput)?.name || 'General Donor';
+        }
+
+        setSelectedReceiptData({
+          receiptNo: data.donation?.receipts?.[0]?.receiptNumber || `TOH-2026-${cleanId}`,
+          date: new Date().toISOString(),
+          name: finalDonorName || 'General Donor',
+          place: donorAddressInput || 'Kerala',
+          phone: donorPhoneInput || '',
+          amount: donationAmount
+        });
+        setShowReceiptModal(true);
+
         setDonorIdInput('');
         setDonorNameInput('');
         setDonorPhoneInput('');
@@ -1449,6 +1475,23 @@ export default function DashboardOverview() {
                                     title="Send WhatsApp Receipt"
                                   >
                                     <MessageSquare className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedReceiptData({
+                                        receiptNo: receiptNo,
+                                        date: item.createdAt,
+                                        name: item.donor?.name || 'General Donor',
+                                        place: item.donor?.category || 'Kerala',
+                                        phone: item.donor?.phone || '',
+                                        amount: item.amount
+                                      });
+                                      setShowReceiptModal(true);
+                                    }}
+                                    className="p-1.5 hover:bg-blue-500/10 text-blue-500 rounded-full transition cursor-pointer"
+                                    title="View Receipt"
+                                  >
+                                    <Receipt className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => {
@@ -3287,7 +3330,12 @@ export default function DashboardOverview() {
       )}
 
       </main>
-
+      
+      <ReceiptModal 
+        isOpen={showReceiptModal} 
+        onClose={() => setShowReceiptModal(false)} 
+        receiptData={selectedReceiptData} 
+      />
     </div>
   );
 }

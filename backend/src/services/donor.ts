@@ -13,6 +13,7 @@ export const donorCreateSchema = z.object({
   occupation: z.string().optional(),
   category: z.enum(['GENERAL', 'PREMIUM', 'WIDOW', 'ORPHAN', 'POOR']).default('GENERAL'),
   donationPlan: z.enum(['MONTHLY', 'YEARLY', 'ONE_OFF']).default('MONTHLY'),
+  location: z.string().optional(),
   unitId: z.string().optional(),
   classId: z.string().optional(),
   forceCreate: z.boolean().optional()
@@ -74,6 +75,7 @@ export class DonorService {
         occupation: validated.occupation,
         category: validated.category,
         donationPlan: validated.donationPlan,
+        location: validated.location,
         uniqueHash,
         unitId: validated.unitId,
         classId: validated.classId,

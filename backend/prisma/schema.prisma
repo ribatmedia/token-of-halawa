@@ -247,6 +247,7 @@ model Donor {
   occupation     String?
   category       String         @default("GENERAL") // PREMIUM, GENERAL, WIDOW, ORPHAN, POOR
   donationPlan   String         @default("MONTHLY") // MONTHLY, YEARLY, ONE_OFF
+  location       String?
   status         String         @default("ACTIVE") // ACTIVE, INACTIVE, DECEASED, MERGED
   uniqueHash     String         @unique // Concatenated / normalized details
   createdAt      DateTime       @default(now())

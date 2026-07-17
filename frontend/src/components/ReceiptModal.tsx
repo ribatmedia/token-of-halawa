@@ -80,12 +80,35 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
   };
 
   const handleWhatsAppShare = async () => {
-    // For WhatsApp web/mobile sharing, we can't directly attach an image via deep link.
-    // We can only send a text message. (Alternatively, Web Share API if supported)
-    const text = `*Thank you for your generous contribution!*\n\n*Receipt No:* ${receiptData.receiptNo}\n*Amount:* ₹${receiptData.amount}\n*Name:* ${receiptData.name}\n\nTowards Inyaasunna Working Fund. Your Support Makes a Real Difference.`;
-    const encodedText = encodeURIComponent(text);
-    const waUrl = `https://wa.me/?text=${encodedText}`;
-    window.open(waUrl, '_blank');
+    try {
+      setIsExporting(true);
+      const dataUrl = await generateImage();
+      if (!dataUrl) return;
+      
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `Receipt_${receiptData.receiptNo}.png`, { type: 'image/png' });
+      
+      const text = `*Thank you for your generous contribution!*\n\n*Receipt No:* ${receiptData.receiptNo}\n*Amount:* ₹${receiptData.amount}\n*Name:* ${receiptData.name}`;
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Donation Receipt',
+          text: text
+        });
+      } else {
+        // Fallback for browsers that don't support file sharing
+        const encodedText = encodeURIComponent(text);
+        const waUrl = `https://wa.me/?text=${encodedText}`;
+        window.open(waUrl, '_blank');
+        alert("Your browser does not support sharing the image directly to WhatsApp. A text message was opened instead. You can download the receipt PNG and share it manually.");
+      }
+    } catch (error) {
+      console.error("Error sharing to WhatsApp:", error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handlePrint = () => {

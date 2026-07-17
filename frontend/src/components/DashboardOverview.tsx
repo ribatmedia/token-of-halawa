@@ -2682,16 +2682,10 @@ export default function DashboardOverview() {
                     </h3>
                     <p className="text-xs opacity-60 mt-1">Manage, search, export and merge donor profiles registered under your hub.</p>
                   </div>
-                  <button 
-                    onClick={() => setActiveTab('add-donor')}
-                    className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2.5 rounded-2xl text-xs font-bold shrink-0 self-start md:self-center"
-                  >
-                    <UserPlus className="w-4 h-4" /> Add Donor Profile
-                  </button>
                 </div>
 
                 {/* Filters & Search Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   <div className="relative">
                     <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                     <input 
@@ -2701,20 +2695,6 @@ export default function DashboardOverview() {
                       onChange={(e) => setDonorSearchQuery(e.target.value)}
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-11 pr-4 py-3 text-xs text-slate-800 dark:text-slate-200 outline-none"
                     />
-                  </div>
-                  <div>
-                    <select
-                      value={donorFilterCategory}
-                      onChange={(e) => setDonorFilterCategory(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                    >
-                      <option value="ALL">All Categories</option>
-                      <option value="GENERAL">General</option>
-                      <option value="PREMIUM">Premium</option>
-                      <option value="WIDOW">Widow</option>
-                      <option value="ORPHAN">Orphan</option>
-                      <option value="POOR">Poor</option>
-                    </select>
                   </div>
                   
                   {/* Export Buttons */}
@@ -2922,11 +2902,8 @@ export default function DashboardOverview() {
 
                               {/* Subscription Plan & Payment Month Buttons */}
                               <td className="py-4 px-4">
-                                <div className="flex flex-col items-center gap-1.5 min-w-[210px]">
-                                  <span className="text-[10px] font-black text-blue-500 dark:text-blue-400 tracking-wider uppercase bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">
-                                    {detectedPlan}
-                                  </span>
-                                  <div className="grid grid-cols-5 gap-1 text-[9px] font-bold">
+                                  <div className="flex flex-col items-center gap-1.5 min-w-[210px]">
+                                    <div className="grid grid-cols-5 gap-1 text-[9px] font-bold">
                                     {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'].map(month => {
                                       const isPaid = paidMonths.includes(month);
                                       const shortName = month.substring(0, 3);

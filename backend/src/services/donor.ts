@@ -14,7 +14,8 @@ export const donorCreateSchema = z.object({
   category: z.enum(['GENERAL', 'PREMIUM', 'WIDOW', 'ORPHAN', 'POOR']).default('GENERAL'),
   donationPlan: z.enum(['MONTHLY', 'YEARLY', 'ONE_OFF']).default('MONTHLY'),
   unitId: z.string().optional(),
-  classId: z.string().optional()
+  classId: z.string().optional(),
+  forceCreate: z.boolean().optional()
 });
 
 export class DonorService {
@@ -43,13 +44,17 @@ export class DonorService {
     const normEmail = validated.email?.trim().toLowerCase();
 
     // Check duplicates
-    const duplicates = await this.checkDuplicate(normPhone, normEmail);
-    if (duplicates && duplicates.length > 0) {
-      throw new ApiError(409, `Potential duplicate donor profile discovered. Matches ID: ${duplicates[0].uniqueId}`);
+    if (!validated.forceCreate) {
+      const duplicates = await this.checkDuplicate(normPhone, normEmail);
+      if (duplicates && duplicates.length > 0) {
+        throw new ApiError(409, `Potential duplicate donor profile discovered. Matches ID: ${duplicates[0].uniqueId}`);
+      }
     }
 
-    // Generate unique indexable hash
-    const uniqueHash = `${normPhone}-${normEmail || 'none'}`;
+    // Generate unique indexable hash (append timestamp if forced to avoid Prisma unique constraint error)
+    const uniqueHash = validated.forceCreate 
+      ? `${normPhone}-${normEmail || 'none'}-${Date.now()}`
+      : `${normPhone}-${normEmail || 'none'}`;
 
     // Auto-generate Unique ID format (TOH-D-XXXXXX)
     const count = await prisma.donor.count();

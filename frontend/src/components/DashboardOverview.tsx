@@ -575,25 +575,44 @@ export default function DashboardOverview() {
         const cleanNameSlug = donorNameInput.toLowerCase().replace(/\s+/g, '');
         const generatedEmail = donorPhoneInput ? `${donorPhoneInput}@hidayaonline.org` : `${cleanNameSlug}-${Date.now()}@hidayaonline.org`;
         
-        const donorRes = await fetch(`${API_URL}/donors`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            name: donorNameInput,
-            email: generatedEmail,
-            phone: donorPhoneInput || undefined,
-            category: donationType
-          })
-        });
-        
-        const donorData = await donorRes.json();
+        const attemptDonorCreate = async (force: boolean) => {
+          const response = await fetch(`${API_URL}/donors`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              name: donorNameInput,
+              email: generatedEmail,
+              phone: donorPhoneInput || undefined,
+              category: donationType,
+              forceCreate: force
+            })
+          });
+          return { res: response, data: await response.json() };
+        };
+
+        let { res: donorRes, data: donorData } = await attemptDonorCreate(false);
+
+        // Handle Duplicate Phone Number Conflict (409)
+        if (!donorRes.ok && donorRes.status === 409 && donorData.error?.includes('duplicate')) {
+          const confirmForce = window.confirm("ഈ ഫോൺ നമ്പർ ഉപയോഗിച്ച് ഇതിനകം ഒരു ഡോണർ ഉണ്ട്. എങ്കിലും പുതിയൊരു ഡോണറായി തുടരണമെന്നുറപ്പാണോ?\n\n(This phone number is already registered. Are you sure you want to create a new, separate donor profile?)");
+          if (confirmForce) {
+            const retry = await attemptDonorCreate(true);
+            donorRes = retry.res;
+            donorData = retry.data;
+          } else {
+            setFormError("Action cancelled. Please use another phone number or choose 'Renew (Existing)'.");
+            return;
+          }
+        }
+
         if (!donorRes.ok) {
           setFormError(donorData.error || donorData.message || 'Failed to create new donor profile first.');
           return;
         }
+        
         donorId = donorData.donor?.id || donorData.id;
       }
 

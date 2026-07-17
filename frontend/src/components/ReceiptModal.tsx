@@ -249,8 +249,8 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
             position: 'absolute', bottom: 0, width: '100%',
             display: 'flex', alignItems: 'center', padding: '0 80px', gap: '40px'
           }}>
-             <div style={{ width: '120px', height: '120px', backgroundColor: 'white', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '15px' }}>
-                <Image src="/ribat-logo.png" alt="Logo" width={100} height={100} style={{ objectFit: 'contain' }} priority />
+             <div style={{ width: '120px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Image src="/ribat-logo.png" alt="Logo" width={120} height={120} style={{ objectFit: 'contain' }} priority />
              </div>
              <div style={{ color: 'white' }}>
                <h4 style={{ fontSize: '42px', fontWeight: 800, margin: 0 }}>RIBAT Students Union</h4>

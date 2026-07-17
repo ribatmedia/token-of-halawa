@@ -592,6 +592,7 @@ export default function DashboardOverview() {
               name: donorNameInput,
               email: generatedEmail,
               phone: donorPhoneInput || undefined,
+              location: donorAddressInput || undefined,
               category: donationType,
               forceCreate: force
             })
@@ -1702,6 +1703,19 @@ export default function DashboardOverview() {
                         value={donorPhoneInput}
                         onChange={(e) => setDonorPhoneInput(e.target.value)}
                         placeholder="Enter 10 digit Phone Number"
+                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Place</label>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">സ്ഥലം നൽകുക</span>
+                      </div>
+                      <input 
+                        type="text" 
+                        value={donorAddressInput}
+                        onChange={(e) => setDonorAddressInput(e.target.value)}
+                        placeholder="Enter Place / Location"
                         className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
                       />
                     </div>

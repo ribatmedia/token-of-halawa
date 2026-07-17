@@ -8,7 +8,7 @@ import {
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
   Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy,
-  Receipt
+  Receipt, FileSpreadsheet, List
 } from 'lucide-react';
 import ReceiptModal from './ReceiptModal';
 import { Chart, registerables } from 'chart.js';
@@ -286,6 +286,8 @@ export default function DashboardOverview() {
   const [donorDirectoryStatus, setDonorDirectoryStatus] = useState('ALL');
   const [donorDirectoryMonth, setDonorDirectoryMonth] = useState('ALL');
   const [donorDirectoryPlan, setDonorDirectoryPlan] = useState('ALL');
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [exportFields, setExportFields] = useState({ receipt: true, donorDetails: true, planMonths: true, place: true, campaigner: true, amount: true, status: true });
   const [mergeSourceId, setMergeSourceId] = useState('');
   const [mergeTargetId, setMergeTargetId] = useState('');
   const [mergeReason, setMergeReason] = useState('');
@@ -2309,6 +2311,7 @@ export default function DashboardOverview() {
                 </html>
               `);
               printWin.document.close();
+              setShowExportMenu(false);
             };
 
             return (
@@ -2629,9 +2632,29 @@ export default function DashboardOverview() {
             });
 
             const handleExportCSV = () => {
-              const headers = ['Unique ID,Name,Email,Phone,Category,Donation Plan\n'];
-              const rows = filteredDonors.map(d => `"${d.uniqueId || d.id}","${d.name}","${d.email || ''}","${d.phone}","${d.category || 'GENERAL'}","${d.donationPlan || 'MONTHLY'}"`);
-              const blob = new Blob([headers.concat(rows.join('\n')).join('')], { type: 'text/csv;charset=utf-8;' });
+              const headers: string[] = [];
+              if (exportFields.receipt) headers.push('Receipt / REG ID');
+              if (exportFields.donorDetails) headers.push('Donor Name', 'Phone', 'Email');
+              if (exportFields.planMonths) headers.push('Plan', 'Months');
+              if (exportFields.place) headers.push('Place / Category');
+              if (exportFields.campaigner) headers.push('Campaigner', 'Class');
+              if (exportFields.amount) headers.push('Amount');
+              if (exportFields.status) headers.push('Status');
+              headers.push('\n');
+
+              const rows = filteredDonors.map(d => {
+                const row: string[] = [];
+                if (exportFields.receipt) row.push(`"${d.uniqueId || d.id}"`);
+                if (exportFields.donorDetails) row.push(`"${d.name}"`, `"${d.phone}"`, `"${d.email || ''}"`);
+                if (exportFields.planMonths) row.push(`"${d.detectedPlan}"`, `"${d.paidMonths.join(', ')}"`);
+                if (exportFields.place) row.push(`"${d.location || d.category || 'General'}"`);
+                if (exportFields.campaigner) row.push(`"${d.campaignerName}"`, `"${d.campaignerClass}"`);
+                if (exportFields.amount) row.push(`"${d.totalCollected}"`);
+                if (exportFields.status) row.push(`"${d.overallStatus}"`);
+                return row.join(',');
+              });
+
+              const blob = new Blob([headers.join(',') + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
               const url = URL.createObjectURL(blob);
               const link = document.createElement('a');
               link.href = url;
@@ -2639,6 +2662,7 @@ export default function DashboardOverview() {
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
+              setShowExportMenu(false);
             };
 
             const handleExportPDF = () => {
@@ -2691,9 +2715,47 @@ export default function DashboardOverview() {
             };
 
             const handleWhatsAppText = () => {
-              const text = `*Donors Registry Directory*\n\n` + filteredDonors.map((d, i) => `${i+1}. ${d.name} (${d.uniqueId || d.id}) - Phone: ${d.phone} [${d.category || 'GENERAL'}]`).join('\n');
+              const text = `*Donors Registry Directory*\n\n` + filteredDonors.map((d, i) => {
+                let line = `${i+1}. `;
+                if (exportFields.donorDetails) line += `*${d.name}*`;
+                if (exportFields.receipt) line += ` (${d.uniqueId || d.id})`;
+                if (exportFields.donorDetails) line += ` - ${d.phone}`;
+                if (exportFields.place) line += ` [${d.location || d.category || 'General'}]`;
+                if (exportFields.amount) line += ` - ₹${d.totalCollected}`;
+                if (exportFields.status) line += ` (${d.overallStatus})`;
+                return line;
+              }).join('\n');
               navigator.clipboard.writeText(text);
               alert("WhatsApp share text copied to clipboard! You can paste it into any WhatsApp chat.");
+              setShowExportMenu(false);
+            };
+
+            const handleCopyTable = () => {
+              const headers: string[] = [];
+              if (exportFields.receipt) headers.push('Receipt / REG ID');
+              if (exportFields.donorDetails) headers.push('Donor Name', 'Phone', 'Email');
+              if (exportFields.planMonths) headers.push('Plan', 'Months');
+              if (exportFields.place) headers.push('Place / Category');
+              if (exportFields.campaigner) headers.push('Campaigner', 'Class');
+              if (exportFields.amount) headers.push('Amount');
+              if (exportFields.status) headers.push('Status');
+
+              const rows = filteredDonors.map(d => {
+                const row: string[] = [];
+                if (exportFields.receipt) row.push(d.uniqueId || d.id || '');
+                if (exportFields.donorDetails) row.push(d.name || '', d.phone || '', d.email || '');
+                if (exportFields.planMonths) row.push(d.detectedPlan || '', d.paidMonths.join(', '));
+                if (exportFields.place) row.push(d.location || d.category || 'General');
+                if (exportFields.campaigner) row.push(d.campaignerName || '', d.campaignerClass || '');
+                if (exportFields.amount) row.push(String(d.totalCollected));
+                if (exportFields.status) row.push(d.overallStatus || '');
+                return row.join('\t');
+              });
+
+              const text = headers.join('\t') + '\n' + rows.join('\n');
+              navigator.clipboard.writeText(text);
+              alert('Table copied to clipboard! You can paste it into Excel or Google Sheets.');
+              setShowExportMenu(false);
             };
 
             const handleMergeSubmit = async (e: React.FormEvent) => {
@@ -2751,43 +2813,116 @@ export default function DashboardOverview() {
                     </h3>
                     <p className="text-xs opacity-60 mt-1">Manage, search, export and merge donor profiles registered under your hub.</p>
                   </div>
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowExportMenu(!showExportMenu)}
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold self-start md:self-center shrink-0 shadow-md transition-all"
+                    >
+                      <Download className="w-4 h-4" /> Download Report
+                    </button>
+                    {showExportMenu && (
+                      <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl p-4 z-50">
+                        <div className="mb-4">
+                          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">Select fields:</h4>
+                          <div className="space-y-1.5">
+                            {[
+                              { id: 'receipt', label: 'Receipt' },
+                              { id: 'donorDetails', label: 'Donor Details' },
+                              { id: 'planMonths', label: 'Plan & Months' },
+                              { id: 'place', label: 'Place' },
+                              { id: 'campaigner', label: 'Campaigner' },
+                              { id: 'amount', label: 'Amount' },
+                              { id: 'status', label: 'Status' }
+                            ].map(field => (
+                              <label key={field.id} className="flex items-center gap-2 cursor-pointer group">
+                                <input 
+                                  type="checkbox" 
+                                  checked={exportFields[field.id as keyof typeof exportFields]}
+                                  onChange={(e) => setExportFields({...exportFields, [field.id]: e.target.checked})}
+                                  className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{field.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                          <button onClick={handleExportCSV} className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><FileSpreadsheet className="w-3.5 h-3.5" /> CSV</button>
+                          <button onClick={handleExportPDF} className="bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><FileText className="w-3.5 h-3.5" /> PDF</button>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button onClick={handleCopyTable} className="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><List className="w-3.5 h-3.5" /> Copy as Table</button>
+                          <button onClick={handleWhatsAppText} className="w-full bg-[#25D366] hover:bg-[#1ebd5a] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><Share2 className="w-3.5 h-3.5" /> Copy for WhatsApp</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Filters & Search Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                  <div className="relative">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+                  <div className="col-span-2 sm:col-span-1">
+                    <select
+                      value={donorDirectoryCampaigner}
+                      onChange={(e) => setDonorDirectoryCampaigner(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2.5 text-[11px] font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Campaigners</option>
+                      {Array.from(new Set(campaignersList.map(c => c.name))).map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-1">
+                    <select
+                      value={donorDirectoryStatus}
+                      onChange={(e) => setDonorDirectoryStatus(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2.5 text-[11px] font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Status</option>
+                      <option value="RECEIVED">Received</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="UNPAID">Unpaid</option>
+                    </select>
+                  </div>
+                  <div className="col-span-1">
+                    <select
+                      value={donorDirectoryMonth}
+                      onChange={(e) => setDonorDirectoryMonth(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2.5 text-[11px] font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Months</option>
+                      {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'].map(m => (
+                        <option key={m} value={m}>{m.substring(0,3)}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-1">
+                    <select
+                      value={donorDirectoryPlan}
+                      onChange={(e) => setDonorDirectoryPlan(e.target.value)}
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2.5 text-[11px] font-bold text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="ALL">All Plans</option>
+                      <option value="100/MONTH">100/MONTH</option>
+                      <option value="200/MONTH">200/MONTH</option>
+                      <option value="500/MONTH">500/MONTH</option>
+                      <option value="1000/MONTH">1000/MONTH</option>
+                      <option value="CUSTOM">CUSTOM</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 relative flex">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3.5" />
                     <input 
                       type="text"
-                      placeholder="Search by name, phone or ID..."
+                      placeholder="Search..."
                       value={donorSearchQuery}
                       onChange={(e) => setDonorSearchQuery(e.target.value)}
-                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-11 pr-4 py-3 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                      className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-[11px] text-slate-800 dark:text-slate-200 outline-none"
                     />
                   </div>
-                  
-                  {/* Export Buttons */}
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={handleExportCSV}
-                      className="flex-1 bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-350 py-2.5 rounded-2xl text-xs font-bold hover:bg-slate-300/50 dark:hover:bg-white/10 transition flex items-center justify-center gap-1.5"
-                    >
-                      Excel
-                    </button>
-                    <button 
-                      onClick={handleExportPDF}
-                      className="flex-1 bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-slate-350 py-2.5 rounded-2xl text-xs font-bold hover:bg-slate-300/50 dark:hover:bg-white/10 transition flex items-center justify-center gap-1.5"
-                    >
-                      PDF
-                    </button>
-                    <button 
-                      onClick={handleWhatsAppText}
-                      className="flex-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-2xl text-xs font-bold hover:bg-emerald-500/20 transition flex items-center justify-center gap-1.5"
-                    >
-                      Share WA
-                    </button>
-                  </div>
                 </div>
+
 
                 {/* Collapsible Profile Merger */}
                 <details className="mb-6 bg-slate-250/20 dark:bg-black/10 border border-slate-350 dark:border-white/5 rounded-2xl p-4 text-xs">
@@ -2926,7 +3061,23 @@ export default function DashboardOverview() {
                                         <span 
                                           key={month} 
                                           title={isPaid ? `Paid for ${month}` : `Unpaid for ${month}`}
-                                          className={`px-1.5 py-0.5 rounded text-center transition-all min-w-[34px] uppercase select-none ${
+                                          onClick={() => {
+                                            if (isPaid) {
+                                              const donation = d.donorDonations.find((q: any) => q.notes?.includes(month));
+                                              if (donation) {
+                                                setSelectedReceiptData({
+                                                  id: donation.id,
+                                                  date: donation.date,
+                                                  name: d.name,
+                                                  phone: d.phone,
+                                                  place: d.location || d.category || 'General',
+                                                  amount: donation.amount
+                                                });
+                                                setShowReceiptModal(true);
+                                              }
+                                            }
+                                          }}
+                                          className={`px-1.5 py-0.5 rounded text-center transition-all min-w-[34px] uppercase select-none ${isPaid ? 'cursor-pointer hover:scale-105' : ''} ${
                                             isPaid 
                                               ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm shadow-emerald-500/20' 
                                               : 'bg-slate-200/50 dark:bg-black/25 text-slate-400 dark:text-slate-500 border border-slate-350 dark:border-white/5'

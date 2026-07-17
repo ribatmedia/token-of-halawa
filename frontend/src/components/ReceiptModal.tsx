@@ -135,7 +135,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         .receipt-wrapper {
           /* Scale down the 1080x1350 container to fit the screen */
@@ -168,93 +168,97 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
           style={{ width: '1080px', height: '1350px', fontFamily: "'Inter', sans-serif" }}
         >
           {/* Header Title Section */}
-          <div className="text-center" style={{ marginTop: '90px' }}>
-             <div style={{ color: '#18A06A', fontSize: '50px', fontFamily: "'Great Vibes', cursive", marginBottom: '-20px' }}>
+          <div className="text-center" style={{ paddingTop: '90px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+             <div style={{ color: '#18A66A', fontSize: '54px', fontFamily: "'Great Vibes', cursive", fontWeight: 400, lineHeight: 1, marginBottom: '-8px', zIndex: 10, position: 'relative' }}>
                Token of
              </div>
-             <h1 style={{ color: '#18A06A', fontSize: '120px', fontWeight: 900, lineHeight: 1.1, margin: 0, letterSpacing: '-2px' }}>
+             <h1 style={{ color: '#18A66A', fontSize: '120px', fontWeight: 900, lineHeight: 1, margin: 0, letterSpacing: '-2px' }}>
                Halawa
              </h1>
-             <h2 style={{ color: '#222', fontSize: '52px', fontWeight: 800, margin: 0 }}>
+             <h2 style={{ color: '#222', fontSize: '52px', fontWeight: 700, lineHeight: 1, margin: '8px 0 0 0' }}>
                Working Fund
              </h2>
           </div>
 
-          {/* Receipt Details Meta */}
-          <div style={{ position: 'absolute', top: '390px', left: '120px' }}>
-            <div className="flex items-center gap-4 mb-2">
-               <p style={{ fontSize: '32px', color: '#555', margin: 0, fontWeight: 600, width: '180px' }}>Receipt No</p>
-               <span style={{ fontSize: '32px', color: '#222', fontWeight: 800 }}>: {receiptData.receiptNo}</span>
+          {/* Receipt Meta & Badge Row */}
+          <div style={{ marginTop: '60px', padding: '0 120px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            {/* Receipt Details */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+              <div className="flex items-center gap-4">
+                 <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Receipt No</p>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#222', fontWeight: 700 }}>: {receiptData.receiptNo}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                 <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Date</p>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#222', fontWeight: 700 }}>: {formattedDate}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-               <p style={{ fontSize: '32px', color: '#555', margin: 0, fontWeight: 600, width: '180px' }}>Date</p>
-               <span style={{ fontSize: '32px', color: '#222', fontWeight: 800 }}>: {formattedDate}</span>
-            </div>
-          </div>
 
-          {/* Payment Badge */}
-          <div style={{ 
-            position: 'absolute', top: '380px', right: '120px', 
-            border: '4px solid #18A06A', borderRadius: '50px', 
-            padding: '10px 30px', display: 'flex', alignItems: 'center', gap: '15px' 
-          }}>
-            <div style={{ backgroundColor: '#18A06A', color: 'white', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckCircle2 size={24} />
-            </div>
-            <div style={{ color: '#18A06A', fontSize: '28px', fontWeight: 800, lineHeight: 1.1, textAlign: 'center' }}>
-               PAYMENT<br/>RECEIVED
+            {/* Payment Badge */}
+            <div style={{ 
+              border: '4px solid #18A66A', borderRadius: '45px', 
+              width: '270px', height: '82px', padding: '0 25px', display: 'flex', alignItems: 'center', gap: '12px',
+              backgroundColor: 'white'
+            }}>
+              <div style={{ backgroundColor: '#18A66A', color: 'white', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <CheckCircle2 size={20} />
+              </div>
+              <div style={{ color: '#18A66A', fontSize: '20px', fontWeight: 800, lineHeight: 1.1, textAlign: 'left' }}>
+                 PAYMENT<br/>RECEIVED
+              </div>
             </div>
           </div>
 
           {/* Main Body (Donor Info) */}
-          <div className="w-full text-center flex flex-col items-center" style={{ marginTop: '220px' }}>
+          <div className="w-full text-center flex flex-col items-center" style={{ marginTop: '65px' }}>
              
-             <div style={{ fontFamily: "'Great Vibes', cursive", fontSize: '80px', color: '#222', marginBottom: '20px' }}>
+             <div style={{ fontFamily: "'Great Vibes', cursive", fontSize: '88px', color: '#222', lineHeight: 1, marginBottom: '18px' }}>
                Thank you
              </div>
 
-             <h3 style={{ fontSize: '62px', fontWeight: 800, color: '#222', margin: 0, textTransform: 'uppercase' }}>
+             <h3 style={{ fontSize: '72px', fontWeight: 800, color: '#222', margin: 0, lineHeight: 1, textTransform: 'uppercase', marginBottom: '10px' }}>
                {receiptData.name}
              </h3>
              
-             <p style={{ fontSize: '44px', color: '#555', margin: '0 0 30px 0', fontWeight: 600 }}>
+             <p style={{ fontSize: '52px', color: '#555', margin: 0, fontWeight: 600, lineHeight: 1, marginBottom: '30px' }}>
                {receiptData.place || 'Kerala'} {receiptData.phone ? `(${receiptData.phone})` : ''}
              </p>
 
-             <div style={{ fontSize: '40px', color: '#444', marginBottom: '40px' }}>
+             <div style={{ fontSize: '48px', color: '#333', fontWeight: 500, lineHeight: 1, marginBottom: '28px' }}>
                for your kind contribution of
              </div>
 
              {/* Amount Box */}
              <div style={{ 
-               width: '560px', height: '140px', 
-               backgroundColor: '#169C69', borderRadius: '70px',
+               width: '560px', height: '118px', 
+               backgroundColor: '#18A66A', borderRadius: '65px',
                display: 'flex', alignItems: 'center', justifyContent: 'center',
-               color: 'white', fontSize: '90px', fontWeight: 900,
-               boxShadow: '0 20px 40px rgba(22, 156, 105, 0.3)'
+               color: 'white', fontSize: '78px', fontWeight: 800,
+               boxShadow: '0 20px 40px rgba(24, 166, 106, 0.3)',
+               marginBottom: '32px'
              }}>
                ₹{receiptData.amount}
              </div>
 
-             <div style={{ marginTop: '50px', fontSize: '32px', color: '#555', fontFamily: "'Great Vibes', cursive", lineHeight: 1.4 }}>
-               Towards Inyaasunna Working Fund<br/>
-               <span style={{ fontSize: '36px' }}>Your Support Makes a Real Difference.</span>
+             <div style={{ fontSize: '28px', color: '#444', fontFamily: "'Great Vibes', cursive", lineHeight: 1.4, marginBottom: '55px' }}>
+               towards Inyaasunna Working Fund<br/>
+               Your Support Makes a Real Difference.
              </div>
 
           </div>
 
           {/* Footer */}
           <div style={{ 
-            height: '200px', backgroundColor: '#169C69', 
+            height: '170px', backgroundColor: '#18A66A', 
             position: 'absolute', bottom: 0, width: '100%',
-            display: 'flex', alignItems: 'center', padding: '0 80px', gap: '40px'
+            display: 'flex', alignItems: 'center', padding: '0 80px', gap: '25px'
           }}>
-             <div style={{ width: '120px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Image src="/ribat-logo.png" alt="Logo" width={120} height={120} style={{ objectFit: 'contain' }} priority />
+             <div style={{ width: '85px', height: '85px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Image src="/ribat-logo.png" alt="Logo" width={85} height={85} style={{ objectFit: 'contain' }} priority />
              </div>
-             <div style={{ color: 'white' }}>
-               <h4 style={{ fontSize: '42px', fontWeight: 800, margin: 0 }}>RIBAT Students Union</h4>
-               <p style={{ fontSize: '28px', margin: 0, opacity: 0.9 }}>Green Valley, Pantheerankavu, Kozhikode - 19</p>
+             <div style={{ color: 'white', textAlign: 'left' }}>
+               <h4 style={{ fontSize: '44px', fontWeight: 700, margin: 0, lineHeight: 1.1, marginBottom: '4px' }}>RIBAT Students Union</h4>
+               <p style={{ fontSize: '22px', fontWeight: 400, margin: 0, opacity: 0.9 }}>Green Valley, Pantheerankavu, Kozhikode - 19</p>
              </div>
           </div>
 

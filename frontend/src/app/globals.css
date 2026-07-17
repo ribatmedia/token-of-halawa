@@ -117,3 +117,9 @@ body {
 .font-malayalam {
   font-family: 'Anek Malayalam', sans-serif !important;
 }
+
+option {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+

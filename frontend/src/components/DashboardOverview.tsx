@@ -282,6 +282,10 @@ export default function DashboardOverview() {
   // Donors Directory Advanced States
   const [donorSearchQuery, setDonorSearchQuery] = useState('');
   const [donorFilterCategory, setDonorFilterCategory] = useState('ALL');
+  const [donorDirectoryCampaigner, setDonorDirectoryCampaigner] = useState('ALL');
+  const [donorDirectoryStatus, setDonorDirectoryStatus] = useState('ALL');
+  const [donorDirectoryMonth, setDonorDirectoryMonth] = useState('ALL');
+  const [donorDirectoryPlan, setDonorDirectoryPlan] = useState('ALL');
   const [mergeSourceId, setMergeSourceId] = useState('');
   const [mergeTargetId, setMergeTargetId] = useState('');
   const [mergeReason, setMergeReason] = useState('');
@@ -1367,7 +1371,7 @@ export default function DashboardOverview() {
                       onChange={(e) => setDonationMonthFilter(e.target.value)}
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
                     >
-              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'One Time'].map(m => (
+              {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March', 'One Time'].map(m => (
                         <option key={m} value={m}>{m}</option>
                       ))}
                     </select>
@@ -2545,18 +2549,83 @@ export default function DashboardOverview() {
 
           {/* VIEW: Donors Directory */}
           {activeTab === 'donors' && (() => {
-            const filteredDonors = donors.filter(d => {
+            
+            const mappedDonors = donors.map(d => {
+              const donorDonations = verificationQueue.filter(q => q.donorId === d.id || q.donorId === d.uniqueId);
+              const lastDonation = donorDonations[0];
+              
+              let detectedPlan = 'CUSTOM';
+              if (lastDonation?.notes) {
+                const planMatch = lastDonation.notes.match(/Plan:\s*([^.]+)/);
+                if (planMatch) detectedPlan = planMatch[1].trim().toUpperCase();
+              } else if (d.category) {
+                detectedPlan = d.category.toUpperCase();
+              }
+
+              let campaignerName = 'Admin';
+              let campaignerClass = 'NF3';
+              
+              if (donorDonations.length > 0) {
+                const donationWithLogger = donorDonations.find(q => q.notes?.includes('Logged by:'));
+                if (donationWithLogger?.notes) {
+                  const nameMatch = donationWithLogger.notes.match(/Logged by:\s*([^.]+)/i);
+                  if (nameMatch) campaignerName = nameMatch[1].trim();
+                  
+                  const classMatch = donationWithLogger.notes.match(/Class:\s*([^.]+)/i);
+                  if (classMatch) {
+                    campaignerClass = classMatch[1].trim();
+                  }
+                }
+              }
+
+              const campRecord = campaignersList.find(c => c.name.toLowerCase() === campaignerName.toLowerCase());
+              if (campRecord) {
+                campaignerClass = campRecord.class;
+                campaignerName = campRecord.name;
+              }
+
+              const paidMonths = donorDonations
+                .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
+                .map(q => {
+                  const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
+                  return monthMatch ? monthMatch[1].trim() : '';
+                })
+                .filter(Boolean);
+
+              const totalCollected = donorDonations
+                .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
+                .reduce((acc, q) => acc + Number(q.amount || 0), 0);
+
+              const hasPending = donorDonations.some(q => q.status === 'PENDING');
+              const hasApproved = donorDonations.some(q => q.status === 'APPROVED');
+              const overallStatus = hasPending ? 'PENDING' : (hasApproved ? 'RECEIVED' : 'UNPAID');
+
+              return {
+                ...d,
+                donorDonations,
+                detectedPlan,
+                campaignerName,
+                campaignerClass,
+                paidMonths,
+                totalCollected,
+                overallStatus
+              };
+            });
+
+            const filteredDonors = mappedDonors.filter(d => {
               const query = donorSearchQuery.toLowerCase().trim();
               const matchesSearch = !query || 
-                d.name.toLowerCase().includes(query) ||
-                d.phone.includes(query) ||
-                d.id.toLowerCase().includes(query) ||
+                (d.name || '').toLowerCase().includes(query) ||
+                (d.phone || '').includes(query) ||
+                (d.id || '').toLowerCase().includes(query) ||
                 (d.uniqueId && d.uniqueId.toLowerCase().includes(query));
 
-              const matchesCategory = donorFilterCategory === 'ALL' || 
-                d.category === donorFilterCategory;
+              const matchesCampaigner = donorDirectoryCampaigner === 'ALL' || d.campaignerName === donorDirectoryCampaigner;
+              const matchesStatus = donorDirectoryStatus === 'ALL' || d.overallStatus === donorDirectoryStatus;
+              const matchesMonth = donorDirectoryMonth === 'ALL' || d.paidMonths.includes(donorDirectoryMonth);
+              const matchesPlan = donorDirectoryPlan === 'ALL' || d.detectedPlan === donorDirectoryPlan;
 
-              return matchesSearch && matchesCategory;
+              return matchesSearch && matchesCampaigner && matchesStatus && matchesMonth && matchesPlan;
             });
 
             const handleExportCSV = () => {
@@ -2802,61 +2871,7 @@ export default function DashboardOverview() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredDonors.map((d, index) => {
-                          // 1. Get donor donations
-                          const donorDonations = verificationQueue.filter(q => q.donorId === d.id);
-                          const lastDonation = donorDonations[0];
-                          
-                          // 2. Extract donation plan
-                          let detectedPlan = 'CUSTOM';
-                          if (lastDonation?.notes) {
-                            const planMatch = lastDonation.notes.match(/Plan:\s*([^.]+)/);
-                            if (planMatch) {
-                              detectedPlan = planMatch[1].trim().toUpperCase();
-                            }
-                          } else if (d.category) {
-                            detectedPlan = d.category.toUpperCase();
-                          }
-
-                          // 3. Extract paid months
-                          const paidMonths = donorDonations
-                            .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
-                            .map(q => {
-                              const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
-                              return monthMatch ? monthMatch[1].trim() : '';
-                            })
-                            .filter(Boolean);
-
-                          // 4. Extract total collected amount
-                          const totalCollected = donorDonations
-                            .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
-                            .reduce((acc, q) => acc + Number(q.amount), 0);
-
-                          // 5. Extract Campaigner details
-                          let campaignerName = 'Admin';
-                          let campaignerClass = 'NF3';
-                          
-                          const donationWithLogger = donorDonations.find(q => q.notes?.includes('Logged by:'));
-                          if (donationWithLogger?.notes) {
-                            const nameMatch = donationWithLogger.notes.match(/Logged by:\s*([^.]+)/i);
-                            if (nameMatch) campaignerName = nameMatch[1].trim();
-                            
-                            const classMatch = donationWithLogger.notes.match(/Class:\s*([^.]+)/i);
-                            if (classMatch) campaignerClass = classMatch[1].trim();
-                          } else {
-                            const matchedCamp = campaignersList.find(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
-                            if (matchedCamp) {
-                              campaignerName = matchedCamp.name;
-                              campaignerClass = matchedCamp.class;
-                            }
-                          }
-
-                          const campRecord = campaignersList.find(c => c.name.toLowerCase() === campaignerName.toLowerCase());
-                          if (campRecord) {
-                            campaignerClass = campRecord.class;
-                          }
-
-                          // 6. Format registration date
+                        {filteredDonors.map((d: any, index) => {
                           const regDate = new Date(d.createdAt).toLocaleDateString('en-GB', {
                             day: '2-digit',
                             month: 'short',
@@ -2905,7 +2920,7 @@ export default function DashboardOverview() {
                                   <div className="flex flex-col items-center gap-1.5 min-w-[210px]">
                                     <div className="grid grid-cols-5 gap-1 text-[9px] font-bold">
                                     {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'].map(month => {
-                                      const isPaid = paidMonths.includes(month);
+                                      const isPaid = d.paidMonths.includes(month);
                                       const shortName = month.substring(0, 3);
                                       return (
                                         <span 
@@ -2936,10 +2951,10 @@ export default function DashboardOverview() {
                               <td className="py-4 px-4">
                                 <div className="flex flex-col gap-0.5">
                                   <span className="font-extrabold text-slate-900 dark:text-white text-xs uppercase tracking-wide">
-                                    {campaignerName}
+                                    {d.campaignerName}
                                   </span>
                                   <span className="text-[10px] text-slate-400 font-bold uppercase">
-                                    Class: {campaignerClass}
+                                    Class: {d.campaignerClass}
                                   </span>
                                 </div>
                               </td>
@@ -2947,7 +2962,7 @@ export default function DashboardOverview() {
                               {/* Total Collected Amount */}
                               <td className="py-4 px-4 text-right">
                                 <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">
-                                  ₹{totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  ₹{d.totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                               </td>
 

@@ -45,4 +45,18 @@ export class DonationController {
       next(error);
     }
   }
+
+  static async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const orgId = req.user!.organizationId;
+      const { id } = req.params;
+      
+      await DonationService.delete(orgId, id);
+      return res.status(200).json({
+        message: 'Donation deleted successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

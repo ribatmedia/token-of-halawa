@@ -77,12 +77,16 @@ export default function DeveloperPage() {
   const [actionMessage, setActionMessage] = useState('');
 
   // Receipt Settings State
-  const [moveX, setMoveX] = useState(320);
-  const [moveY, setMoveY] = useState(418);
-  const [textSize, setTextSize] = useState(29);
-  const [textAlign, setTextAlign] = useState('center');
-  const [fontWeight, setFontWeight] = useState('Bold (700)');
-  const [fontFamily, setFontFamily] = useState('Outfit');
+  const defaultReceiptLayout = {
+    receiptNo: { dx: 0, dy: 0, size: 28 },
+    date: { dx: 0, dy: 0, size: 28 },
+    name: { dx: 0, dy: 0, size: 72 },
+    placePhone: { dx: 0, dy: 0, size: 52 },
+    amount: { dx: 0, dy: 0, size: 78 }
+  };
+  type ElementKey = keyof typeof defaultReceiptLayout;
+  const [selectedElement, setSelectedElement] = useState<ElementKey>('name');
+  const [receiptLayout, setReceiptLayout] = useState(defaultReceiptLayout);
 
   // UI Banner Notice Tickers
   const [tickerText, setTickerText] = useState('Welcome to Token of Halawa donation program ★ Live tracking active');
@@ -95,6 +99,7 @@ export default function DeveloperPage() {
   const [donationQueue, setDonationQueue] = useState<any[]>([]);
   const [simDonorName, setSimDonorName] = useState('');
   const [simDonorPhone, setSimDonorPhone] = useState('');
+  const [simPlace, setSimPlace] = useState('');
   const [simAmount, setSimAmount] = useState('');
   const [simMonth, setSimMonth] = useState('July');
   const [simFormSuccess, setSimFormSuccess] = useState('');
@@ -137,6 +142,15 @@ export default function DeveloperPage() {
           setDevSlides(JSON.parse(savedSlides));
         } catch (e) {
           console.error("Failed to parse campaign_slides from localStorage", e);
+        }
+      }
+      
+      const savedLayout = localStorage.getItem('receipt_layout_settings');
+      if (savedLayout) {
+        try {
+          setReceiptLayout(JSON.parse(savedLayout));
+        } catch (e) {
+          console.error("Failed to parse receipt_layout_settings from localStorage", e);
         }
       }
     }
@@ -228,7 +242,8 @@ export default function DeveloperPage() {
         phone: simDonorPhone,
         email: `${simDonorName.toLowerCase().replace(/\s+/g, '')}@example.com`,
         category: 'GENERAL',
-        donationPlan: 'MONTHLY'
+        donationPlan: 'MONTHLY',
+        location: simPlace
       };
 
       const donorRes = await fetch(`${API_URL}/donors`, {
@@ -330,6 +345,11 @@ export default function DeveloperPage() {
     localStorage.setItem('notice_ticker_text', tickerText);
     localStorage.setItem('app_loader_style', loaderStyle);
     setActionMessage('UI branding parameters saved successfully.');
+  };
+
+  const handleSaveReceiptSettings = () => {
+    localStorage.setItem('receipt_layout_settings', JSON.stringify(receiptLayout));
+    setActionMessage('Receipt Layout Settings saved successfully.');
   };
 
   const handleSaveSlides = () => {
@@ -691,6 +711,16 @@ export default function DeveloperPage() {
                           className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
                         />
                       </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Place / Location</label>
+                        <input
+                          type="text"
+                          value={simPlace}
+                          onChange={(e) => setSimPlace(e.target.value)}
+                          placeholder="e.g. Kerala"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
+                        />
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Amount (₹) *</label>
@@ -904,47 +934,69 @@ export default function DeveloperPage() {
             <div className={`p-6 md:p-8 rounded-3xl ${glassClass} space-y-6 animate-in fade-in duration-350`}>
               <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <h3 className="text-xl font-bold">Receipt Margin & Position Studio</h3>
-                <button className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold">
+                <button onClick={handleSaveReceiptSettings} className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-500/20 transition-colors">
                   <Check className="w-4 h-4" /> Save Layout Settings
                 </button>
               </div>
 
-              {/* Slider tools */}
-              <div className="space-y-4 max-w-xl">
-                <div>
-                  <div className="flex justify-between text-xs font-bold uppercase mb-2"><span>Nudge Move X</span><span className="bg-white/10 px-2 py-0.5 rounded">{moveX}px</span></div>
-                  <input type="range" min="0" max="1000" value={moveX} onChange={(e) => setMoveX(Number(e.target.value))} className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold uppercase mb-2"><span>Nudge Move Y</span><span className="bg-white/10 px-2 py-0.5 rounded">{moveY}px</span></div>
-                  <input type="range" min="0" max="1200" value={moveY} onChange={(e) => setMoveY(Number(e.target.value))} className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold uppercase mb-2"><span>Text Size</span><span className="bg-white/10 px-2 py-0.5 rounded">{textSize}pt</span></div>
-                  <input type="range" min="10" max="80" value={textSize} onChange={(e) => setTextSize(Number(e.target.value))} className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" />
-                </div>
+              {/* Element Selector */}
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Select Element to Adjust</label>
+                <select 
+                  value={selectedElement} 
+                  onChange={(e) => setSelectedElement(e.target.value as ElementKey)} 
+                  className="w-full max-w-sm bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                >
+                  <option value="name" className="text-slate-800">Donor Name</option>
+                  <option value="amount" className="text-slate-800">Amount</option>
+                  <option value="placePhone" className="text-slate-800">Place & Phone</option>
+                  <option value="date" className="text-slate-800">Date</option>
+                  <option value="receiptNo" className="text-slate-800">Receipt No</option>
+                </select>
               </div>
 
-              {/* Fonts configurator */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/5">
+              {/* Slider tools */}
+              <div className="space-y-6 max-w-xl bg-white/5 p-6 rounded-2xl border border-white/10">
                 <div>
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Font Weight Variant</label>
-                  <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer">
-                    <option value="Bold (700)" className="text-slate-800">Bold (700)</option>
-                    <option value="Regular (400)" className="text-slate-800">Regular (400)</option>
-                    <option value="Light (300)" className="text-slate-800">Light (300)</option>
-                  </select>
+                  <div className="flex justify-between text-xs font-bold uppercase mb-2">
+                    <span className="flex items-center gap-2">Nudge Move X <span className="opacity-50 lowercase text-[10px]">(Horizontal)</span></span>
+                    <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].dx}px</span>
+                  </div>
+                  <input 
+                    type="range" min="-300" max="300" 
+                    value={receiptLayout[selectedElement].dx} 
+                    onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], dx: Number(e.target.value) } }))} 
+                    className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
+                  />
+                  <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>-300px Left</span><span>0</span><span>+300px Right</span></div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Font Family</label>
-                  <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer">
-                    <option value="Outfit" className="text-slate-800">Outfit</option>
-                    <option value="Inter" className="text-slate-800">Inter</option>
-                    <option value="Cairo" className="text-slate-800">Cairo</option>
-                  </select>
+                  <div className="flex justify-between text-xs font-bold uppercase mb-2">
+                    <span className="flex items-center gap-2">Nudge Move Y <span className="opacity-50 lowercase text-[10px]">(Vertical)</span></span>
+                    <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].dy}px</span>
+                  </div>
+                  <input 
+                    type="range" min="-300" max="300" 
+                    value={receiptLayout[selectedElement].dy} 
+                    onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], dy: Number(e.target.value) } }))} 
+                    className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
+                  />
+                  <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>-300px Up</span><span>0</span><span>+300px Down</span></div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs font-bold uppercase mb-2">
+                    <span>Text Size</span>
+                    <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].size}px</span>
+                  </div>
+                  <input 
+                    type="range" min="10" max="150" 
+                    value={receiptLayout[selectedElement].size} 
+                    onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], size: Number(e.target.value) } }))} 
+                    className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
+                  />
+                  <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>10px Small</span><span>150px Huge</span></div>
                 </div>
               </div>
             </div>

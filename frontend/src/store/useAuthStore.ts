@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface User {
   id: string;
@@ -22,14 +23,21 @@ interface AuthState {
   toggleTheme: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: null,
-  refreshToken: null,
-  user: null,
-  organization: null,
-  theme: 'dark', // default premium theme
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      token: null,
+      refreshToken: null,
+      user: null,
+      organization: null,
+      theme: 'dark', // default premium theme
 
-  setAuth: (token, refreshToken, user, organization) => set({ token, refreshToken, user, organization }),
-  clearAuth: () => set({ token: null, refreshToken: null, user: null, organization: null }),
-  toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' }))
-}));
+      setAuth: (token, refreshToken, user, organization) => set({ token, refreshToken, user, organization }),
+      clearAuth: () => set({ token: null, refreshToken: null, user: null, organization: null }),
+      toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' }))
+    }),
+    {
+      name: 'auth-storage', // name of the item in the storage (must be unique)
+    }
+  )
+);

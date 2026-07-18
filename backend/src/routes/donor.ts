@@ -9,6 +9,7 @@ router.use(authenticate);
 
 router.post('/', requirePermission(PERMISSIONS.DONOR_CREATE), DonorController.create);
 router.get('/', requirePermission(PERMISSIONS.DONOR_READ), DonorController.list);
+router.delete('/:id', requirePermission(PERMISSIONS.DONOR_DELETE), DonorController.delete);
 router.post('/merge', requirePermission(PERMISSIONS.DONOR_MERGE), DonorController.merge);
 
 export default router;

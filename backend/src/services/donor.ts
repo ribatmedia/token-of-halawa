@@ -144,4 +144,45 @@ export class DonorService {
       });
     });
   }
+
+  static async delete(orgId: string, id: string) {
+    const donor = await prisma.donor.findUnique({ where: { id } });
+    if (!donor || donor.organizationId !== orgId) {
+      throw new ApiError(404, 'Donor not found');
+    }
+
+    return prisma.$transaction(async (tx) => {
+      // 1. Find all donations by this donor
+      const donations = await tx.donation.findMany({ where: { donorId: id } });
+      const donationIds = donations.map(d => d.id);
+      
+      // 2. Delete associated workflow logs, payments, receipts
+      if (donationIds.length > 0) {
+        await tx.workflowLog.deleteMany({ where: { donationId: { in: donationIds } } });
+        await tx.payment.deleteMany({ where: { donationId: { in: donationIds } } });
+        await tx.receipt.deleteMany({ where: { donationId: { in: donationIds } } });
+      }
+
+      // 3. Decrement campaign amounts for VERIFIED donations
+      for (const d of donations) {
+        if (d.campaignId && d.status === 'VERIFIED') {
+          await tx.campaign.update({
+            where: { id: d.campaignId },
+            data: { collectedAmount: { decrement: d.amount } }
+          });
+        }
+      }
+
+      // 4. Delete donations
+      await tx.donation.deleteMany({ where: { donorId: id } });
+
+      // 5. Delete donor merge logs involving this donor
+      await tx.donorMerge.deleteMany({
+        where: { OR: [{ mergedFromId: id }, { mergedToId: id }] }
+      });
+
+      // 6. Delete the donor
+      return tx.donor.delete({ where: { id } });
+    });
+  }
 }

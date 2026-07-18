@@ -167,4 +167,37 @@ export class DonationService {
       orderBy: { createdAt: 'asc' }
     });
   }
+
+  static async delete(orgId: string, id: string) {
+    const donation = await prisma.donation.findUnique({
+      where: { id },
+      include: { donor: true }
+    });
+
+    if (!donation || donation.donor.organizationId !== orgId) {
+      throw new ApiError(404, 'Donation record not found');
+    }
+
+    return prisma.$transaction(async (tx) => {
+      // 1. Delete associated workflow logs
+      await tx.workflowLog.deleteMany({ where: { donationId: id } });
+      
+      // 2. Delete associated payments
+      await tx.payment.deleteMany({ where: { donationId: id } });
+      
+      // 3. Delete associated receipts
+      await tx.receipt.deleteMany({ where: { donationId: id } });
+      
+      // 4. Update campaign collection metric if attached
+      if (donation.campaignId && donation.status === 'VERIFIED') {
+        await tx.campaign.update({
+          where: { id: donation.campaignId },
+          data: { collectedAmount: { decrement: donation.amount } }
+        });
+      }
+      
+      // 5. Delete donation itself
+      return tx.donation.delete({ where: { id } });
+    });
+  }
 }

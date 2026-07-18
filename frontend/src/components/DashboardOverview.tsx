@@ -11,6 +11,7 @@ import {
   Receipt, FileSpreadsheet, List
 } from 'lucide-react';
 import ReceiptModal from './ReceiptModal';
+import { ExportMenu } from './ExportMenu';
 import { Chart, registerables } from 'chart.js';
 
 if (typeof window !== 'undefined') {
@@ -286,8 +287,6 @@ export default function DashboardOverview() {
   const [donorDirectoryStatus, setDonorDirectoryStatus] = useState('ALL');
   const [donorDirectoryMonth, setDonorDirectoryMonth] = useState('ALL');
   const [donorDirectoryPlan, setDonorDirectoryPlan] = useState('ALL');
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  const [exportFields, setExportFields] = useState({ receipt: true, donorDetails: true, planMonths: true, place: true, campaigner: true, amount: true, status: true });
   const [mergeSourceId, setMergeSourceId] = useState('');
   const [mergeTargetId, setMergeTargetId] = useState('');
   const [mergeReason, setMergeReason] = useState('');
@@ -734,6 +733,32 @@ export default function DashboardOverview() {
       }
     } catch (err) {
       console.error('Error verifying donation:', err);
+    }
+  };
+
+  const handleDeleteDonation = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this donation entry? This action cannot be undone.')) return;
+    try {
+      const res = await fetch(`${API_URL}/donations/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) fetchDatabaseData();
+    } catch (err) {
+      console.error('Error deleting donation:', err);
+    }
+  };
+
+  const handleDeleteDonor = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this donor profile? All their donation entries will also be removed. This action cannot be undone.')) return;
+    try {
+      const res = await fetch(`${API_URL}/donors/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) fetchDatabaseData();
+    } catch (err) {
+      console.error('Error deleting donor:', err);
     }
   };
 
@@ -1321,6 +1346,18 @@ export default function DashboardOverview() {
               return matchesSearch && matchesClass && matchesCampaigner && matchesMonth && matchesStatus;
             });
 
+            const donationsExportColumns = [
+              { id: 'receiptId', label: 'Receipt ID', getValue: (r: any) => r.id },
+              { id: 'donorName', label: 'Donor Name', getValue: (r: any) => r.donor?.name || '' },
+              { id: 'donorPhone', label: 'Donor Phone', getValue: (r: any) => r.donor?.phone || '' },
+              { id: 'amount', label: 'Amount', getValue: (r: any) => String(r.amount) },
+              { id: 'loggedBy', label: 'Logged By', getValue: (r: any) => r.notes?.match(/Logged by:\s*([^\.]+)/)?.[1] || '' },
+              { id: 'class', label: 'Class', getValue: (r: any) => r.notes?.match(/Class:\s*([^\.]+)/)?.[1] || '' },
+              { id: 'month', label: 'Month', getValue: (r: any) => r.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '' },
+              { id: 'status', label: 'Status', getValue: (r: any) => r.status },
+              { id: 'date', label: 'Date', getValue: (r: any) => new Date(r.createdAt).toLocaleString() }
+            ];
+
             return (
               <div className="space-y-6 flex-1 flex flex-col">
                 
@@ -1401,6 +1438,15 @@ export default function DashboardOverview() {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search donor, receiver, receipt, phone..."
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
+                    />
+                  </div>
+
+                  <div className="col-span-2 sm:col-span-1 md:col-span-1 flex items-center z-40 relative">
+                    <ExportMenu 
+                      data={filteredEntries}
+                      columns={donationsExportColumns}
+                      filename="donation_entries"
+                      title="Donation Entries History"
                     />
                   </div>
                 </div>
@@ -1525,12 +1571,19 @@ export default function DashboardOverview() {
                                   </button>
                                   <button
                                     onClick={() => {
-                                      if (confirm("Are you sure you want to reject/remove this entry?")) {
+                                      if (confirm("Are you sure you want to reject this entry?")) {
                                         handleApproveDonation(item.id, 'REJECTED');
                                       }
                                     }}
+                                    className="p-1.5 hover:bg-orange-500/10 text-orange-500 rounded-full transition cursor-pointer"
+                                    title="Reject Entry"
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteDonation(item.id)}
                                     className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-full transition cursor-pointer"
-                                    title="Remove Entry"
+                                    title="Delete Entry Permanently"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </button>
@@ -2108,6 +2161,12 @@ export default function DashboardOverview() {
               return matchesSearch && matchesClass;
             });
 
+            const campaignersExportColumns = [
+              { id: 'hn', label: 'HN', getValue: (c: any) => String(c.hn) },
+              { id: 'name', label: 'Name', getValue: (c: any) => c.name },
+              { id: 'class', label: 'Class', getValue: (c: any) => c.class },
+            ];
+
             return (
               <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -2146,6 +2205,14 @@ export default function DashboardOverview() {
                       <option value="Plus two" className="text-slate-800">Plus two</option>
                       <option value="Plus one" className="text-slate-800">Plus one</option>
                     </select>
+                  </div>
+                  <div className="flex items-center z-40 relative">
+                    <ExportMenu 
+                      data={filteredCampaigners}
+                      columns={campaignersExportColumns}
+                      filename="campaigners_directory"
+                      title="Campaigners Directory"
+                    />
                   </div>
                 </div>
 
@@ -2204,65 +2271,87 @@ export default function DashboardOverview() {
           })()}
 
           {/* VIEW: Campaigners Stats */}
-          {activeTab === 'campaigners-stats' && (
-            <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div>
-                  <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                    <FileText className="w-5 h-5 text-emerald-400" />
-                    Campaigners Stats
-                  </h3>
-                  <p className="text-xs opacity-60 mt-1">Detailed breakdown of all active campaigners, targets, and collections.</p>
-                </div>
-              </div>
+          {activeTab === 'campaigners-stats' && (() => {
+            const campaignersStatsData = campaignersList.map((item) => {
+              const collected = verificationQueue
+                .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
+                .reduce((acc, q) => acc + Number(q.amount), 0);
+              const target = 10000;
+              const percent = Math.min(100, Math.round((collected / target) * 100));
+              const receiptsCount = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
+              return { ...item, collected, percent, receiptsCount };
+            });
 
-              <div className="overflow-x-auto flex-1 max-h-[500px]">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
-                      <th className="py-3 px-4">HN</th>
-                      <th className="py-3 px-4">Name</th>
-                      <th className="py-3 px-4">Class</th>
-                      <th className="py-3 px-4">Collected</th>
-                      <th className="py-3 px-4">Receipts</th>
-                      <th className="py-3 px-4">Target Progress</th>
-                      <th className="py-3 px-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {campaignersList.map((item) => {
-                      const collected = verificationQueue
-                        .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
-                        .reduce((acc, q) => acc + Number(q.amount), 0);
-                      const target = 10000;
-                      const percent = Math.min(100, Math.round((collected / target) * 100));
-                      const receiptsCount = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
-                      return (
+            const campaignersStatsExportColumns = [
+              { id: 'hn', label: 'HN', getValue: (c: any) => String(c.hn) },
+              { id: 'name', label: 'Name', getValue: (c: any) => c.name },
+              { id: 'class', label: 'Class', getValue: (c: any) => c.class },
+              { id: 'collected', label: 'Collected', getValue: (c: any) => String(c.collected) },
+              { id: 'receipts', label: 'Receipts', getValue: (c: any) => String(c.receiptsCount) },
+              { id: 'targetProgress', label: 'Target Progress', getValue: (c: any) => `${c.percent}%` },
+              { id: 'status', label: 'Status', getValue: (c: any) => 'Active' }
+            ];
+
+            return (
+              <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                      <FileText className="w-5 h-5 text-emerald-400" />
+                      Campaigners Stats
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Detailed breakdown of all active campaigners, targets, and collections.</p>
+                  </div>
+                  <div className="flex items-center z-40 relative">
+                    <ExportMenu 
+                      data={campaignersStatsData}
+                      columns={campaignersStatsExportColumns}
+                      filename="campaigners_stats"
+                      title="Campaigners Stats"
+                    />
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto flex-1 max-h-[500px]">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
+                        <th className="py-3 px-4">HN</th>
+                        <th className="py-3 px-4">Name</th>
+                        <th className="py-3 px-4">Class</th>
+                        <th className="py-3 px-4">Collected</th>
+                        <th className="py-3 px-4">Receipts</th>
+                        <th className="py-3 px-4">Target Progress</th>
+                        <th className="py-3 px-4">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {campaignersStatsData.map((item) => (
                         <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
                           <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
                           <td className="py-4 px-4">{item.class}</td>
-                          <td className="py-4 px-4 font-bold text-emerald-500">₹{collected.toLocaleString()}</td>
-                          <td className="py-4 px-4 font-bold">{receiptsCount}</td>
+                          <td className="py-4 px-4 font-bold text-emerald-500">₹{item.collected.toLocaleString()}</td>
+                          <td className="py-4 px-4 font-bold">{item.receiptsCount}</td>
                           <td className="py-4 px-4 min-w-[150px]">
                             <div className="flex items-center gap-2">
                               <div className="w-full bg-slate-200/50 dark:bg-black/30 h-2 rounded-full overflow-hidden">
-                                <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${percent}%` }} />
+                                <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${item.percent}%` }} />
                               </div>
-                              <span className="text-[10px] font-bold">{percent}%</span>
+                              <span className="text-[10px] font-bold">{item.percent}%</span>
                             </div>
                           </td>
                           <td className="py-4 px-4">
                             <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Active</span>
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* VIEW: Class Collections (Handovers Form & Recent list) */}
           {activeTab === 'class-collections' && (() => {
@@ -2325,8 +2414,17 @@ export default function DashboardOverview() {
                 </html>
               `);
               printWin.document.close();
-              setShowExportMenu(false);
             };
+
+            const classCollectionsExportColumns = [
+              { id: 'receiptNo', label: 'Receipt No', getValue: (ho: any) => ho.id },
+              { id: 'className', label: 'Class', getValue: (ho: any) => ho.className },
+              { id: 'leader', label: 'Leader', getValue: (ho: any) => ho.leader },
+              { id: 'phone', label: 'Phone', getValue: (ho: any) => ho.phone },
+              { id: 'amount', label: 'Amount', getValue: (ho: any) => String(ho.amount) },
+              { id: 'month', label: 'Month', getValue: (ho: any) => ho.month },
+              { id: 'date', label: 'Date', getValue: (ho: any) => ho.date }
+            ];
 
             return (
               <div className="space-y-6 flex-1 flex flex-col">
@@ -2423,7 +2521,17 @@ export default function DashboardOverview() {
 
                 {/* Recent Handovers List */}
                 <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
-                  <h4 className="font-bold text-slate-800 dark:text-white">Recent Class Handovers</h4>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h4 className="font-bold text-slate-800 dark:text-white">Recent Class Handovers</h4>
+                    <div className="flex items-center z-40 relative">
+                      <ExportMenu 
+                        data={classHandovers}
+                        columns={classCollectionsExportColumns}
+                        filename="class_handovers"
+                        title="Recent Class Handovers"
+                      />
+                    </div>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs sm:text-sm">
                       <thead>
@@ -2645,134 +2753,21 @@ export default function DashboardOverview() {
               return matchesSearch && matchesCampaigner && matchesStatus && matchesMonth && matchesPlan;
             });
 
-            const handleExportCSV = () => {
-              const headers: string[] = [];
-              if (exportFields.receipt) headers.push('Receipt / REG ID');
-              if (exportFields.donorDetails) headers.push('Donor Name', 'Phone', 'Email');
-              if (exportFields.planMonths) headers.push('Plan', 'Months');
-              if (exportFields.place) headers.push('Place / Category');
-              if (exportFields.campaigner) headers.push('Campaigner', 'Class');
-              if (exportFields.amount) headers.push('Amount');
-              if (exportFields.status) headers.push('Status');
-              headers.push('\n');
+              const donorsExportColumns = [
+                { id: 'receipt', label: 'Receipt / REG ID', getValue: (d: any) => d.uniqueId || d.id || '' },
+                { id: 'donorDetails', label: 'Donor Name', getValue: (d: any) => d.name || '' },
+                { id: 'phone', label: 'Phone', getValue: (d: any) => d.phone || '' },
+                { id: 'email', label: 'Email', getValue: (d: any) => d.email || '' },
+                { id: 'plan', label: 'Plan', getValue: (d: any) => d.detectedPlan || '' },
+                { id: 'months', label: 'Months', getValue: (d: any) => d.paidMonths?.join(', ') || '' },
+                { id: 'place', label: 'Place / Category', getValue: (d: any) => d.location || d.category || 'General' },
+                { id: 'campaigner', label: 'Campaigner', getValue: (d: any) => d.campaignerName || '' },
+                { id: 'class', label: 'Class', getValue: (d: any) => d.campaignerClass || '' },
+                { id: 'amount', label: 'Amount', getValue: (d: any) => String(d.totalCollected) },
+                { id: 'status', label: 'Status', getValue: (d: any) => d.overallStatus || '' }
+              ];
 
-              const rows = filteredDonors.map(d => {
-                const row: string[] = [];
-                if (exportFields.receipt) row.push(`"${d.uniqueId || d.id}"`);
-                if (exportFields.donorDetails) row.push(`"${d.name}"`, `"${d.phone}"`, `"${d.email || ''}"`);
-                if (exportFields.planMonths) row.push(`"${d.detectedPlan}"`, `"${d.paidMonths.join(', ')}"`);
-                if (exportFields.place) row.push(`"${d.location || d.category || 'General'}"`);
-                if (exportFields.campaigner) row.push(`"${d.campaignerName}"`, `"${d.campaignerClass}"`);
-                if (exportFields.amount) row.push(`"${d.totalCollected}"`);
-                if (exportFields.status) row.push(`"${d.overallStatus}"`);
-                return row.join(',');
-              });
-
-              const blob = new Blob([headers.join(',') + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.setAttribute('download', `donors_registry_${new Date().toISOString().split('T')[0]}.csv`);
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              setShowExportMenu(false);
-            };
-
-            const handleExportPDF = () => {
-              const printWin = window.open('', '_blank');
-              if (!printWin) return;
-              printWin.document.write(`
-                <html>
-                  <head>
-                    <title>Donors Registry Directory</title>
-                    <style>
-                      body { font-family: sans-serif; padding: 20px; color: #333; }
-                      h1 { text-align: center; color: #10b981; }
-                      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                      th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 11px; }
-                      th { background-color: #f3f4f6; font-weight: bold; }
-                    </style>
-                  </head>
-                  <body>
-                    <h1>Donors Registry Directory</h1>
-                    <p>Total Records: ${filteredDonors.length} | Generated on: ${new Date().toLocaleDateString()}</p>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Unique ID</th>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Category</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${filteredDonors.map(d => `
-                          <tr>
-                            <td>${d.uniqueId || d.id}</td>
-                            <td><b>${d.name}</b></td>
-                            <td>${d.email || 'N/A'}</td>
-                            <td>${d.phone}</td>
-                            <td>${d.category || 'GENERAL'}</td>
-                          </tr>
-                        `).join('')}
-                      </tbody>
-                    </table>
-                    <script>
-                      window.onload = function() { window.print(); window.close(); }
-                    </script>
-                  </body>
-                </html>
-              `);
-              printWin.document.close();
-            };
-
-            const handleWhatsAppText = () => {
-              const text = `*Donors Registry Directory*\n\n` + filteredDonors.map((d, i) => {
-                let line = `${i+1}. `;
-                if (exportFields.donorDetails) line += `*${d.name}*`;
-                if (exportFields.receipt) line += ` (${d.uniqueId || d.id})`;
-                if (exportFields.donorDetails) line += ` - ${d.phone}`;
-                if (exportFields.place) line += ` [${d.location || d.category || 'General'}]`;
-                if (exportFields.amount) line += ` - ₹${d.totalCollected}`;
-                if (exportFields.status) line += ` (${d.overallStatus})`;
-                return line;
-              }).join('\n');
-              navigator.clipboard.writeText(text);
-              alert("WhatsApp share text copied to clipboard! You can paste it into any WhatsApp chat.");
-              setShowExportMenu(false);
-            };
-
-            const handleCopyTable = () => {
-              const headers: string[] = [];
-              if (exportFields.receipt) headers.push('Receipt / REG ID');
-              if (exportFields.donorDetails) headers.push('Donor Name', 'Phone', 'Email');
-              if (exportFields.planMonths) headers.push('Plan', 'Months');
-              if (exportFields.place) headers.push('Place / Category');
-              if (exportFields.campaigner) headers.push('Campaigner', 'Class');
-              if (exportFields.amount) headers.push('Amount');
-              if (exportFields.status) headers.push('Status');
-
-              const rows = filteredDonors.map(d => {
-                const row: string[] = [];
-                if (exportFields.receipt) row.push(d.uniqueId || d.id || '');
-                if (exportFields.donorDetails) row.push(d.name || '', d.phone || '', d.email || '');
-                if (exportFields.planMonths) row.push(d.detectedPlan || '', d.paidMonths.join(', '));
-                if (exportFields.place) row.push(d.location || d.category || 'General');
-                if (exportFields.campaigner) row.push(d.campaignerName || '', d.campaignerClass || '');
-                if (exportFields.amount) row.push(String(d.totalCollected));
-                if (exportFields.status) row.push(d.overallStatus || '');
-                return row.join('\t');
-              });
-
-              const text = headers.join('\t') + '\n' + rows.join('\n');
-              navigator.clipboard.writeText(text);
-              alert('Table copied to clipboard! You can paste it into Excel or Google Sheets.');
-              setShowExportMenu(false);
-            };
-
-            const handleMergeSubmit = async (e: React.FormEvent) => {
+              const handleMergeSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
               if (!mergeSourceId || !mergeTargetId) {
                 setMergeError('Please select both source and target profiles.');
@@ -2828,48 +2823,12 @@ export default function DashboardOverview() {
                     <p className="text-xs opacity-60 mt-1">Manage, search, export and merge donor profiles registered under your hub.</p>
                   </div>
                   <div className="relative">
-                    <button 
-                      onClick={() => setShowExportMenu(!showExportMenu)}
-                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold self-start md:self-center shrink-0 shadow-md transition-all"
-                    >
-                      <Download className="w-4 h-4" /> Download Report
-                    </button>
-                    {showExportMenu && (
-                      <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl p-4 z-50">
-                        <div className="mb-4">
-                          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">Select fields:</h4>
-                          <div className="space-y-1.5">
-                            {[
-                              { id: 'receipt', label: 'Receipt' },
-                              { id: 'donorDetails', label: 'Donor Details' },
-                              { id: 'planMonths', label: 'Plan & Months' },
-                              { id: 'place', label: 'Place' },
-                              { id: 'campaigner', label: 'Campaigner' },
-                              { id: 'amount', label: 'Amount' },
-                              { id: 'status', label: 'Status' }
-                            ].map(field => (
-                              <label key={field.id} className="flex items-center gap-2 cursor-pointer group">
-                                <input 
-                                  type="checkbox" 
-                                  checked={exportFields[field.id as keyof typeof exportFields]}
-                                  onChange={(e) => setExportFields({...exportFields, [field.id]: e.target.checked})}
-                                  className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{field.label}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mb-2">
-                          <button onClick={handleExportCSV} className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><FileSpreadsheet className="w-3.5 h-3.5" /> CSV</button>
-                          <button onClick={handleExportPDF} className="bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><FileText className="w-3.5 h-3.5" /> PDF</button>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <button onClick={handleCopyTable} className="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><List className="w-3.5 h-3.5" /> Copy as Table</button>
-                          <button onClick={handleWhatsAppText} className="w-full bg-[#25D366] hover:bg-[#1ebd5a] text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"><Share2 className="w-3.5 h-3.5" /> Copy for WhatsApp</button>
-                        </div>
-                      </div>
-                    )}
+                    <ExportMenu 
+                      data={filteredDonors}
+                      columns={donorsExportColumns}
+                      filename="donors_registry"
+                      title="Donors Registry Directory"
+                    />
                   </div>
                 </div>
 
@@ -3142,17 +3101,26 @@ export default function DashboardOverview() {
                                       <Check className="w-2.5 h-2.5" /> Verified
                                     </span>
                                   </div>
-                                  <button 
-                                    onClick={() => {
-                                      setDonorPhoneInput(d.phone);
-                                      setDonorNameInput(d.name);
-                                      setDonorIdInput(d.uniqueId || d.id);
-                                      setActiveTab('add-donation');
-                                    }}
-                                    className="w-full bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-3 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase"
-                                  >
-                                    Add Receipt
-                                  </button>
+                                  <div className="flex gap-2 w-full mt-2">
+                                    <button 
+                                      onClick={() => {
+                                        setDonorPhoneInput(d.phone);
+                                        setDonorNameInput(d.name);
+                                        setDonorIdInput(d.uniqueId || d.id);
+                                        setActiveTab('add-donation');
+                                      }}
+                                      className="flex-1 bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-3 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase"
+                                    >
+                                      Add Receipt
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteDonor(d.id)}
+                                      className="px-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded transition flex items-center justify-center"
+                                      title="Delete Donor Permanently"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
                                 </div>
                               </td>
                             </tr>
@@ -3168,30 +3136,6 @@ export default function DashboardOverview() {
 
           {/* VIEW: Class Rankings / Leaderboard */}
           {(activeTab === 'rankings' || activeTab === 'v-leaderboard') && (() => {
-            const handleExportRankings = () => {
-              const headers = ['Rank,Class Name,Campaigners,Target Donors,Achieved Donors,Collected Amount\n'];
-              const rows = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
-                .map((className) => {
-                  const campaigners = campaignersList.filter(c => c.class === className).length;
-                  const collected = verificationQueue
-                    .filter(q => q.notes?.includes(`Class: ${className}`))
-                    .reduce((acc, q) => acc + Number(q.amount), 0);
-                  const achieved = new Set(verificationQueue.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId)).size;
-                  return { className, campaigners, collected, achieved };
-                })
-                .sort((a, b) => b.collected - a.collected)
-                .map((c, i) => `"#${i+1}","${c.className}","${c.campaigners}","${c.campaigners * 5}","${c.achieved}","₹${c.collected}"`);
-
-              const blob = new Blob([headers.concat(rows.join('\n')).join('')], { type: 'text/csv;charset=utf-8;' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.setAttribute('download', `class_rankings_${new Date().toISOString().split('T')[0]}.csv`);
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            };
-
             const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
               .map((className) => {
                 const campaigners = campaignersList.filter(c => c.class === className).length;
@@ -3202,6 +3146,18 @@ export default function DashboardOverview() {
                 return { className, campaigners, collected, achieved };
               })
               .sort((a, b) => b.collected - a.collected);
+
+            const rankingsExportColumns = [
+              { id: 'rank', label: 'Rank', getValue: (r: any) => `#${r.rank}` },
+              { id: 'className', label: 'Class Name', getValue: (r: any) => r.className },
+              { id: 'campaigners', label: 'Campaigners', getValue: (r: any) => r.campaigners },
+              { id: 'targetDonors', label: 'Target Donors', getValue: (r: any) => r.campaigners * 5 },
+              { id: 'achievedDonors', label: 'Achieved Donors', getValue: (r: any) => r.achieved },
+              { id: 'collectedAmount', label: 'Collected Amount', getValue: (r: any) => String(r.collected) },
+            ];
+            const exportData = rankedClasses.map((c, i) => ({ ...c, rank: i + 1 }));
+
+
 
             return (
               <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
@@ -3215,12 +3171,14 @@ export default function DashboardOverview() {
                     </h3>
                     <p className="text-xs opacity-60 mt-1">Real-time target leaderboard sorted by class collections.</p>
                   </div>
-                  <button 
-                    onClick={handleExportRankings}
-                    className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2.5 rounded-2xl text-xs font-bold self-start md:self-center shrink-0"
-                  >
-                    <Download className="w-4 h-4" /> Download Report
-                  </button>
+                  <div className="relative z-40">
+                    <ExportMenu 
+                      data={exportData}
+                      columns={rankingsExportColumns}
+                      filename="class_rankings"
+                      title="Class Rankings & Progress"
+                    />
+                  </div>
                 </div>
 
                 {/* Table */}

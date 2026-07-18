@@ -24,6 +24,26 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
   const receiptRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
+  const defaultReceiptLayout = {
+    receiptNo: { dx: 0, dy: 0, size: 28 },
+    date: { dx: 0, dy: 0, size: 28 },
+    name: { dx: 0, dy: 0, size: 72 },
+    placePhone: { dx: 0, dy: 0, size: 52 },
+    amount: { dx: 0, dy: 0, size: 78 }
+  };
+  const [layout, setLayout] = useState(defaultReceiptLayout);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLayout = localStorage.getItem('receipt_layout_settings');
+      if (savedLayout) {
+        try {
+          setLayout(JSON.parse(savedLayout));
+        } catch (e) {}
+      }
+    }
+  }, [isOpen]);
+
   if (!isOpen || !receiptData) return null;
 
   // Format date to e.g. "17 Jul 2026"
@@ -186,11 +206,11 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
             <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
               <div className="flex items-center gap-4">
                  <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Receipt No</p>
-                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#222', fontWeight: 700 }}>: {receiptData.receiptNo}</span>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: `${layout.receiptNo.size}px`, color: '#222', fontWeight: 700, transform: `translate(${layout.receiptNo.dx}px, ${layout.receiptNo.dy}px)`, display: 'inline-block' }}>: {receiptData.receiptNo}</span>
               </div>
               <div className="flex items-center gap-4">
                  <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Date</p>
-                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#222', fontWeight: 700 }}>: {formattedDate}</span>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: `${layout.date.size}px`, color: '#222', fontWeight: 700, transform: `translate(${layout.date.dx}px, ${layout.date.dy}px)`, display: 'inline-block' }}>: {formattedDate}</span>
               </div>
             </div>
 
@@ -216,11 +236,11 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
                Thank you
              </div>
 
-             <h3 style={{ fontSize: '72px', fontWeight: 800, color: '#222', margin: 0, lineHeight: 1, textTransform: 'uppercase', marginBottom: '10px' }}>
+             <h3 style={{ fontSize: `${layout.name.size}px`, fontWeight: 800, color: '#222', margin: 0, lineHeight: 1, textTransform: 'uppercase', marginBottom: '10px', transform: `translate(${layout.name.dx}px, ${layout.name.dy}px)`, display: 'inline-block' }}>
                {receiptData.name}
              </h3>
              
-             <p style={{ fontSize: '52px', color: '#555', margin: 0, fontWeight: 600, lineHeight: 1, marginBottom: '30px' }}>
+             <p style={{ fontSize: `${layout.placePhone.size}px`, color: '#555', margin: 0, fontWeight: 600, lineHeight: 1, marginBottom: '30px', transform: `translate(${layout.placePhone.dx}px, ${layout.placePhone.dy}px)`, display: 'inline-block' }}>
                {receiptData.place || 'Kerala'} {receiptData.phone ? `(${receiptData.phone})` : ''}
              </p>
 
@@ -233,9 +253,10 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
                width: '560px', height: '118px', 
                backgroundColor: '#18A66A', borderRadius: '65px',
                display: 'flex', alignItems: 'center', justifyContent: 'center',
-               color: 'white', fontSize: '78px', fontWeight: 800,
+               color: 'white', fontSize: `${layout.amount.size}px`, fontWeight: 800,
                boxShadow: '0 20px 40px rgba(24, 166, 106, 0.3)',
-               marginBottom: '32px'
+               marginBottom: '32px',
+               transform: `translate(${layout.amount.dx}px, ${layout.amount.dy}px)`
              }}>
                ₹{receiptData.amount}
              </div>

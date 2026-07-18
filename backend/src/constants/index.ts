@@ -23,6 +23,7 @@ export const PERMISSIONS = {
   DONATION_VERIFY: 'donation:verify',
   DONATION_REJECT: 'donation:reject',
   DONATION_REFUND: 'donation:refund',
+  DONATION_DELETE: 'donation:delete',
 
   // Campaign Permissions
   CAMPAIGN_CREATE: 'campaign:create',

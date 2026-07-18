@@ -25,7 +25,7 @@ export default function HomePage() {
   const [studentView, setStudentView] = useState<'overall' | 'today'>('overall');
   const [classView, setClassView] = useState<'classes' | 'today'>('classes');
 
-  // Slider slides state
+  // Slider slides state (text-based fallback)
   const [slides, setSlides] = useState([
     {
       title: "Intelligent Campaign Collections",
@@ -47,17 +47,34 @@ export default function HomePage() {
     }
   ]);
 
+  // Banner images from developer panel
+  const [bannerImages, setBannerImages] = useState<string[]>([]);
+
   const [tickerText, setTickerText] = useState('Welcome to Token of Halawa donation program ★ Live tracking of monthly targets and campaign approvals active ★ Direct WhatsApp verification now enabled for all campaigners');
 
-  // Load custom slides and ticker text from localStorage if present
+  // Load custom slides, banners, and ticker text from localStorage if present
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Load text-based slides
       const saved = localStorage.getItem('campaign_slides');
       if (saved) {
         try {
           setSlides(JSON.parse(saved));
         } catch (e) {
           console.error("Failed to parse campaign_slides from localStorage", e);
+        }
+      }
+      // Load uploaded banner images
+      const savedBanners = localStorage.getItem('homepage_banners');
+      if (savedBanners) {
+        try {
+          const parsed = JSON.parse(savedBanners);
+          const activeBanners = parsed.filter((b: string) => b && b.length > 0);
+          if (activeBanners.length > 0) {
+            setBannerImages(activeBanners);
+          }
+        } catch (e) {
+          console.error("Failed to parse homepage_banners from localStorage", e);
         }
       }
       const savedTicker = localStorage.getItem('notice_ticker_text');
@@ -70,13 +87,16 @@ export default function HomePage() {
   // Helper to detect Malayalam characters
   const isMalayalam = (text: string) => /[\u0D00-\u0D7F]/.test(text);
 
+  // Determine total slide count (banners take priority over text slides)
+  const totalSlides = bannerImages.length > 0 ? bannerImages.length : slides.length;
+
   // Rotate slides
   useEffect(() => {
     const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % (slides.length || 1));
+      setActiveSlide((prev) => (prev + 1) % (totalSlides || 1));
     }, 4500);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, [totalSlides]);
 
   // Leaderboard rotation
   useEffect(() => {
@@ -231,30 +251,57 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Web Banner Slider Card (CSS Styled slides) */}
+      {/* Web Banner Slider Card */}
       <section className="pt-24 md:pt-32 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className={`relative overflow-hidden rounded-3xl border backdrop-blur-xl p-8 md:p-12 transition-all duration-700 ${slides[activeSlide]?.bg || 'bg-slate-50'}`}>
-            <div className="relative z-10 max-w-2xl text-left">
-              <span className={`text-xs uppercase font-extrabold tracking-wider ${slides[activeSlide]?.accent || 'text-slate-600'}`}>Campaign Slider</span>
-              <h2 className={`text-2xl md:text-4xl font-extrabold text-slate-900 mt-2 mb-4 transition-all duration-500 ${slides[activeSlide] && isMalayalam(slides[activeSlide].title) ? 'font-malayalam' : ''}`}>
-                {slides[activeSlide]?.title}
-              </h2>
-              <p className={`text-sm md:text-base text-slate-600 leading-relaxed font-medium ${slides[activeSlide] && isMalayalam(slides[activeSlide].desc) ? 'font-malayalam font-bold' : ''}`}>
-                {slides[activeSlide]?.desc}
-              </p>
-            </div>
-            {/* Dots */}
-            <div className="absolute bottom-6 right-6 flex gap-2 z-20">
-              {slides.map((_, index) => (
-                <button 
-                  key={index} 
-                  onClick={() => setActiveSlide(index)} 
-                  className={`w-2.5 h-2.5 rounded-full border border-slate-400/50 transition-all ${activeSlide === index ? 'bg-slate-900 scale-125' : 'bg-slate-300'}`}
+          {bannerImages.length > 0 ? (
+            /* Image Banner Carousel */
+            <div className="relative overflow-hidden rounded-3xl shadow-xl" style={{ aspectRatio: '2 / 1' }}>
+              {bannerImages.map((banner, index) => (
+                <img
+                  key={index}
+                  src={banner}
+                  alt={`Banner ${index + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                    activeSlide === index ? 'opacity-100' : 'opacity-0'
+                  }`}
                 />
               ))}
+              {/* Dots */}
+              <div className="absolute bottom-4 right-4 flex gap-2 z-20">
+                {bannerImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveSlide(index)}
+                    className={`w-2.5 h-2.5 rounded-full border border-white/60 transition-all ${activeSlide === index ? 'bg-white scale-125' : 'bg-white/40'}`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Fallback: Text-based slides */
+            <div className={`relative overflow-hidden rounded-3xl border backdrop-blur-xl p-8 md:p-12 transition-all duration-700 ${slides[activeSlide]?.bg || 'bg-slate-50'}`}>
+              <div className="relative z-10 max-w-2xl text-left">
+                <span className={`text-xs uppercase font-extrabold tracking-wider ${slides[activeSlide]?.accent || 'text-slate-600'}`}>Campaign Slider</span>
+                <h2 className={`text-2xl md:text-4xl font-extrabold text-slate-900 mt-2 mb-4 transition-all duration-500 ${slides[activeSlide] && isMalayalam(slides[activeSlide].title) ? 'font-malayalam' : ''}`}>
+                  {slides[activeSlide]?.title}
+                </h2>
+                <p className={`text-sm md:text-base text-slate-600 leading-relaxed font-medium ${slides[activeSlide] && isMalayalam(slides[activeSlide].desc) ? 'font-malayalam font-bold' : ''}`}>
+                  {slides[activeSlide]?.desc}
+                </p>
+              </div>
+              {/* Dots */}
+              <div className="absolute bottom-6 right-6 flex gap-2 z-20">
+                {slides.map((_, index) => (
+                  <button 
+                    key={index} 
+                    onClick={() => setActiveSlide(index)} 
+                    className={`w-2.5 h-2.5 rounded-full border border-slate-400/50 transition-all ${activeSlide === index ? 'bg-slate-900 scale-125' : 'bg-slate-300'}`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

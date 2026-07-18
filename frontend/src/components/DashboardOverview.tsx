@@ -198,7 +198,7 @@ const campaignersList = [
 ];
 
 export default function DashboardOverview() {
-  const { theme, toggleTheme, token, user, organization, setAuth, clearAuth } = useAuthStore();
+  const { theme, toggleTheme, token, user, organization, setAuth, clearAuth, _hasHydrated } = useAuthStore();
   const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>('en');
   const [isClient, setIsClient] = useState(false);
   const [showSyncAlert, setShowSyncAlert] = useState(false);
@@ -851,7 +851,7 @@ export default function DashboardOverview() {
     }
   }, [isClient, theme, lang, activeTab, token]);
 
-  if (!isClient) return null;
+  if (!isClient || !_hasHydrated) return null;
 
   const glassClass = theme === 'dark' ? 'apple-glass text-slate-100' : 'apple-glass-light text-slate-800';
 

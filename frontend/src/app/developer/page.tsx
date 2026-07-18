@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Heart, Code, KeyRound, ArrowLeft, Sun, Moon, Laptop, ShieldCheck, 
   Database, RefreshCw, Users, FileText, CheckCircle2, AlertTriangle, 
-  Download, Trash2, Sliders, Type, Palette, Video, Settings, Sparkles, Check, UserCheck, Award
+  Download, Trash2, Image, Type, Palette, Video, Settings, Sparkles, Check, UserCheck, Award
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -73,6 +73,26 @@ export default function DeveloperPage() {
   const [stats, setStats] = useState({ totalVolunteers: 40, totalDonations: 3, totalAmount: 1450, verifiedAmount: 1150 });
   const [dbStatus, setDbStatus] = useState('Connecting...');
   const [systemEnv, setSystemEnv] = useState('Next.js 15.5.20');
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleFactoryReset = async () => {
+    if (!window.confirm('Are you absolutely sure? This will PERMANENTLY wipe all donors, donations, payments, and workflow logs. This action cannot be undone.')) return;
+    
+    setIsResetting(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/developer/reset', { method: 'DELETE' });
+      if (res.ok) {
+        alert('Database successfully reset to factory settings.');
+        window.location.reload();
+      } else {
+        alert('Failed to reset database.');
+      }
+    } catch (e) {
+      alert('Error connecting to backend.');
+    } finally {
+      setIsResetting(false);
+    }
+  };
   const [loading, setLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
 
@@ -106,27 +126,9 @@ export default function DeveloperPage() {
   const [simFormError, setSimFormError] = useState('');
   const [simLoading, setSimLoading] = useState(false);
 
-  // Slider slides customization state
-  const [devSlides, setDevSlides] = useState([
-    {
-      title: "Intelligent Campaign Collections",
-      desc: "Raise funds dynamically with real-time analytics, goal tracking, and automated progress report boards.",
-      bg: "bg-emerald-50/75 border border-emerald-200/80 shadow-md",
-      accent: "text-emerald-600 dark:text-emerald-400"
-    },
-    {
-      title: "Smart Receipt & QR Verification",
-      desc: "Instant digital receipt generation with unique serial codes, cryptographic signatures, and verification QR codes.",
-      bg: "bg-amber-50/75 border border-amber-200/80 shadow-md",
-      accent: "text-amber-600 dark:text-amber-400"
-    },
-    {
-      title: "WhatsApp & Multi-Lingual Alerts",
-      desc: "Broadcasting receipts, automated payment links, and renewal warnings in English, Malayalam, Arabic, and Tamil.",
-      bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md",
-      accent: "text-indigo-600 dark:text-indigo-400"
-    }
-  ]);
+  // Banner images state (3 banners, 2:1 aspect ratio)
+  const [bannerImages, setBannerImages] = useState<string[]>(['', '', '']);
+  const [bannerUploading, setBannerUploading] = useState<number | null>(null);
 
   // Load custom UI settings and slides from localStorage on mount
   useEffect(() => {
@@ -136,12 +138,12 @@ export default function DeveloperPage() {
         setTickerText(savedTicker);
       }
       
-      const savedSlides = localStorage.getItem('campaign_slides');
-      if (savedSlides) {
+      const savedBanners = localStorage.getItem('homepage_banners');
+      if (savedBanners) {
         try {
-          setDevSlides(JSON.parse(savedSlides));
+          setBannerImages(JSON.parse(savedBanners));
         } catch (e) {
-          console.error("Failed to parse campaign_slides from localStorage", e);
+          console.error("Failed to parse homepage_banners from localStorage", e);
         }
       }
       
@@ -352,41 +354,50 @@ export default function DeveloperPage() {
     setActionMessage('Receipt Layout Settings saved successfully.');
   };
 
-  const handleSaveSlides = () => {
-    localStorage.setItem('campaign_slides', JSON.stringify(devSlides));
-    setActionMessage('Campaign slides configuration saved successfully. Refresh homepage to see changes.');
+  const handleBannerUpload = (index: number, file: File) => {
+    // Validate image
+    if (!file.type.startsWith('image/')) {
+      setActionMessage('Please upload an image file (JPG, PNG, WebP).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setActionMessage('Image must be under 5MB.');
+      return;
+    }
+    setBannerUploading(index);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const ratio = img.width / img.height;
+        if (ratio < 1.5 || ratio > 2.5) {
+          setActionMessage(`Banner ${index + 1}: Aspect ratio is ${ratio.toFixed(2)}:1. Recommended is 2:1 (between 1.5:1 and 2.5:1). Image uploaded anyway.`);
+        }
+        const newBanners = [...bannerImages];
+        newBanners[index] = e.target?.result as string;
+        setBannerImages(newBanners);
+        setBannerUploading(null);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleResetSlides = () => {
-    const defaultSlides = [
-      {
-        title: "Intelligent Campaign Collections",
-        desc: "Raise funds dynamically with real-time analytics, goal tracking, and automated progress report boards.",
-        bg: "bg-emerald-50/75 border border-emerald-200/80 shadow-md",
-        accent: "text-emerald-600 dark:text-emerald-400"
-      },
-      {
-        title: "Smart Receipt & QR Verification",
-        desc: "Instant digital receipt generation with unique serial codes, cryptographic signatures, and verification QR codes.",
-        bg: "bg-amber-50/75 border border-amber-200/80 shadow-md",
-        accent: "text-amber-600 dark:text-amber-400"
-      },
-      {
-        title: "WhatsApp & Multi-Lingual Alerts",
-        desc: "Broadcasting receipts, automated payment links, and renewal warnings in English, Malayalam, Arabic, and Tamil.",
-        bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md",
-        accent: "text-indigo-600 dark:text-indigo-400"
-      }
-    ];
-    setDevSlides(defaultSlides);
-    localStorage.setItem('campaign_slides', JSON.stringify(defaultSlides));
-    setActionMessage('Campaign slides restored to default settings.');
+  const handleSaveBanners = () => {
+    localStorage.setItem('homepage_banners', JSON.stringify(bannerImages));
+    setActionMessage('Homepage banners saved successfully. Refresh homepage to see changes.');
   };
 
-  const updateSlideField = (index: number, key: string, value: string) => {
-    const newSlides = [...devSlides];
-    newSlides[index] = { ...newSlides[index], [key]: value };
-    setDevSlides(newSlides);
+  const handleRemoveBanner = (index: number) => {
+    const newBanners = [...bannerImages];
+    newBanners[index] = '';
+    setBannerImages(newBanners);
+  };
+
+  const handleResetBanners = () => {
+    setBannerImages(['', '', '']);
+    localStorage.removeItem('homepage_banners');
+    setActionMessage('All banners cleared.');
   };
 
   const glassClass = theme === 'dark' ? 'apple-glass text-slate-100' : 'apple-glass-light text-slate-800';
@@ -483,9 +494,7 @@ export default function DeveloperPage() {
         <nav className="flex-1 space-y-1.5">
           {[
             { id: 'dashboard', name: 'System Overview', icon: Laptop },
-            { id: 'camp-dash-tester', name: 'Campaigner Tester', icon: UserCheck },
-            { id: 'class-dash-tester', name: 'Class Tester', icon: Award },
-            { id: 'slider', name: 'Campaign Slider', icon: Sliders },
+            { id: 'banners', name: 'Banner Upload', icon: Image },
             { id: 'bulk', name: 'Bulk Campaigners', icon: Users },
             { id: 'receipt', name: 'Receipt Settings', icon: FileText },
             { id: 'ui', name: 'UI & Banners', icon: Palette }
@@ -603,291 +612,25 @@ export default function DeveloperPage() {
                     </div>
                     <span className="font-mono text-xs bg-slate-300 dark:bg-white/10 px-3 py-1 rounded-xl">{systemEnv}</span>
                   </div>
+
+                  <div className="flex justify-between items-center p-4 bg-red-500/10 rounded-2xl border border-red-500/25">
+                    <div>
+                      <div className="font-bold text-sm text-red-500">Factory Reset Database</div>
+                      <div className="text-xs opacity-60 text-red-400">Permanently delete all donors, donations, payments, and logs. This cannot be undone.</div>
+                    </div>
+                    <button 
+                      onClick={handleFactoryReset}
+                      disabled={isResetting}
+                      className="px-4 py-2 bg-red-500 text-white rounded-xl text-xs font-bold hover:bg-red-600 transition disabled:opacity-50 cursor-pointer"
+                    >
+                      {isResetting ? 'Resetting...' : 'Reset Data'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB: Campaigner Dashboard Tester */}
-          {currentTab === 'camp-dash-tester' && (() => {
-            const campaigner = campaignersList.find(c => c.name === selectedTestCampaigner) || campaignersList[0];
-            const myCollections = donationQueue.filter(q => q.notes?.includes(`Logged by: ${campaigner.name}`));
-            const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount), 0);
-            const myVerifiedTotal = myCollections.filter(q => q.status === 'APPROVED').reduce((acc, q) => acc + Number(q.amount), 0);
-            const myPendingTotal = myCollections.filter(q => q.status === 'PENDING').reduce((acc, q) => acc + Number(q.amount), 0);
-            const myDonorsCount = new Set(myCollections.map(q => q.donorId)).size;
-
-            return (
-              <div className="space-y-6 flex-1 flex flex-col animate-in fade-in duration-350">
-                {/* Selector */}
-                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
-                  <div>
-                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">Simulated Campaigner Dashboard</h4>
-                    <p className="text-xs opacity-60 mt-1">Select any campaigner to inspect what stats they see in their portal.</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold opacity-60">Campaigner:</span>
-                    <select
-                      value={selectedTestCampaigner}
-                      onChange={(e) => setSelectedTestCampaigner(e.target.value)}
-                      className="bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold outline-none text-slate-800 dark:text-white"
-                    >
-                      {campaignersList.map(c => (
-                        <option key={c.name} value={c.name} className="text-slate-850">{c.name} ({c.class})</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Profile Card & Stats Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Profile info */}
-                  <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Campaigner Info</span>
-                      <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mt-2 uppercase">{campaigner.name}</h3>
-                      <p className="text-xs opacity-60 mt-1">Class: {campaigner.class} · HN Code: {campaigner.hn}</p>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-slate-350/30">
-                      <span className="text-[9px] font-bold text-slate-450 uppercase block">Compiled Email address</span>
-                      <span className="font-mono text-xs text-emerald-500 font-bold">hn{campaigner.hn}@hidayaonline.org</span>
-                    </div>
-                  </div>
-
-                  {/* Summary Metric Cards */}
-                  <div className="lg:col-span-2 grid grid-cols-2 gap-4">
-                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
-                      <span className="text-[9px] font-bold opacity-50 uppercase">Total Collected</span>
-                      <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">₹{myCollectedTotal.toLocaleString()}.00</h4>
-                    </div>
-                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
-                      <span className="text-[9px] font-bold opacity-50 uppercase">Total Donors</span>
-                      <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">{myDonorsCount} Donors</h4>
-                    </div>
-                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
-                      <span className="text-[9px] font-bold opacity-50 uppercase">Verified Amount</span>
-                      <h4 className="text-xl font-black text-emerald-500 mt-1">₹{myVerifiedTotal.toLocaleString()}.00</h4>
-                    </div>
-                    <div className={`p-5 rounded-3xl bg-white/5 border border-white/10`}>
-                      <span className="text-[9px] font-bold opacity-50 uppercase">Pending Amount</span>
-                      <h4 className="text-xl font-black text-amber-500 mt-1">₹{myPendingTotal.toLocaleString()}.00</h4>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Form to log simulated donation */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Log Donation form */}
-                  <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
-                    <h4 className="text-md font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-                      Log Simulated Donation
-                    </h4>
-                    <p className="text-xs opacity-60">Log a donation directly on behalf of this campaigner for instant class leaderboard verification.</p>
-                    
-                    {simFormSuccess && <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 p-3 rounded-xl font-bold">{simFormSuccess}</div>}
-                    {simFormError && <div className="text-xs text-red-500 bg-red-500/10 p-3 rounded-xl font-bold">{simFormError}</div>}
-
-                    <form onSubmit={handleSimLogDonation} className="space-y-4">
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Donor Name *</label>
-                        <input
-                          type="text"
-                          required
-                          value={simDonorName}
-                          onChange={(e) => setSimDonorName(e.target.value)}
-                          placeholder="e.g. Abrar"
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Donor Phone *</label>
-                        <input
-                          type="text"
-                          required
-                          value={simDonorPhone}
-                          onChange={(e) => setSimDonorPhone(e.target.value)}
-                          placeholder="e.g. +91 97455 71286"
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Place / Location</label>
-                        <input
-                          type="text"
-                          value={simPlace}
-                          onChange={(e) => setSimPlace(e.target.value)}
-                          placeholder="e.g. Kerala"
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Amount (₹) *</label>
-                          <input
-                            type="number"
-                            required
-                            value={simAmount}
-                            onChange={(e) => setSimAmount(e.target.value)}
-                            placeholder="e.g. 200"
-                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Target Month</label>
-                          <select
-                            value={simMonth}
-                            onChange={(e) => setSimMonth(e.target.value)}
-                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                          >
-                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'One Time'].map(m => (
-                              <option key={m} value={m} className="text-slate-850">{m}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      <button
-                        type="submit"
-                        disabled={simLoading}
-                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black py-2.5 rounded-xl text-xs hover:shadow-emerald-500/25 active:scale-95 transition cursor-pointer"
-                      >
-                        {simLoading ? 'Logging...' : 'Log Simulated Donation'}
-                      </button>
-                    </form>
-                  </div>
-
-                  {/* Collections list */}
-                  <div className={`p-6 rounded-3xl ${glassClass} space-y-4 overflow-x-auto`}>
-                    <h4 className="text-md font-bold text-slate-800 dark:text-white">Logged Collections Log</h4>
-                    {myCollections.length === 0 ? (
-                      <p className="text-xs text-slate-500 py-6 text-center">No donations logged by this campaigner yet.</p>
-                    ) : (
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="border-b border-white/10 text-slate-400 text-[9px] uppercase font-bold">
-                            <th className="py-2 px-1">Receipt</th>
-                            <th className="py-2 px-1">Donor</th>
-                            <th className="py-2 px-1">Amount</th>
-                            <th className="py-2 px-1 text-right">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {myCollections.map((item) => (
-                            <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-350 font-medium">
-                              <td className="py-3 px-1 font-mono text-[10px]">TOH-{item.id.slice(0, 4).toUpperCase()}</td>
-                              <td className="py-3 px-1">
-                                <span className="font-bold block">{item.donor?.name || 'General'}</span>
-                                <span className="opacity-55 text-[8px] block">{item.donor?.phone}</span>
-                              </td>
-                              <td className="py-3 px-1 font-bold text-emerald-500">₹{item.amount}</td>
-                              <td className="py-3 px-1 text-right">
-                                <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${
-                                  item.status === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-500' :
-                                  item.status === 'REJECTED' ? 'bg-red-500/10 text-red-500' :
-                                  'bg-amber-500/10 text-amber-500'
-                                }`}>
-                                  {item.status === 'APPROVED' ? 'Verified' : item.status === 'REJECTED' ? 'Rejected' : 'Pending'}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* TAB: Class Dashboard Tester */}
-          {currentTab === 'class-dash-tester' && (() => {
-            const classCampaigners = campaignersList.filter(c => c.class === selectedTestClass);
-            const totalCampaigners = classCampaigners.length;
-
-            const collected = donationQueue
-              .filter(q => q.notes?.includes(`Class: ${selectedTestClass}`))
-              .reduce((acc, q) => acc + Number(q.amount), 0);
-            
-            const avgCollected = totalCampaigners > 0 ? Math.round(collected / totalCampaigners) : 0;
-
-            // Compute campaigner leaderboard in this class
-            const leaderboard = classCampaigners.map(camp => {
-              const campDonations = donationQueue.filter(q => q.notes?.includes(`Logged by: ${camp.name}`));
-              const totalAmount = campDonations.reduce((acc, q) => acc + Number(q.amount), 0);
-              const donorsCount = new Set(campDonations.map(q => q.donorId)).size;
-              return { ...camp, totalAmount, donorsCount };
-            }).sort((a, b) => b.totalAmount - a.totalAmount);
-
-            return (
-              <div className="space-y-6 flex-1 flex flex-col animate-in fade-in duration-350">
-                {/* Selector */}
-                <div className={`p-6 rounded-3xl ${glassClass} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
-                  <div>
-                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">Simulated Class Dashboard</h4>
-                    <p className="text-xs opacity-60 mt-1">Select any class to review class stats and campaigner rankings.</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold opacity-60">Class:</span>
-                    <select
-                      value={selectedTestClass}
-                      onChange={(e) => setSelectedTestClass(e.target.value)}
-                      className="bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold outline-none text-slate-800 dark:text-white"
-                    >
-                      {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(name => (
-                        <option key={name} value={name} className="text-slate-850">{name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Class Stats cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className={`p-6 rounded-3xl ${glassClass}`}>
-                    <span className="text-xs font-bold opacity-60 uppercase">Total Class Collection</span>
-                    <h3 className="text-3xl font-extrabold tracking-tight text-emerald-500 mt-2">₹{collected.toLocaleString()}.00</h3>
-                  </div>
-                  <div className={`p-6 rounded-3xl ${glassClass}`}>
-                    <span className="text-xs font-bold opacity-60 uppercase">Active Campaigners</span>
-                    <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{totalCampaigners} Students</h3>
-                  </div>
-                  <div className={`p-6 rounded-3xl ${glassClass}`}>
-                    <span className="text-xs font-bold opacity-60 uppercase">Average Student Collection</span>
-                    <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{avgCollected.toLocaleString()}.00</h3>
-                  </div>
-                </div>
-
-                {/* Leaderboard */}
-                <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
-                  <h4 className="text-md font-bold text-slate-800 dark:text-white uppercase tracking-wider">Class Performance Leaderboard</h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead>
-                        <tr className="border-b border-white/10 text-slate-400 text-[10px] uppercase font-bold">
-                          <th className="py-3 px-2">Rank</th>
-                          <th className="py-3 px-2">Campaigner</th>
-                          <th className="py-3 px-2">HN Code</th>
-                          <th className="py-3 px-2">Donors Count</th>
-                          <th className="py-3 px-2 text-right">Total Collected</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {leaderboard.map((item, index) => (
-                          <tr key={item.hn} className="border-b border-white/5 text-slate-800 dark:text-slate-350 font-medium">
-                            <td className="py-3 px-2 font-bold">#{index + 1}</td>
-                            <td className="py-3 px-2 font-bold uppercase">{item.name}</td>
-                            <td className="py-3 px-2 font-mono">HN-{String(item.hn).padStart(3, '0')}</td>
-                            <td className="py-3 px-2">{item.donorsCount} active profiles</td>
-                            <td className="py-3 px-2 font-extrabold text-emerald-500 text-right">₹{item.totalAmount.toLocaleString()}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* TAB 2: Bulk Campaigners */}
           {currentTab === 'bulk' && (
@@ -1054,108 +797,115 @@ export default function DeveloperPage() {
             </div>
           )}
 
-          {/* TAB: Campaign Slider Studio */}
-          {currentTab === 'slider' && (
+          {/* TAB: Banner Upload Studio */}
+          {currentTab === 'banners' && (
             <div className={`p-6 md:p-8 rounded-3xl ${glassClass} space-y-6 animate-in fade-in duration-350`}>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                   <h4 className="text-lg font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" /> Campaign Slider Studio
+                    <Image className="w-5 h-5" /> Homepage Banner Upload
                   </h4>
-                  <p className="text-xs text-slate-500 mt-1">Configure and localize homepage slides with real-time Malayalam font compilation</p>
+                  <p className="text-xs text-slate-500 mt-1">Upload 3 homepage banners in 2:1 aspect ratio (e.g. 1200×600, 1600×800). Supports JPG, PNG, WebP up to 5MB each.</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <button 
-                    onClick={handleResetSlides}
+                    onClick={handleResetBanners}
                     className="flex-1 sm:flex-none border border-slate-350 dark:border-white/10 hover:bg-slate-200/50 dark:hover:bg-white/5 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer"
                   >
-                    Reset Defaults
+                    Clear All
                   </button>
                   <button 
-                    onClick={handleSaveSlides}
+                    onClick={handleSaveBanners}
                     className="flex-1 sm:flex-none bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold transition hover:bg-emerald-450 hover:shadow shadow-sm cursor-pointer flex items-center justify-center gap-1"
                   >
-                    <Check className="w-3.5 h-3.5" /> Save Slider Configuration
+                    <Check className="w-3.5 h-3.5" /> Save Banners
                   </button>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                {devSlides.map((slide, index) => {
-                  const themes = [
-                    { name: 'Emerald (Green)', bg: "bg-emerald-50/75 border border-emerald-200/80 shadow-md", accent: "text-emerald-600 dark:text-emerald-400" },
-                    { name: 'Amber (Gold)', bg: "bg-amber-50/75 border border-amber-200/80 shadow-md", accent: "text-amber-600 dark:text-amber-400" },
-                    { name: 'Indigo (Blue)', bg: "bg-indigo-50/75 border border-indigo-200/80 shadow-md", accent: "text-indigo-600 dark:text-indigo-400" },
-                    { name: 'Violet (Purple)', bg: "bg-violet-50/75 border border-violet-200/80 shadow-md", accent: "text-violet-600 dark:text-violet-400" },
-                    { name: 'Rose (Red)', bg: "bg-rose-50/75 border border-rose-200/80 shadow-md", accent: "text-rose-600 dark:text-rose-400" }
-                  ];
-
-                  return (
-                    <div key={index} className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 text-left flex flex-col justify-between">
-                      <div className="space-y-3.5">
-                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                          <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Slide #{index + 1}</span>
-                          <span className="text-[10px] bg-slate-200/20 px-2 py-0.5 rounded font-mono text-slate-400">active</span>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Color Theme</label>
-                          <select 
-                            value={slide.bg} 
-                            onChange={(e) => {
-                              const selected = themes.find(t => t.bg === e.target.value);
-                              if (selected) {
-                                updateSlideField(index, 'bg', selected.bg);
-                                  updateSlideField(index, 'accent', selected.accent);
-                              }
-                            }}
-                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/40"
-                          >
-                            {themes.map(t => (
-                              <option key={t.bg} value={t.bg} className="text-slate-800">{t.name}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Slide Title</label>
-                          <input 
-                            type="text"
-                            value={slide.title}
-                            onChange={(e) => updateSlideField(index, 'title', e.target.value)}
-                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                            placeholder="Enter slide title..."
-                          />
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Slide Description</label>
-                          <textarea 
-                            value={slide.desc}
-                            onChange={(e) => updateSlideField(index, 'desc', e.target.value)}
-                            rows={3}
-                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
-                            placeholder="Enter slide description..."
-                          />
-                        </div>
-                      </div>
-
-                      {/* Visual Live Preview with Malayalam support */}
-                      <div className="pt-4 border-t border-white/5 mt-4">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Live Mockup View</span>
-                        <div className={`p-4 rounded-2xl border text-left transition-all ${slide.bg}`}>
-                          <span className={`text-[9px] uppercase font-black tracking-wider ${slide.accent}`}>Campaign Slider</span>
-                          <h5 className={`text-sm font-black text-slate-900 mt-1 leading-tight ${isMalayalam(slide.title) ? 'font-malayalam' : ''}`}>
-                            {slide.title || 'Untitled Slide'}
-                          </h5>
-                          <p className={`text-[10px] text-slate-650 mt-1 leading-relaxed font-semibold ${isMalayalam(slide.desc) ? 'font-malayalam' : ''}`}>
-                            {slide.desc || 'No description provided.'}
-                          </p>
-                        </div>
-                      </div>
+                {bannerImages.map((banner, index) => (
+                  <div key={index} className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 text-left flex flex-col">
+                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                      <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Banner #{index + 1}</span>
+                      <span className="text-[10px] bg-slate-200/20 px-2 py-0.5 rounded font-mono text-slate-400">
+                        {banner ? 'uploaded' : 'empty'}
+                      </span>
                     </div>
-                  );
-                })}
+
+                    {/* Preview Area */}
+                    <div 
+                      className="relative w-full rounded-2xl overflow-hidden border-2 border-dashed border-slate-300 dark:border-white/15 bg-slate-100/50 dark:bg-black/20 transition-all hover:border-emerald-500/50 cursor-pointer group"
+                      style={{ aspectRatio: '2 / 1' }}
+                      onClick={() => {
+                        const input = document.getElementById(`banner-input-${index}`);
+                        if (input) input.click();
+                      }}
+                    >
+                      {banner ? (
+                        <>
+                          <img 
+                            src={banner} 
+                            alt={`Banner ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                            <span className="text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">Click to replace</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                          {bannerUploading === index ? (
+                            <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
+                          ) : (
+                            <>
+                              <Image className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Click to upload</span>
+                              <span className="text-[9px] text-slate-400/60">2:1 ratio · max 5MB</span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      <input 
+                        id={`banner-input-${index}`}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleBannerUpload(index, file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+
+                    {/* Action buttons */}
+                    {banner && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            const input = document.getElementById(`banner-input-${index}`);
+                            if (input) input.click();
+                          }}
+                          className="flex-1 border border-slate-350 dark:border-white/10 hover:bg-slate-200/50 dark:hover:bg-white/5 px-3 py-2 rounded-xl text-[10px] font-bold transition cursor-pointer"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          onClick={() => handleRemoveBanner(index)}
+                          className="px-3 py-2 bg-red-500/10 text-red-500 rounded-xl text-[10px] font-bold transition hover:bg-red-500/20 cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Info Note */}
+              <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                <strong>Note:</strong> Banners are stored in browser localStorage and displayed on the homepage as a slider/carousel. For best results, use images with exactly 2:1 aspect ratio (e.g. 1200×600px).
               </div>
             </div>
           )}

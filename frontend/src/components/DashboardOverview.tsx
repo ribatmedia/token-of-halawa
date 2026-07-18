@@ -149,6 +149,8 @@ const translations = {
 };
 
 const campaignersList = [
+  // Developer Sandbox
+  { hn: 0, name: "Developer", class: "Developer" },
   // Final year
   { hn: 1, name: "Asif ali", class: "Final year" },
   { hn: 2, name: "Bishrul wafa", class: "Final year" },

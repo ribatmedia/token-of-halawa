@@ -2899,66 +2899,6 @@ export default function DashboardOverview() {
                 </div>
 
 
-                {/* Collapsible Profile Merger */}
-                <details className="mb-6 bg-slate-250/20 dark:bg-black/10 border border-slate-350 dark:border-white/5 rounded-2xl p-4 text-xs">
-                  <summary className="font-bold text-slate-700 dark:text-slate-300 cursor-pointer outline-none select-none">
-                    Profile Merging Studio (Mahabba Merge)
-                  </summary>
-                  
-                  <form onSubmit={handleMergeSubmit} className="mt-4 space-y-4 max-w-2xl">
-                    {mergeError && <div className="text-red-500 font-semibold">{mergeError}</div>}
-                    {mergeSuccess && <div className="text-emerald-500 font-semibold">{mergeSuccess}</div>}
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block mb-1 font-bold text-slate-400">Duplicate Profile (To Merge/Delete)</label>
-                        <select 
-                          value={mergeSourceId}
-                          onChange={(e) => setMergeSourceId(e.target.value)}
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
-                        >
-                          <option value="">Select profile...</option>
-                          {donors.map(d => (
-                            <option key={d.id} value={d.id}>{d.name} ({d.uniqueId || d.id.slice(0,8)}) - {d.phone}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block mb-1 font-bold text-slate-400">Primary Profile (To Keep)</label>
-                        <select 
-                          value={mergeTargetId}
-                          onChange={(e) => setMergeTargetId(e.target.value)}
-                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
-                        >
-                          <option value="">Select profile...</option>
-                          {donors.map(d => (
-                            <option key={d.id} value={d.id}>{d.name} ({d.uniqueId || d.id.slice(0,8)}) - {d.phone}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block mb-1 font-bold text-slate-400">Reason for consolidation</label>
-                      <input 
-                        type="text"
-                        value={mergeReason}
-                        onChange={(e) => setMergeReason(e.target.value)}
-                        placeholder="e.g. Duplicate registration codes found"
-                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none"
-                      />
-                    </div>
-
-                    <button 
-                      type="submit"
-                      disabled={mergeLoading}
-                      className="bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 px-4 py-2 rounded-xl font-bold transition disabled:opacity-50"
-                    >
-                      {mergeLoading ? 'Consolidating...' : 'Execute Merge'}
-                    </button>
-                  </form>
-                </details>
 
                 {/* Table */}
                 <div className="overflow-x-auto">

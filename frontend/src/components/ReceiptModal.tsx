@@ -102,6 +102,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
   };
 
   const handleWhatsAppShare = async () => {
+    if (!receiptData) return;
     try {
       setIsExporting(true);
       const dataUrl = await generateImage();

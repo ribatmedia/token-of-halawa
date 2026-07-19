@@ -148,14 +148,14 @@ export default function DeveloperPage() {
         setTickerText(savedTicker);
       }
       
-      const savedBanners = localStorage.getItem('homepage_banners');
-      if (savedBanners) {
-        try {
-          setBannerImages(JSON.parse(savedBanners));
-        } catch (e) {
-          console.error("Failed to parse homepage_banners from localStorage", e);
-        }
-      }
+      fetch(`${API_URL}/public/banners`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setBannerImages(data.concat(['', '', '']).slice(0, 3));
+          }
+        })
+        .catch(e => console.error("Failed to load banners from DB", e));
       
       const savedLayout = localStorage.getItem('receipt_layout_settings');
       if (savedLayout) {
@@ -414,9 +414,20 @@ export default function DeveloperPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSaveBanners = () => {
-    localStorage.setItem('homepage_banners', JSON.stringify(bannerImages));
-    setActionMessage('Homepage banners saved successfully. Refresh homepage to see changes.');
+  const handleSaveBanners = async () => {
+    try {
+      setActionMessage('Saving banners to database...');
+      const response = await fetch(`${API_URL}/developer/banners`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banners: bannerImages })
+      });
+      if (!response.ok) throw new Error('Failed to save');
+      setActionMessage('Homepage banners saved successfully to database. Refresh homepage to see changes.');
+    } catch (e) {
+      console.error(e);
+      setActionMessage('Error saving banners. Please try again.');
+    }
   };
 
   const handleRemoveBanner = (index: number) => {
@@ -425,10 +436,18 @@ export default function DeveloperPage() {
     setBannerImages(newBanners);
   };
 
-  const handleResetBanners = () => {
+  const handleResetBanners = async () => {
     setBannerImages(['', '', '']);
-    localStorage.removeItem('homepage_banners');
-    setActionMessage('All banners cleared.');
+    try {
+      await fetch(`${API_URL}/developer/banners`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banners: ['', '', ''] })
+      });
+      setActionMessage('All banners cleared from database.');
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const glassClass = theme === 'dark' ? 'apple-glass text-slate-100' : 'apple-glass-light text-slate-800';
@@ -956,8 +975,8 @@ export default function DeveloperPage() {
               </div>
 
               {/* Info Note */}
-              <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-xs text-amber-600 dark:text-amber-400 font-medium">
-                <strong>Note:</strong> Banners are stored in browser localStorage and displayed on the homepage in a 2:1 ratio. Clear browser data to reset.
+              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl mt-4">
+                <p className="text-xs text-amber-500 font-medium">Note: Banners are stored in the database and displayed on the homepage in a 2:1 ratio. Clear All to reset.</p>
               </div>
             </div>
           )}

@@ -168,6 +168,22 @@ export class DonationService {
     });
   }
 
+  static async getAll(orgId: string) {
+    return prisma.donation.findMany({
+      where: {
+        donor: { organizationId: orgId }
+      },
+      include: {
+        donor: true,
+        campaign: true,
+        payments: {
+          include: { paymentMethod: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
   static async delete(orgId: string, id: string) {
     const donation = await prisma.donation.findUnique({
       where: { id },

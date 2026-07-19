@@ -64,24 +64,25 @@ export default function HomePage() {
           console.error("Failed to parse campaign_slides from localStorage", e);
         }
       }
-      // Load uploaded banner images
-      const savedBanners = localStorage.getItem('homepage_banners');
-      if (savedBanners) {
-        try {
-          const parsed = JSON.parse(savedBanners);
-          const activeBanners = parsed.filter((b: string) => b && b.length > 0);
-          if (activeBanners.length > 0) {
-            setBannerImages(activeBanners);
-          }
-        } catch (e) {
-          console.error("Failed to parse homepage_banners from localStorage", e);
-        }
-      }
+      
       const savedTicker = localStorage.getItem('notice_ticker_text');
       if (savedTicker) {
         setTickerText(savedTicker);
       }
     }
+    
+    // Fetch banners from DB
+    fetch('http://localhost:5000/api/v1/public/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const activeBanners = data.filter((b: string) => b && b.length > 0);
+          if (activeBanners.length > 0) {
+            setBannerImages(activeBanners);
+          }
+        }
+      })
+      .catch(e => console.error("Failed to load banners from DB", e));
   }, []);
 
   // Helper to detect Malayalam characters

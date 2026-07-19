@@ -54,4 +54,47 @@ export class DeveloperController {
       res.status(500).json({ error: 'Failed to fetch system diagnostics' });
     }
   }
+
+  // Update Banners
+  async updateBanners(req: Request, res: Response) {
+    try {
+      const { banners } = req.body;
+      if (!Array.isArray(banners)) {
+        return res.status(400).json({ error: 'Banners must be an array' });
+      }
+
+      const org = await prisma.organization.findFirst();
+      if (!org) {
+        return res.status(400).json({ error: 'No organization found' });
+      }
+
+      // Delete existing banners
+      await prisma.setting.deleteMany({
+        where: {
+          organizationId: org.id,
+          category: 'THEME',
+          key: { startsWith: 'BANNER_' }
+        }
+      });
+
+      // Insert new banners
+      const createData = banners.filter(b => b).map((banner, index) => ({
+        organizationId: org.id,
+        key: `BANNER_${index + 1}`,
+        value: banner,
+        category: 'THEME'
+      }));
+
+      if (createData.length > 0) {
+        await prisma.setting.createMany({
+          data: createData
+        });
+      }
+
+      res.status(200).json({ message: 'Banners updated successfully' });
+    } catch (error) {
+      console.error('Update Banners Error:', error);
+      res.status(500).json({ error: 'Failed to update banners' });
+    }
+  }
 }

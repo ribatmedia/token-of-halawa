@@ -46,6 +46,16 @@ export class DonationController {
     }
   }
 
+  static async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const orgId = req.user!.organizationId;
+      const result = await DonationService.getAll(orgId);
+      return res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async delete(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const orgId = req.user!.organizationId;

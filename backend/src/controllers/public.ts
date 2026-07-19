@@ -157,4 +157,21 @@ export class PublicController {
       next(error);
     }
   }
+
+  static async getBanners(req: Request, res: Response, next: NextFunction) {
+    try {
+      const settings = await prisma.setting.findMany({
+        where: {
+          category: 'THEME',
+          key: { startsWith: 'BANNER_' }
+        },
+        orderBy: { key: 'asc' }
+      });
+      
+      const banners = settings.map(s => s.value);
+      return res.status(200).json(banners);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -249,6 +249,7 @@ export default function DashboardOverview() {
   // Dynamic Live Database States
   const [donors, setDonors] = useState<any[]>([]);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [donations, setDonations] = useState<any[]>([]);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
   const todayCollectionTotal = verificationQueue.reduce((acc, item) => acc + (item.status === 'APPROVED' || item.status === 'PENDING' ? Number(item.amount) : 0), 0);
@@ -443,11 +444,19 @@ export default function DashboardOverview() {
         setLoginRole('admin');
         if (user && (user as any).hn) {
           clearAuth();
+          setDonations([]);
+          setDonors([]);
+          setCampaigns([]);
+          setVerificationQueue([]);
         }
       } else if (roleParam === 'campaigner') {
         setLoginRole('campaigner');
         if (user && !(user as any).hn) {
           clearAuth();
+          setDonations([]);
+          setDonors([]);
+          setCampaigns([]);
+          setVerificationQueue([]);
         }
       }
     }
@@ -457,33 +466,18 @@ export default function DashboardOverview() {
   const fetchDatabaseData = async () => {
     if (!token) return;
     try {
-      // 1. Fetch Donors
-      const donorsRes = await fetch(`${API_URL}/donors`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (donorsRes.ok) {
-        const donorsData = await donorsRes.json();
-        setDonors(Array.isArray(donorsData) ? donorsData : donorsData.donors || []);
-      }
+      const headers = { Authorization: `Bearer ${token}` };
+      const [donorsRes, campaignsRes, queueRes, allDonationsRes] = await Promise.all([
+        fetch(`${API_URL}/donors`, { headers }),
+        fetch(`${API_URL}/campaigns`, { headers }),
+        fetch(`${API_URL}/donations/queue`, { headers }),
+        fetch(`${API_URL}/donations/all`, { headers })
+      ]);
 
-      // 2. Fetch Campaigns
-      const campaignsRes = await fetch(`${API_URL}/campaigns`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (campaignsRes.ok) {
-        const campaignsData = await campaignsRes.json();
-        setCampaigns(campaignsData);
-      }
-
-      // 3. Fetch Verification Queue
-      const queueRes = await fetch(`${API_URL}/donations/queue`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (queueRes.ok) {
-        const queueData = await queueRes.json();
-        setVerificationQueue(queueData);
-      }
-
+      if (donorsRes.ok) setDonors(await donorsRes.json());
+      if (campaignsRes.ok) setCampaigns(await campaignsRes.json());
+      if (queueRes.ok) setVerificationQueue(await queueRes.json());
+      if (allDonationsRes.ok) setDonations(await allDonationsRes.json());
     } catch (err) {
       console.error('Failed to load database values:', err);
     }
@@ -669,7 +663,7 @@ export default function DashboardOverview() {
           campaignId: campaignIdInput || undefined,
           donationType,
           amount: Number(donationAmount),
-          notes: notes || `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
+          notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
           paymentMethod
         })
       });
@@ -3232,7 +3226,7 @@ export default function DashboardOverview() {
           {/* Fallback Viewport for Volunteer Overview dashboard */}
           {activeTab === 'v-overview' && (() => {
             // 1. Calculate stats for logged-in campaigner
-            const myCollections = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${user?.fullName || 'Campaigner'}`));
+            const myCollections = donations.filter(q => q.notes?.includes(`Logged by: ${user?.fullName || 'Campaigner'}`));
             const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount), 0);
             
             // Expected collections of donors registered by this campaigner (defaults to a sensible base target like ₹5,000)
@@ -3242,7 +3236,7 @@ export default function DashboardOverview() {
 
             // 2. Calculate ranks dynamically from real data only
             const calculatedCampaignerStats = campaignersList.map(c => {
-              const matches = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${c.name}`));
+              const matches = donations.filter(q => q.notes?.includes(`Logged by: ${c.name}`));
               const total = matches.reduce((acc, q) => acc + Number(q.amount), 0);
               return { name: c.name, class: c.class, donorsCount: matches.length, total };
             });
@@ -3266,11 +3260,11 @@ export default function DashboardOverview() {
             const classNames = Array.from(new Set(campaignersList.map(c => c.class)));
             const calculatedClassStats = classNames
               .map(className => {
-                const total = verificationQueue
+                const total = donations
                   .filter(q => q.notes?.includes(`Class: ${className}`))
                   .reduce((acc, q) => acc + Number(q.amount), 0);
                 const activeCamps = campaignersList.filter(c => c.class === className).length;
-                const donorIds = new Set(verificationQueue.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId));
+                const donorIds = new Set(donations.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId));
                 return { className, total, receivers: activeCamps, donorsCount: donorIds.size };
               })
               .sort((a, b) => b.total - a.total);

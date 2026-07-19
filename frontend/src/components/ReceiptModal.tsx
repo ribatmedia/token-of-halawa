@@ -182,8 +182,8 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
              <h1 style={{ color: '#18A66A', fontSize: '130px', fontWeight: 900, lineHeight: 1, margin: 0, letterSpacing: '-3px' }}>
                Halawa
              </h1>
-             <h2 style={{ color: '#111', fontSize: '56px', fontWeight: 800, lineHeight: 1, margin: '5px 0 0 0', letterSpacing: '-1px' }}>
-               Working Fund
+             <h2 style={{ color: '#111', fontSize: '56px', fontFamily: "'Anek Malayalam', sans-serif", fontWeight: 800, lineHeight: 1, margin: '5px 0 0 0', letterSpacing: '-1px' }}>
+               പ്രവർത്തന ഫണ്ട്
              </h2>
           </div>
 
@@ -246,7 +246,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
              </div>
 
              <div style={{ fontSize: '32px', color: '#333', fontFamily: "'Satisfy', cursive", lineHeight: 1.3 }}>
-               towards Token of Halawa Working Fund 2026-27<br/>
+               towards Token of Halawa <span style={{ fontFamily: "'Anek Malayalam', sans-serif" }}>പ്രവർത്തന ഫണ്ട്</span> 2026-27<br/>
                Your Support Makes a Real Difference.
              </div>
 

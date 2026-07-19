@@ -8,6 +8,7 @@ import {
   Download, Trash2, Image, Type, Palette, Video, Settings, Sparkles, Check, UserCheck, Award
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import ReceiptModal from '../../components/ReceiptModal';
 
 // Fetch base endpoint URL
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
@@ -64,6 +65,15 @@ const campaignersList = [
 export default function DeveloperPage() {
   const { theme, toggleTheme, token } = useAuthStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isAuth = localStorage.getItem('dev_auth') === 'true';
+      if (isAuth) {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
   const [loginUser, setLoginUser] = useState('');
   const [loginPass, setLoginPass] = useState('');
   const [error, setError] = useState('');
@@ -177,6 +187,9 @@ export default function DeveloperPage() {
     e.preventDefault();
     if ((loginUser === 'Halawa@26' && loginPass === '7860786') || (loginUser === 'Admin' && loginPass === 'Halawa@2k26')) {
       setIsAuthenticated(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('dev_auth', 'true');
+      }
       setError('');
     } else {
       setError('Invalid developer credentials');
@@ -340,6 +353,23 @@ export default function DeveloperPage() {
       setLoading(false);
       setActionMessage(`System action '${actionType}' executed successfully.`);
     }, 1500);
+  };
+
+  const exportCampaignersCSV = () => {
+    const header = ['HN Code', 'Name', 'Class'];
+    const csvContent = [
+      header.join(','),
+      ...campaignersList.map(c => `${c.hn},"${c.name}","${c.class}"`)
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'campaigners_list.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // UI & Slide Customization Handlers
@@ -525,7 +555,7 @@ export default function DeveloperPage() {
             <KeyRound className="w-3.5 h-3.5" />
             <span>Auth: Halawa@26</span>
           </p>
-          <button onClick={() => setIsAuthenticated(false)} className="text-red-500 font-bold hover:underline text-left">Exit Console</button>
+          <button onClick={() => { setIsAuthenticated(false); if (typeof window !== 'undefined') localStorage.removeItem('dev_auth'); }} className="text-red-500 font-bold hover:underline text-left">Exit Console</button>
         </div>
       </aside>
 
@@ -650,7 +680,7 @@ export default function DeveloperPage() {
                   <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                     <h5 className="font-bold">Download Data & Passwords</h5>
                     <p className="text-xs opacity-60 leading-relaxed">Download a complete CSV backup list of receivers/campaigners including their auto-generated login credentials to distribute to unit representatives.</p>
-                    <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2.5 rounded-xl text-xs font-bold">
+                    <button onClick={exportCampaignersCSV} className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2.5 rounded-xl text-xs font-bold transition hover:bg-emerald-500/20">
                       <Download className="w-4 h-4" /> Export Campaigners List
                     </button>
                   </div>
@@ -683,64 +713,87 @@ export default function DeveloperPage() {
                 </button>
               </div>
 
-              {/* Element Selector */}
-              <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Select Element to Adjust</label>
-                <select 
-                  value={selectedElement} 
-                  onChange={(e) => setSelectedElement(e.target.value as ElementKey)} 
-                  className="w-full max-w-sm bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
-                >
-                  <option value="name" className="text-slate-800">Donor Name</option>
-                  <option value="amount" className="text-slate-800">Amount</option>
-                  <option value="placePhone" className="text-slate-800">Place & Phone</option>
-                  <option value="date" className="text-slate-800">Date</option>
-                  <option value="receiptNo" className="text-slate-800">Receipt No</option>
-                </select>
-              </div>
-
-              {/* Slider tools */}
-              <div className="space-y-6 max-w-xl bg-white/5 p-6 rounded-2xl border border-white/10">
-                <div>
-                  <div className="flex justify-between text-xs font-bold uppercase mb-2">
-                    <span className="flex items-center gap-2">Nudge Move X <span className="opacity-50 lowercase text-[10px]">(Horizontal)</span></span>
-                    <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].dx}px</span>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  {/* Element Selector */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Select Element to Adjust</label>
+                    <select 
+                      value={selectedElement} 
+                      onChange={(e) => setSelectedElement(e.target.value as ElementKey)} 
+                      className="w-full max-w-sm bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
+                    >
+                      <option value="name" className="text-slate-800">Donor Name</option>
+                      <option value="amount" className="text-slate-800">Amount</option>
+                      <option value="placePhone" className="text-slate-800">Place & Phone</option>
+                      <option value="date" className="text-slate-800">Date</option>
+                      <option value="receiptNo" className="text-slate-800">Receipt No</option>
+                    </select>
                   </div>
-                  <input 
-                    type="range" min="-300" max="300" 
-                    value={receiptLayout[selectedElement].dx} 
-                    onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], dx: Number(e.target.value) } }))} 
-                    className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
-                  />
-                  <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>-300px Left</span><span>0</span><span>+300px Right</span></div>
+
+                  {/* Slider tools */}
+                  <div className="space-y-6 w-full bg-white/5 p-6 rounded-2xl border border-white/10">
+                    <div>
+                      <div className="flex justify-between text-xs font-bold uppercase mb-2">
+                        <span className="flex items-center gap-2">Nudge Move X <span className="opacity-50 lowercase text-[10px]">(Horizontal)</span></span>
+                        <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].dx}px</span>
+                      </div>
+                      <input 
+                        type="range" min="-300" max="300" 
+                        value={receiptLayout[selectedElement].dx} 
+                        onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], dx: Number(e.target.value) } }))} 
+                        className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
+                      />
+                      <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>-300px Left</span><span>0</span><span>+300px Right</span></div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs font-bold uppercase mb-2">
+                        <span className="flex items-center gap-2">Nudge Move Y <span className="opacity-50 lowercase text-[10px]">(Vertical)</span></span>
+                        <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].dy}px</span>
+                      </div>
+                      <input 
+                        type="range" min="-300" max="300" 
+                        value={receiptLayout[selectedElement].dy} 
+                        onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], dy: Number(e.target.value) } }))} 
+                        className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
+                      />
+                      <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>-300px Up</span><span>0</span><span>+300px Down</span></div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs font-bold uppercase mb-2">
+                        <span>Text Size</span>
+                        <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].size}px</span>
+                      </div>
+                      <input 
+                        type="range" min="10" max="150" 
+                        value={receiptLayout[selectedElement].size} 
+                        onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], size: Number(e.target.value) } }))} 
+                        className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
+                      />
+                      <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>10px Small</span><span>150px Huge</span></div>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between text-xs font-bold uppercase mb-2">
-                    <span className="flex items-center gap-2">Nudge Move Y <span className="opacity-50 lowercase text-[10px]">(Vertical)</span></span>
-                    <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].dy}px</span>
-                  </div>
-                  <input 
-                    type="range" min="-300" max="300" 
-                    value={receiptLayout[selectedElement].dy} 
-                    onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], dy: Number(e.target.value) } }))} 
-                    className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
-                  />
-                  <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>-300px Up</span><span>0</span><span>+300px Down</span></div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold uppercase mb-2">
-                    <span>Text Size</span>
-                    <span className="bg-white/10 px-2 py-0.5 rounded">{receiptLayout[selectedElement].size}px</span>
-                  </div>
-                  <input 
-                    type="range" min="10" max="150" 
-                    value={receiptLayout[selectedElement].size} 
-                    onChange={(e) => setReceiptLayout(prev => ({ ...prev, [selectedElement]: { ...prev[selectedElement], size: Number(e.target.value) } }))} 
-                    className="w-full accent-emerald-400 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer" 
-                  />
-                  <div className="flex justify-between text-[10px] opacity-40 mt-1"><span>10px Small</span><span>150px Huge</span></div>
+                {/* Live Preview Column */}
+                <div className="bg-slate-900/5 rounded-2xl border border-white/10 p-2 hidden lg:flex items-center justify-center">
+                   <ReceiptModal 
+                     isOpen={true} 
+                     onClose={() => {}} 
+                     previewMode={true} 
+                     customLayout={receiptLayout}
+                     receiptData={{
+                        receiptNo: 'RC-12345',
+                        name: 'Shafique PC',
+                        place: 'Kozhikode',
+                        amount: '5000',
+                        date: new Date().toISOString(),
+                        campaignerName: 'Developer Studio',
+                        campaignerHn: 'HN000'
+                     }} 
+                   />
                 </div>
               </div>
             </div>

@@ -18,9 +18,11 @@ interface ReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
   receiptData: ReceiptData | null;
+  customLayout?: any;
+  previewMode?: boolean;
 }
 
-export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptModalProps) {
+export default function ReceiptModal({ isOpen, onClose, receiptData, customLayout, previewMode }: ReceiptModalProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -31,10 +33,10 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
     placePhone: { dx: 0, dy: 0, size: 52 },
     amount: { dx: 0, dy: 0, size: 78 }
   };
-  const [layout, setLayout] = useState(defaultReceiptLayout);
+  const [layout, setLayout] = useState(customLayout || defaultReceiptLayout);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !customLayout) {
       const savedLayout = localStorage.getItem('receipt_layout_settings');
       if (savedLayout) {
         try {
@@ -42,12 +44,12 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
         } catch (e) {}
       }
     }
-  }, [isOpen]);
+  }, [isOpen, customLayout]);
 
-  if (!isOpen || !receiptData) return null;
+  if (!previewMode && (!isOpen || !receiptData)) return null;
 
   // Format date to e.g. "17 Jul 2026"
-  const formattedDate = new Date(receiptData.date).toLocaleDateString('en-GB', {
+  const formattedDate = new Date(receiptData?.date || Date.now()).toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
@@ -76,7 +78,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
 
   const handleDownloadPNG = async () => {
     const dataUrl = await generateImage();
-    if (dataUrl) {
+    if (dataUrl && receiptData) {
       const link = document.createElement('a');
       link.download = `Receipt_${receiptData.receiptNo}.png`;
       link.href = dataUrl;
@@ -86,7 +88,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
 
   const handleDownloadPDF = async () => {
     const dataUrl = await generateImage();
-    if (dataUrl) {
+    if (dataUrl && receiptData) {
       // 1080x1350 is a 4:5 aspect ratio. Standard A4 is 210x297mm.
       // We will create a PDF that perfectly fits the receipt dimensions.
       const pdf = new jsPDF({
@@ -135,25 +137,8 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
     window.print();
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      
-      {/* Action Bar (Mobile Responsive) */}
-      <div className="absolute top-4 right-4 z-10 flex flex-wrap gap-2 justify-end">
-         <button onClick={handleWhatsAppShare} className="bg-[#25D366] text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg hover:bg-[#20bd5a] transition-colors">
-            <Share2 className="w-4 h-4" /> <span className="hidden sm:inline">WhatsApp</span>
-         </button>
-         <button onClick={handleDownloadPDF} disabled={isExporting} className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
-            <Download className="w-4 h-4" /> <span className="hidden sm:inline">PDF</span>
-         </button>
-         <button onClick={handleDownloadPNG} disabled={isExporting} className="bg-slate-800 dark:bg-slate-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg hover:bg-slate-900 transition-colors disabled:opacity-50">
-            <Download className="w-4 h-4" /> <span className="hidden sm:inline">PNG</span>
-         </button>
-         <button onClick={onClose} className="bg-white/10 text-white p-2 rounded-xl border border-white/20 hover:bg-white/20 transition-colors ml-2">
-            <X className="w-6 h-6" />
-         </button>
-      </div>
-
+  const receiptContent = (
+    <>
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
         
@@ -180,7 +165,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
         }
       `}} />
 
-      <div className="receipt-wrapper">
+      <div className="receipt-wrapper" style={previewMode ? { transform: 'scale(0.35)', transformOrigin: 'top left' } : {}}>
         {/* The Actual Receipt Template - 1080x1350 exactly */}
         <div 
           ref={receiptRef}
@@ -206,7 +191,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
             <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
               <div className="flex items-center gap-4">
                  <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Receipt No</p>
-                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: `${layout.receiptNo.size}px`, color: '#222', fontWeight: 700, transform: `translate(${layout.receiptNo.dx}px, ${layout.receiptNo.dy}px)`, display: 'inline-block' }}>: {receiptData.receiptNo}</span>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: `${layout.receiptNo.size}px`, color: '#222', fontWeight: 700, transform: `translate(${layout.receiptNo.dx}px, ${layout.receiptNo.dy}px)`, display: 'inline-block' }}>: {receiptData?.receiptNo || 'RC-00000'}</span>
               </div>
               <div className="flex items-center gap-4">
                  <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Date</p>
@@ -237,11 +222,11 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
              </div>
 
              <h3 style={{ fontSize: `${layout.name.size}px`, fontWeight: 800, color: '#222', margin: 0, lineHeight: 1, textTransform: 'uppercase', marginBottom: '10px', transform: `translate(${layout.name.dx}px, ${layout.name.dy}px)`, display: 'inline-block' }}>
-               {receiptData.name}
+               {receiptData?.name || 'Dummy Name'}
              </h3>
              
              <p style={{ fontSize: `${layout.placePhone.size}px`, color: '#555', margin: 0, fontWeight: 600, lineHeight: 1, marginBottom: '30px', transform: `translate(${layout.placePhone.dx}px, ${layout.placePhone.dy}px)`, display: 'inline-block' }}>
-               {receiptData.place || 'Kerala'} {receiptData.phone ? `(${receiptData.phone})` : ''}
+               {receiptData?.place || 'Kerala'}
              </p>
 
              <div style={{ fontSize: '48px', color: '#333', fontWeight: 500, lineHeight: 1, marginBottom: '28px' }}>
@@ -258,7 +243,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
                marginBottom: '32px',
                transform: `translate(${layout.amount.dx}px, ${layout.amount.dy}px)`
              }}>
-               ₹{receiptData.amount}
+               ₹{receiptData?.amount || '0'}
              </div>
 
              <div style={{ fontSize: '28px', color: '#444', fontFamily: "'Great Vibes', cursive", lineHeight: 1.4, marginBottom: '55px' }}>
@@ -285,6 +270,37 @@ export default function ReceiptModal({ isOpen, onClose, receiptData }: ReceiptMo
 
         </div>
       </div>
+    </>
+  );
+
+  if (previewMode) {
+    return (
+      <div className="w-full flex justify-center items-center overflow-hidden min-h-[500px] pointer-events-none">
+        {receiptContent}
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      
+      {/* Action Bar (Mobile Responsive) */}
+      <div className="absolute top-4 right-4 z-10 flex flex-wrap gap-2 justify-end">
+         <button onClick={handleWhatsAppShare} className="bg-[#25D366] text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg hover:bg-[#20bd5a] transition-colors">
+            <Share2 className="w-4 h-4" /> <span className="hidden sm:inline">WhatsApp</span>
+         </button>
+         <button onClick={handleDownloadPDF} disabled={isExporting} className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+            <Download className="w-4 h-4" /> <span className="hidden sm:inline">PDF</span>
+         </button>
+         <button onClick={handleDownloadPNG} disabled={isExporting} className="bg-slate-800 dark:bg-slate-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold shadow-lg hover:bg-slate-900 transition-colors disabled:opacity-50">
+            <Download className="w-4 h-4" /> <span className="hidden sm:inline">PNG</span>
+         </button>
+         <button onClick={onClose} className="bg-white/10 text-white p-2 rounded-xl border border-white/20 hover:bg-white/20 transition-colors ml-2">
+            <X className="w-6 h-6" />
+         </button>
+      </div>
+
+      {receiptContent}
     </div>
   );
 }

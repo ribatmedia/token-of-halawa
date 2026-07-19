@@ -11,6 +11,7 @@ interface ReceiptData {
   place: string;
   phone?: string;
   amount: string | number;
+  month?: string;
   plan?: string;
 }
 
@@ -141,7 +142,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
   const receiptContent = (
     <>
       <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Satisfy&family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         .receipt-wrapper {
           /* Scale down the 1080x1350 container to fit the screen */
@@ -174,98 +175,147 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           style={{ width: '1080px', height: '1350px', fontFamily: "'Inter', sans-serif" }}
         >
           {/* Header Title Section */}
-          <div className="text-center" style={{ paddingTop: '90px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-             <div style={{ color: '#18A66A', fontSize: '54px', fontFamily: "'Great Vibes', cursive", fontWeight: 400, lineHeight: 1, marginBottom: '-8px', zIndex: 10, position: 'relative' }}>
+          <div className="text-center" style={{ paddingTop: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+             <div style={{ color: '#18A66A', fontSize: '64px', fontFamily: "'Satisfy', cursive", fontWeight: 400, lineHeight: 1, marginBottom: '-5px', zIndex: 10, position: 'relative' }}>
                Token of
              </div>
-             <h1 style={{ color: '#18A66A', fontSize: '120px', fontWeight: 900, lineHeight: 1, margin: 0, letterSpacing: '-2px' }}>
+             <h1 style={{ color: '#18A66A', fontSize: '130px', fontWeight: 900, lineHeight: 1, margin: 0, letterSpacing: '-3px' }}>
                Halawa
              </h1>
-             <h2 style={{ color: '#222', fontSize: '52px', fontWeight: 700, lineHeight: 1, margin: '8px 0 0 0' }}>
+             <h2 style={{ color: '#111', fontSize: '56px', fontWeight: 800, lineHeight: 1, margin: '5px 0 0 0', letterSpacing: '-1px' }}>
                Working Fund
              </h2>
           </div>
 
           {/* Receipt Meta & Badge Row */}
-          <div style={{ marginTop: '60px', padding: '0 120px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ marginTop: '55px', padding: '0 100px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {/* Receipt Details */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div className="flex items-center gap-4">
-                 <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Receipt No</p>
-                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: `${layout.receiptNo.size}px`, color: '#222', fontWeight: 700, transform: `translate(${layout.receiptNo.dx}px, ${layout.receiptNo.dy}px)`, display: 'inline-block' }}>: {receiptData?.receiptNo || 'RC-00000'}</span>
+                 <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#111', margin: 0, fontWeight: 500, width: '160px' }}>Receipt No</p>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#111', fontWeight: 700, display: 'inline-block' }}>: {receiptData?.receiptNo || 'RC-00000'}</span>
               </div>
               <div className="flex items-center gap-4">
-                 <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: '26px', color: '#444', margin: 0, fontWeight: 600, width: '150px' }}>Date</p>
-                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: `${layout.date.size}px`, color: '#222', fontWeight: 700, transform: `translate(${layout.date.dx}px, ${layout.date.dy}px)`, display: 'inline-block' }}>: {formattedDate}</span>
+                 <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#111', margin: 0, fontWeight: 500, width: '160px' }}>Date</p>
+                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '28px', color: '#111', fontWeight: 700, display: 'inline-block' }}>: {formattedDate}</span>
               </div>
             </div>
 
             {/* Payment Badge */}
             <div style={{ 
-              border: '4px solid #18A66A', borderRadius: '45px', 
-              width: '270px', height: '82px', padding: '0 25px', display: 'flex', alignItems: 'center', gap: '12px',
+              border: '3px solid #18A66A', borderRadius: '45px', 
+              padding: '12px 28px', display: 'flex', alignItems: 'center', gap: '12px',
               backgroundColor: 'white'
             }}>
-              <div style={{ backgroundColor: '#18A66A', color: 'white', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <CheckCircle2 size={20} />
-              </div>
-              <div style={{ color: '#18A66A', fontSize: '20px', fontWeight: 800, lineHeight: 1.1, textAlign: 'left' }}>
+              <CheckCircle2 size={32} color="#18A66A" />
+              <div style={{ color: '#18A66A', fontSize: '22px', fontWeight: 800, lineHeight: 1.1, textAlign: 'left' }}>
                  PAYMENT<br/>RECEIVED
               </div>
             </div>
           </div>
 
           {/* Main Body (Donor Info) */}
-          <div className="w-full text-center flex flex-col items-center" style={{ marginTop: '65px' }}>
+          <div className="w-full text-center flex flex-col items-center" style={{ marginTop: '45px' }}>
              
-             <div style={{ fontFamily: "'Great Vibes', cursive", fontSize: '88px', color: '#222', lineHeight: 1, marginBottom: '18px' }}>
+             <div style={{ fontFamily: "'Satisfy', cursive", fontSize: '72px', color: '#111', lineHeight: 1, marginBottom: '15px' }}>
                Thank you
              </div>
 
-             <h3 style={{ fontSize: `${layout.name.size}px`, fontWeight: 800, color: '#222', margin: 0, lineHeight: 1, textTransform: 'uppercase', marginBottom: '10px', transform: `translate(${layout.name.dx}px, ${layout.name.dy}px)`, display: 'inline-block' }}>
+             <h3 style={{ fontSize: '76px', fontWeight: 800, color: '#111', margin: 0, lineHeight: 1.1, letterSpacing: '-1px', marginBottom: '8px', display: 'inline-block' }}>
                {receiptData?.name || 'Dummy Name'}
              </h3>
              
-             <p style={{ fontSize: `${layout.placePhone.size}px`, color: '#555', margin: 0, fontWeight: 600, lineHeight: 1, marginBottom: '30px', transform: `translate(${layout.placePhone.dx}px, ${layout.placePhone.dy}px)`, display: 'inline-block' }}>
+             <p style={{ fontSize: '38px', color: '#333', margin: 0, fontWeight: 500, lineHeight: 1, marginBottom: '35px', display: 'inline-block' }}>
                {receiptData?.place || 'Kerala'}
              </p>
 
-             <div style={{ fontSize: '48px', color: '#333', fontWeight: 500, lineHeight: 1, marginBottom: '28px' }}>
+             <div style={{ fontSize: '42px', color: '#111', fontWeight: 500, lineHeight: 1, marginBottom: '25px', letterSpacing: '-0.5px' }}>
                for your kind contribution of
              </div>
 
              {/* Amount Box */}
              <div style={{ 
-               width: '560px', height: '118px', 
-               backgroundColor: '#18A66A', borderRadius: '65px',
-               display: 'flex', alignItems: 'center', justifyContent: 'center',
-               color: 'white', fontSize: `${layout.amount.size}px`, fontWeight: 800,
-               boxShadow: '0 20px 40px rgba(24, 166, 106, 0.3)',
-               marginBottom: '32px',
-               transform: `translate(${layout.amount.dx}px, ${layout.amount.dy}px)`
+               padding: '18px 80px', 
+               backgroundColor: '#18A66A', borderRadius: '60px',
+               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+               color: 'white', fontSize: '78px', fontWeight: 800,
+               marginBottom: '30px',
+               letterSpacing: '-1px'
              }}>
-               ₹{receiptData?.amount || '0'}
+               ₹ {receiptData?.amount || '0'}
              </div>
 
-             <div style={{ fontSize: '28px', color: '#444', fontFamily: "'Great Vibes', cursive", lineHeight: 1.4, marginBottom: '55px' }}>
-               towards Inyaasunna Working Fund<br/>
+             <div style={{ fontSize: '32px', color: '#333', fontFamily: "'Satisfy', cursive", lineHeight: 1.3 }}>
+               towards Token of Halawa Working Fund 2026-27<br/>
                Your Support Makes a Real Difference.
              </div>
 
           </div>
 
+          {/* Widgets Row (Months, Seal, Plan) */}
+          <div style={{
+             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+             padding: '0 80px', marginTop: '45px'
+          }}>
+             {/* Months Grid */}
+             <div style={{ width: '280px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+                   {['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'].map(m => {
+                      const selectedMonthShort = receiptData?.month ? receiptData.month.substring(0, 3) : '';
+                      const isSelected = selectedMonthShort === m;
+                      return (
+                         <div key={m} style={{ 
+                           backgroundColor: isSelected ? '#18A66A' : '#eef2f6',
+                           color: isSelected ? 'white' : '#64748b',
+                           borderRadius: '12px', padding: '6px 0',
+                           textAlign: 'center', fontSize: '18px', fontWeight: isSelected ? 700 : 500
+                         }}>
+                           {m}
+                         </div>
+                      );
+                   })}
+                </div>
+             </div>
+
+             {/* Seal/Logo */}
+             <div style={{ 
+                width: '140px', height: '140px', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: 'white',
+             }}>
+                <Image src="/ribat-logo.png" alt="Seal" width={110} height={110} style={{ objectFit: 'contain' }} />
+             </div>
+
+             {/* Plan Button */}
+             <div style={{ 
+                backgroundColor: '#18A66A', color: 'white', 
+                borderRadius: '30px', padding: '12px 28px', 
+                fontSize: '26px', fontWeight: 600, width: '280px', textAlign: 'center'
+             }}>
+                Plan: {receiptData?.plan || '100'}/month
+             </div>
+          </div>
+
           {/* Footer */}
           <div style={{ 
-            height: '170px', backgroundColor: '#18A66A', 
+            height: '140px', backgroundColor: '#18A66A', 
             position: 'absolute', bottom: 0, width: '100%',
-            display: 'flex', alignItems: 'center', padding: '0 80px', gap: '25px'
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 80px'
           }}>
-             <div style={{ width: '85px', height: '85px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Image src="/ribat-logo.png" alt="Logo" width={85} height={85} style={{ objectFit: 'contain' }} priority />
-             </div>
              <div style={{ color: 'white', textAlign: 'left' }}>
-               <h4 style={{ fontSize: '44px', fontWeight: 700, margin: 0, lineHeight: 1.1, marginBottom: '4px' }}>RIBAT Students Union</h4>
-               <p style={{ fontSize: '22px', fontWeight: 400, margin: 0, opacity: 0.9 }}>Green Valley, Pantheerankavu, Kozhikode - 19</p>
+               <h4 style={{ fontSize: '38px', fontWeight: 700, margin: 0, lineHeight: 1.1, marginBottom: '2px' }}>RIBAT Students Union</h4>
+               <p style={{ fontSize: '20px', fontWeight: 400, margin: 0, opacity: 0.9 }}>Green Valley, Pantheerankavu, Kozhikode - 19</p>
+             </div>
+             
+             {/* Fake Social Icons (Since we don't have images for them, just using text or basic shapes) */}
+             <div style={{ color: 'white', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                   {/* Simplified social icons placeholder */}
+                   <div style={{ width: '30px', height: '30px', backgroundColor: 'white', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#18A66A', fontWeight: 'bold', fontSize: '18px' }}>f</div>
+                   <div style={{ width: '30px', height: '30px', backgroundColor: 'white', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#18A66A', fontWeight: 'bold', fontSize: '18px' }}>in</div>
+                   <div style={{ width: '30px', height: '30px', backgroundColor: 'white', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#18A66A', fontWeight: 'bold', fontSize: '18px' }}>X</div>
+                </div>
+                <div style={{ fontSize: '22px', fontWeight: 500 }}>@ribatstudents</div>
              </div>
           </div>
 

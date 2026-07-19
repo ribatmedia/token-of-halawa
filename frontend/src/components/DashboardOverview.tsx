@@ -686,7 +686,9 @@ export default function DashboardOverview() {
           name: finalDonorName || 'General Donor',
           place: donorAddressInput || 'Kerala',
           phone: donorPhoneInput || '',
-          amount: donationAmount
+          amount: donationAmount,
+          month: donationMonthInput,
+          plan: monthPlanInput
         });
         setShowReceiptModal(true);
 
@@ -1572,13 +1574,17 @@ export default function DashboardOverview() {
                                   </button>
                                   <button
                                     onClick={() => {
+                                      const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '';
+                                      const itemPlan = item.notes?.match(/Plan:\s*([^\.]+)/)?.[1] || '';
                                       setSelectedReceiptData({
                                         receiptNo: receiptNo,
                                         date: item.createdAt,
                                         name: item.donor?.name || 'General Donor',
                                         place: item.donor?.category || 'Kerala',
                                         phone: item.donor?.phone || '',
-                                        amount: item.amount
+                                        amount: item.amount,
+                                        month: itemMonth,
+                                        plan: itemPlan
                                       });
                                       setShowReceiptModal(true);
                                     }}
@@ -3001,13 +3007,16 @@ export default function DashboardOverview() {
                                             if (isPaid) {
                                               const donation = d.donorDonations.find((q: any) => q.notes?.includes(month));
                                               if (donation) {
+                                                const itemPlan = donation.notes?.match(/Plan:\s*([^\.]+)/)?.[1] || '';
                                                 setSelectedReceiptData({
-                                                  id: donation.id,
-                                                  date: donation.date,
+                                                  receiptNo: donation.receipts?.[0]?.receiptNumber || `TOH-2026-${donation.id.split('-')[0].slice(0, 4).toUpperCase()}`,
+                                                  date: donation.createdAt || donation.date || new Date().toISOString(),
                                                   name: d.name,
                                                   phone: d.phone,
                                                   place: d.location || d.category || 'General',
-                                                  amount: donation.amount
+                                                  amount: donation.amount,
+                                                  month: month,
+                                                  plan: itemPlan
                                                 });
                                                 setShowReceiptModal(true);
                                               }

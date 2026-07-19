@@ -253,9 +253,9 @@ export default function HomePage() {
 
       {/* Web Banner Slider Card / Image Carousel */}
       {bannerImages.length > 0 ? (
-        <section className="pt-20 md:pt-24 w-full">
-          {/* Image Banner Carousel (Full Width) */}
-          <div className="relative w-full overflow-hidden" style={{ aspectRatio: '2 / 1' }}>
+        <section className="pt-20 md:pt-24 w-full bg-slate-50 dark:bg-[#0a0a0a]">
+          {/* Image Banner Carousel (Constrained on Desktop to fit height) */}
+          <div className="relative w-full md:max-w-6xl md:mx-auto overflow-hidden shadow-sm" style={{ aspectRatio: '2 / 1' }}>
             {bannerImages.map((banner, index) => (
                 <img
                   key={index}
@@ -267,7 +267,7 @@ export default function HomePage() {
                 />
               ))}
               {/* Dots */}
-              <div className="absolute bottom-4 right-4 flex gap-2 z-20">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                 {bannerImages.map((_, index) => (
                   <button
                     key={index}

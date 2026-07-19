@@ -175,7 +175,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           style={{ width: '1080px', height: '1350px', fontFamily: "'Inter', sans-serif" }}
         >
           {/* Header Title Section */}
-          <div className="text-center" style={{ paddingTop: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="text-center" style={{ paddingTop: '50px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
              <div style={{ color: '#18A66A', fontSize: '64px', fontFamily: "'Satisfy', cursive", fontWeight: 400, lineHeight: 1, marginBottom: '-5px', zIndex: 10, position: 'relative' }}>
                Token of
              </div>
@@ -188,7 +188,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           </div>
 
           {/* Receipt Meta & Badge Row */}
-          <div style={{ marginTop: '55px', padding: '0 100px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ marginTop: '40px', padding: '0 100px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {/* Receipt Details */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div className="flex items-center gap-4">
@@ -215,7 +215,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           </div>
 
           {/* Main Body (Donor Info) */}
-          <div className="w-full text-center flex flex-col items-center" style={{ marginTop: '45px' }}>
+          <div className="w-full text-center flex flex-col items-center" style={{ marginTop: '30px' }}>
              
              <div style={{ fontFamily: "'Satisfy', cursive", fontSize: '72px', color: '#111', lineHeight: 1, marginBottom: '15px' }}>
                Thank you
@@ -225,11 +225,11 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
                {receiptData?.name || 'Dummy Name'}
              </h3>
              
-             <p style={{ fontSize: '38px', color: '#333', margin: 0, fontWeight: 500, lineHeight: 1, marginBottom: '35px', display: 'inline-block' }}>
+             <p style={{ fontSize: '38px', color: '#333', margin: 0, fontWeight: 500, lineHeight: 1, marginBottom: '20px', display: 'inline-block' }}>
                {receiptData?.place || 'Kerala'}
              </p>
 
-             <div style={{ fontSize: '42px', color: '#111', fontWeight: 500, lineHeight: 1, marginBottom: '25px', letterSpacing: '-0.5px' }}>
+             <div style={{ fontSize: '42px', color: '#111', fontWeight: 500, lineHeight: 1, marginBottom: '20px', letterSpacing: '-0.5px' }}>
                for your kind contribution of
              </div>
 
@@ -239,7 +239,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
                backgroundColor: '#18A66A', borderRadius: '60px',
                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                color: 'white', fontSize: '78px', fontWeight: 800,
-               marginBottom: '30px',
+               marginBottom: '20px',
                letterSpacing: '-1px'
              }}>
                ₹ {receiptData?.amount || '0'}
@@ -255,7 +255,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           {/* Widgets Row (Months, Seal, Plan) */}
           <div style={{
              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-             padding: '0 80px', marginTop: '45px'
+             padding: '0 80px', marginTop: '25px'
           }}>
              {/* Months Grid */}
              <div style={{ width: '280px' }}>

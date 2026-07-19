@@ -253,16 +253,16 @@ export default function HomePage() {
 
       {/* Web Banner Slider Card / Image Carousel */}
       {bannerImages.length > 0 ? (
-        <section className="pt-20 md:pt-24 w-full bg-slate-50 dark:bg-[#0a0a0a]">
-          {/* Image Banner Carousel (Constrained on Desktop to fit height) */}
-          <div className="relative w-full md:max-w-6xl md:mx-auto overflow-hidden shadow-sm" style={{ aspectRatio: '2 / 1' }}>
+        <section className="pt-20 md:pt-24 w-full">
+          {/* Image Banner Carousel (Full Width, Auto Height to prevent crop) */}
+          <div className="relative w-full overflow-hidden">
             {bannerImages.map((banner, index) => (
                 <img
                   key={index}
                   src={banner}
                   alt={`Banner ${index + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-                    activeSlide === index ? 'opacity-100' : 'opacity-0'
+                  className={`w-full h-auto transition-opacity duration-700 ${
+                    activeSlide === index ? 'opacity-100 relative' : 'opacity-0 absolute top-0 left-0'
                   }`}
                 />
               ))}

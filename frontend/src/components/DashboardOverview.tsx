@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import { useSearchParams } from 'next/navigation';
 import { 
   Heart, Users, CheckCircle, TrendingUp, Calendar, AlertCircle, 
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
@@ -419,24 +420,32 @@ export default function DashboardOverview() {
     }
   }, [selectedClass]);
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     setIsClient(true);
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('register') === 'true') {
+    if (searchParams) {
+      if (searchParams.get('register') === 'true') {
         setAuthMode('register');
       }
-      if (params.get('role') === 'admin') {
+      const roleParam = searchParams.get('role');
+      if (roleParam === 'admin') {
         setLoginRole('admin');
-      } else if (params.get('role') === 'campaigner') {
+        if (user && (user as any).hn) {
+          clearAuth(); // Logout campaigner to show admin login
+        }
+      } else if (roleParam === 'campaigner') {
         setLoginRole('campaigner');
+        if (user && !(user as any).hn) {
+          clearAuth(); // Logout admin to show campaigner login
+        }
       }
     }
     const timer = setTimeout(() => {
       setShowSyncAlert(true);
     }, 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [searchParams]);
 
   // Fetch Live Database Data when authenticated
   const fetchDatabaseData = async () => {

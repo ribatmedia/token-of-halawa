@@ -789,9 +789,7 @@ export default function DeveloperPage() {
                         name: 'Shafique PC',
                         place: 'Kozhikode',
                         amount: '5000',
-                        date: new Date().toISOString(),
-                        campaignerName: 'Developer Studio',
-                        campaignerHn: 'HN000'
+                        date: new Date().toISOString()
                      }} 
                    />
                 </div>

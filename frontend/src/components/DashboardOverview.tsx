@@ -429,24 +429,29 @@ export default function DashboardOverview() {
       if (searchParams.get('register') === 'true') {
         setAuthMode('register');
       }
-      const roleParam = searchParams.get('role');
-      if (roleParam === 'admin') {
-        setLoginRole('admin');
-        if (user && (user as any).hn) {
-          clearAuth(); // Logout campaigner to show admin login
-        }
-      } else if (roleParam === 'campaigner') {
-        setLoginRole('campaigner');
-        if (user && !(user as any).hn) {
-          clearAuth(); // Logout admin to show campaigner login
-        }
-      }
     }
     const timer = setTimeout(() => {
       setShowSyncAlert(true);
     }, 2000);
     return () => clearTimeout(timer);
   }, [searchParams]);
+
+  useEffect(() => {
+    if (searchParams && _hasHydrated) {
+      const roleParam = searchParams.get('role');
+      if (roleParam === 'admin') {
+        setLoginRole('admin');
+        if (user && (user as any).hn) {
+          clearAuth();
+        }
+      } else if (roleParam === 'campaigner') {
+        setLoginRole('campaigner');
+        if (user && !(user as any).hn) {
+          clearAuth();
+        }
+      }
+    }
+  }, [searchParams, user, _hasHydrated, clearAuth]);
 
   // Fetch Live Database Data when authenticated
   const fetchDatabaseData = async () => {

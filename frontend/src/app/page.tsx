@@ -256,7 +256,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           {bannerImages.length > 0 ? (
             /* Image Banner Carousel */
-            <div className="relative overflow-hidden rounded-3xl shadow-xl" style={{ aspectRatio: '1 / 2' }}>
+            <div className="relative overflow-hidden rounded-3xl shadow-xl" style={{ aspectRatio: '2 / 1' }}>
               {bannerImages.map((banner, index) => (
                 <img
                   key={index}

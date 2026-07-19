@@ -1396,7 +1396,7 @@ export default function DashboardOverview() {
                 </div>
 
                 {/* Filters row */}
-                <div className={`p-5 rounded-3xl ${glassClass} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-center`}>
+                <div className={`p-5 rounded-3xl ${glassClass} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 items-center relative z-20`}>
                   <div>
                     <select
                       value={donationClassFilter}
@@ -2187,7 +2187,7 @@ export default function DashboardOverview() {
 
             return (
               <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-20">
                   <div>
                     <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                       <Users className="w-5 h-5 text-emerald-400" />
@@ -2198,7 +2198,7 @@ export default function DashboardOverview() {
                 </div>
 
                 {/* Filter controls */}
-                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="flex flex-col md:flex-row gap-4 mb-6 relative z-20">
                   <div className="relative flex-1">
                     <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                     <input 
@@ -2312,7 +2312,7 @@ export default function DashboardOverview() {
 
             return (
               <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-20">
                   <div>
                     <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                       <FileText className="w-5 h-5 text-emerald-400" />
@@ -2603,7 +2603,7 @@ export default function DashboardOverview() {
           {/* VIEW: Class Dashboard */}
           {activeTab === 'class-dashboard' && (
             <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-20">
                 <div>
                   <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                     <Laptop className="w-5 h-5 text-emerald-400" />
@@ -2837,7 +2837,7 @@ export default function DashboardOverview() {
               <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
                 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-20">
                   <div>
                     <h3 className="text-xl font-bold flex items-center gap-2">
                       <UserCheck className="w-5 h-5 text-emerald-400" />
@@ -3126,7 +3126,7 @@ export default function DashboardOverview() {
               <div className={`p-6 rounded-3xl flex-1 flex flex-col ${glassClass}`}>
                 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-20">
                   <div>
                     <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                       <Trophy className="w-5 h-5 text-amber-500" />

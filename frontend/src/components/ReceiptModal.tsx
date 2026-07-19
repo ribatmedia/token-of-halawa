@@ -166,7 +166,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
         }
       `}} />
 
-      <div className="receipt-wrapper" style={previewMode ? { transform: 'scale(0.35)', transformOrigin: 'top left' } : {}}>
+      <div className="receipt-wrapper" style={previewMode ? { transform: 'scale(0.32)', transformOrigin: 'top left', position: 'absolute', top: 0, left: 0 } : {}}>
         {/* The Actual Receipt Template - 1080x1350 exactly */}
         <div 
           ref={receiptRef}
@@ -276,8 +276,10 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
 
   if (previewMode) {
     return (
-      <div className="w-full flex justify-center items-center overflow-hidden min-h-[500px] pointer-events-none">
-        {receiptContent}
+      <div className="flex justify-center items-center pointer-events-none w-full" style={{ height: '500px' }}>
+        <div style={{ width: '345px', height: '432px', position: 'relative', borderRadius: '12px', overflow: 'hidden' }}>
+          {receiptContent}
+        </div>
       </div>
     );
   }

@@ -1852,7 +1852,7 @@ export default function DashboardOverview() {
                                     setIsDonorDropdownOpen(false);
                                     
                                     // Auto-detect donor's plan from previous donations
-                                    const previousDonation = verificationQueue.find(q => q.donorId === d.id);
+                                    const previousDonation = donations.find(q => q.donorId === d.id && q.notes?.includes('Class:'));
                                     if (previousDonation?.notes) {
                                       const planMatch = previousDonation.notes.match(/Plan:\s*([^.]+)/);
                                       if (planMatch) {
@@ -1994,7 +1994,7 @@ export default function DashboardOverview() {
                         if (donationTab === 'renew') {
                           // Find months this donor already paid for
                           const paidMonths = donorIdInput 
-                            ? verificationQueue
+                            ? donations
                                 .filter(q => q.donorId === donorIdInput)
                                 .map(q => {
                                   const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
@@ -2297,12 +2297,12 @@ export default function DashboardOverview() {
           {/* VIEW: Campaigners Stats */}
           {activeTab === 'campaigners-stats' && (() => {
             const campaignersStatsData = campaignersList.map((item) => {
-              const collected = verificationQueue
+              const collected = donations
                 .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
                 .reduce((acc, q) => acc + Number(q.amount), 0);
               const target = 10000;
               const percent = Math.min(100, Math.round((collected / target) * 100));
-              const receiptsCount = verificationQueue.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
+              const receiptsCount = donations.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
               return { ...item, collected, percent, receiptsCount };
             });
 
@@ -2635,7 +2635,7 @@ export default function DashboardOverview() {
               {(() => {
                 const classCampaigners = campaignersList.filter(c => c.class === selectedClassDashboard);
                 const totalCampaigners = classCampaigners.length;
-                const collected = verificationQueue
+                const collected = donations
                   .filter(q => q.notes?.includes(`Class: ${selectedClassDashboard}`))
                   .reduce((acc, q) => acc + Number(q.amount), 0);
                 const avgCollected = totalCampaigners > 0 ? Math.round(collected / totalCampaigners) : 0;
@@ -2674,7 +2674,7 @@ export default function DashboardOverview() {
                           <tbody>
                             {[...classCampaigners]
                               .map(item => {
-                                const amount = verificationQueue
+                                const amount = donations
                                   .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
                                   .reduce((acc, q) => acc + Number(q.amount), 0);
                                 return { ...item, amount };
@@ -2705,7 +2705,7 @@ export default function DashboardOverview() {
           {activeTab === 'donors' && (() => {
             
             const mappedDonors = donors.map(d => {
-              const donorDonations = verificationQueue.filter(q => q.donorId === d.id || q.donorId === d.uniqueId);
+              const donorDonations = donations.filter(q => q.donorId === d.id || q.donorId === d.uniqueId);
               const lastDonation = donorDonations[0];
               
               let detectedPlan = 'CUSTOM';
@@ -2732,7 +2732,7 @@ export default function DashboardOverview() {
                 }
               }
 
-              const campRecord = campaignersList.find(c => c.name.toLowerCase() === campaignerName.toLowerCase());
+              const campRecord = campaignersList.find(c => c.name?.toLowerCase() === campaignerName?.toLowerCase());
               if (campRecord) {
                 campaignerClass = campRecord.class;
                 campaignerName = campRecord.name;
@@ -3111,10 +3111,10 @@ export default function DashboardOverview() {
             const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
               .map((className) => {
                 const campaigners = campaignersList.filter(c => c.class === className).length;
-                const collected = verificationQueue
+                const collected = donations
                   .filter(q => q.notes?.includes(`Class: ${className}`))
                   .reduce((acc, q) => acc + Number(q.amount), 0);
-                const achieved = new Set(verificationQueue.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId)).size;
+                const achieved = new Set(donations.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId)).size;
                 return { className, campaigners, collected, achieved };
               })
               .sort((a, b) => b.collected - a.collected);
@@ -3253,13 +3253,13 @@ export default function DashboardOverview() {
             const allCampaignerStats = [...calculatedCampaignerStats].sort((a, b) => b.total - a.total);
 
             // Find index of current campaigner in overall list
-            const overallRankIndex = allCampaignerStats.findIndex(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
+            const overallRankIndex = allCampaignerStats.findIndex(c => c.name?.toLowerCase() === (user?.fullName || '')?.toLowerCase());
             const overallRank = overallRankIndex !== -1 ? overallRankIndex + 1 : allCampaignerStats.length + 1;
 
             // Filter for current campaigner's class
             const myClass = (user as any)?.class || '';
             const classCampaignerStats = allCampaignerStats.filter(c => c.class === myClass);
-            const classRankIndex = classCampaignerStats.findIndex(c => c.name.toLowerCase() === (user?.fullName || '').toLowerCase());
+            const classRankIndex = classCampaignerStats.findIndex(c => c.name?.toLowerCase() === (user?.fullName || '')?.toLowerCase());
             const classRank = classRankIndex !== -1 ? classRankIndex + 1 : classCampaignerStats.length + 1;
 
             // 3. Leading Collectors (Top 5 Campaigners overall)

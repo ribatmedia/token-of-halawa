@@ -232,7 +232,7 @@ export default function DashboardOverview() {
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [loginRole, setLoginRole] = useState<'campaigner' | 'admin'>('campaigner');
-  const [selectedClass, setSelectedClass] = useState('Final year');
+  const [selectedClass, setSelectedClass] = useState('');
   const [selectedHn, setSelectedHn] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
@@ -956,13 +956,11 @@ export default function DashboardOverview() {
                     value={selectedClass}
                     onChange={(e) => {
                       setSelectedClass(e.target.value);
-                      const listForClass = campaignersList.filter(c => c.class === e.target.value);
-                      if (listForClass.length > 0) {
-                        setSelectedHn(String(listForClass[0].hn));
-                      }
+                      setSelectedHn('');
                     }}
                     className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
                   >
+                    <option value="" disabled className="text-slate-850">Select Class</option>
                     {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
                       <option key={c} value={c} className="text-slate-800">{c}</option>
                     ))}

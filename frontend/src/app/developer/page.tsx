@@ -80,7 +80,7 @@ export default function DeveloperPage() {
     
     setIsResetting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/developer/reset', { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/developer/reset`, { method: 'DELETE' });
       if (res.ok) {
         alert('Database successfully reset to factory settings.');
         window.location.reload();
@@ -126,7 +126,7 @@ export default function DeveloperPage() {
   const [simFormError, setSimFormError] = useState('');
   const [simLoading, setSimLoading] = useState(false);
 
-  // Banner images state (3 banners, 2:1 aspect ratio)
+  // Banner images state (3 banners, 1:2 aspect ratio)
   const [bannerImages, setBannerImages] = useState<string[]>(['', '', '']);
   const [bannerUploading, setBannerUploading] = useState<number | null>(null);
 
@@ -370,9 +370,7 @@ export default function DeveloperPage() {
       const img = new window.Image();
       img.onload = () => {
         const ratio = img.width / img.height;
-        if (ratio < 1.5 || ratio > 2.5) {
-          setActionMessage(`Banner ${index + 1}: Aspect ratio is ${ratio.toFixed(2)}:1. Recommended is 2:1 (between 1.5:1 and 2.5:1). Image uploaded anyway.`);
-        }
+        // Removed strict ratio alert to allow 1:2 banners freely without spamming the user
         const newBanners = [...bannerImages];
         newBanners[index] = e.target?.result as string;
         setBannerImages(newBanners);
@@ -805,7 +803,7 @@ export default function DeveloperPage() {
                   <h4 className="text-lg font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                     <Image className="w-5 h-5" /> Homepage Banner Upload
                   </h4>
-                  <p className="text-xs text-slate-500 mt-1">Upload 3 homepage banners in 2:1 aspect ratio (e.g. 1200×600, 1600×800). Supports JPG, PNG, WebP up to 5MB each.</p>
+                  <p className="text-xs text-slate-500 mt-1">Upload 3 homepage banners in 1:2 aspect ratio. Supports JPG, PNG, WebP up to 5MB each.</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <button 
@@ -836,7 +834,7 @@ export default function DeveloperPage() {
                     {/* Preview Area */}
                     <div 
                       className="relative w-full rounded-2xl overflow-hidden border-2 border-dashed border-slate-300 dark:border-white/15 bg-slate-100/50 dark:bg-black/20 transition-all hover:border-emerald-500/50 cursor-pointer group"
-                      style={{ aspectRatio: '2 / 1' }}
+                      style={{ aspectRatio: '1 / 2' }}
                       onClick={() => {
                         const input = document.getElementById(`banner-input-${index}`);
                         if (input) input.click();
@@ -861,7 +859,7 @@ export default function DeveloperPage() {
                             <>
                               <Image className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Click to upload</span>
-                              <span className="text-[9px] text-slate-400/60">2:1 ratio · max 5MB</span>
+                              <span className="text-[9px] text-slate-400/60">1:2 ratio · max 5MB</span>
                             </>
                           )}
                         </div>
@@ -905,7 +903,7 @@ export default function DeveloperPage() {
 
               {/* Info Note */}
               <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/15 text-xs text-amber-600 dark:text-amber-400 font-medium">
-                <strong>Note:</strong> Banners are stored in browser localStorage and displayed on the homepage as a slider/carousel. For best results, use images with exactly 2:1 aspect ratio (e.g. 1200×600px).
+                <strong>Note:</strong> Banners are stored in browser localStorage and displayed on the homepage in a 1:2 ratio. Clear browser data to reset.
               </div>
             </div>
           )}

@@ -11,6 +11,7 @@ import donorRoutes from './routes/donor';
 import donationRoutes from './routes/donation';
 import campaignRoutes from './routes/campaign';
 import publicRoutes from './routes/public';
+import developerRoutes from './routes/developer';
 import { PublicController } from './controllers/public';
 
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/v1/donors', donorRoutes);
 app.use('/api/v1/donations', donationRoutes);
 app.use('/api/v1/campaigns', campaignRoutes);
 app.use('/api/v1/public', publicRoutes);
+app.use('/api/v1/developer', developerRoutes);
 app.get('/api/v1/campaigners', PublicController.getCampaigners);
 
 // Error Handling Middleware

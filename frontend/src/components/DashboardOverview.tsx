@@ -210,6 +210,24 @@ export default function DashboardOverview() {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>('admin');
   const [activeTab, setActiveTab] = useState<string>('analytics');
 
+  // Sync role and tab if user is a campaigner
+  useEffect(() => {
+    if (user && (user as any).hn) {
+      setSelectedRole('volunteer');
+      // If the current tab is an admin tab, switch to volunteer overview
+      const adminTabs = ['analytics', 'donations', 'verify', 'campaigners', 'campaigners-stats', 'donors', 'rankings', 'class-collections', 'class-dashboard', 'developer'];
+      if (adminTabs.includes(activeTab)) {
+        setActiveTab('v-overview');
+      }
+    } else if (user && !(user as any).hn) {
+      // If admin, ensure they don't get stuck on volunteer tabs if they somehow got there
+      const volunteerTabs = ['v-overview', 'v-add', 'v-history', 'v-leaderboard', 'v-messages'];
+      if (volunteerTabs.includes(activeTab)) {
+        setActiveTab('analytics');
+      }
+    }
+  }, [user]);
+
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [loginRole, setLoginRole] = useState<'campaigner' | 'admin'>('campaigner');

@@ -251,13 +251,12 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Web Banner Slider Card */}
-      <section className="pt-24 md:pt-32 px-6">
-        <div className="max-w-7xl mx-auto">
-          {bannerImages.length > 0 ? (
-            /* Image Banner Carousel */
-            <div className="relative overflow-hidden rounded-3xl shadow-xl" style={{ aspectRatio: '2 / 1' }}>
-              {bannerImages.map((banner, index) => (
+      {/* Web Banner Slider Card / Image Carousel */}
+      {bannerImages.length > 0 ? (
+        <section className="pt-20 md:pt-24 w-full">
+          {/* Image Banner Carousel (Full Width) */}
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: '2 / 1' }}>
+            {bannerImages.map((banner, index) => (
                 <img
                   key={index}
                   src={banner}
@@ -276,10 +275,13 @@ export default function HomePage() {
                     className={`w-2.5 h-2.5 rounded-full border border-white/60 transition-all ${activeSlide === index ? 'bg-white scale-125' : 'bg-white/40'}`}
                   />
                 ))}
-              </div>
             </div>
-          ) : (
-            /* Fallback: Text-based slides */
+          </div>
+        </section>
+      ) : (
+        <section className="pt-24 md:pt-32 px-6">
+          <div className="max-w-7xl mx-auto">
+            {/* Fallback Campaign Slider */}
             <div className={`relative overflow-hidden rounded-3xl border backdrop-blur-xl p-8 md:p-12 transition-all duration-700 ${slides[activeSlide]?.bg || 'bg-slate-50'}`}>
               <div className="relative z-10 max-w-2xl text-left">
                 <span className={`text-xs uppercase font-extrabold tracking-wider ${slides[activeSlide]?.accent || 'text-slate-600'}`}>Campaign Slider</span>
@@ -301,9 +303,9 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* Hero Section */}
       <section className="pt-20 pb-24 text-center px-6 relative z-10">

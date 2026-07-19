@@ -70,7 +70,7 @@ export default function DeveloperPage() {
   const [currentTab, setCurrentTab] = useState('dashboard');
   
   // Stats & diagnostics states
-  const [stats, setStats] = useState({ totalVolunteers: 40, totalDonations: 3, totalAmount: 1450, verifiedAmount: 1150 });
+  const [stats, setStats] = useState({ totalVolunteers: 0, totalDonations: 0, totalAmount: 0, verifiedAmount: 0 });
   const [dbStatus, setDbStatus] = useState('Connecting...');
   const [systemEnv, setSystemEnv] = useState('Next.js 15.5.20');
   const [isResetting, setIsResetting] = useState(false);
@@ -85,10 +85,10 @@ export default function DeveloperPage() {
         alert('Database successfully reset to factory settings.');
         window.location.reload();
       } else {
-        alert('Failed to reset database.');
+        alert('Failed to reset database. (Note: Make sure your live backend server has been re-deployed with the latest code)');
       }
     } catch (e) {
-      alert('Error connecting to backend.');
+      alert('Error connecting to backend. (Note: Make sure your live backend server has been re-deployed with the latest code)');
     } finally {
       setIsResetting(false);
     }

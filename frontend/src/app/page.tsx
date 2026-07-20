@@ -20,6 +20,8 @@ interface ClassData {
   donors: number;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
 export default function HomePage() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [studentView, setStudentView] = useState<'overall' | 'today'>('overall');
@@ -48,7 +50,11 @@ export default function HomePage() {
   ]);
 
   // Banner images from developer panel
-  const [bannerImages, setBannerImages] = useState<string[]>([]);
+  const [bannerImages, setBannerImages] = useState<string[]>([
+    'https://kommodo.ai/i/NmelkzgwVPlT3nGlRLXA',
+    'https://kommodo.ai/i/hGITCUuUtS16230xQJpU',
+    'https://kommodo.ai/i/MO6TIAqWUIkzTfuemQeH'
+  ]);
 
   const [tickerText, setTickerText] = useState('Welcome to Token of Halawa donation program ★ Live tracking of monthly targets and campaign approvals active ★ Direct WhatsApp verification now enabled for all campaigners');
 
@@ -72,7 +78,7 @@ export default function HomePage() {
     }
     
     // Fetch banners from DB
-    fetch('http://localhost:5000/api/v1/public/banners')
+    fetch(`${API_URL}/public/banners`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -143,7 +149,6 @@ export default function HomePage() {
 
   // Fetch live stats from public backend endpoint
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
     const fetchHomeStats = async () => {
       try {
         const res = await fetch(`${API_URL}/public/home-stats`);

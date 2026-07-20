@@ -221,11 +221,14 @@ export default function DashboardOverview() {
         setActiveTab('v-overview');
       }
     } else if (user && !(user as any).hn) {
+      setSelectedRole('admin');
       // If admin, ensure they don't get stuck on volunteer tabs if they somehow got there
       const volunteerTabs = ['v-overview', 'v-add', 'v-history', 'v-leaderboard', 'v-messages'];
       if (volunteerTabs.includes(activeTab)) {
         setActiveTab('analytics');
       }
+    } else if (!user) {
+      setSelectedRole('admin');
     }
   }, [user]);
 

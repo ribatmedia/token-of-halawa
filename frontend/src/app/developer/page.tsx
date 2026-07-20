@@ -508,8 +508,8 @@ export default function DeveloperPage() {
               Verify & Enter Studio
             </button>
             
-            <Link href="/dashboard" className="block text-center mt-6 text-xs text-slate-400 hover:text-emerald-400 font-bold transition">
-              ← Return to Dashboard
+            <Link href="/admin" className="block text-center mt-6 text-xs text-slate-400 hover:text-emerald-500 transition-colors">
+              ← Back to Admin Dashboard
             </Link>
           </form>
         </div>

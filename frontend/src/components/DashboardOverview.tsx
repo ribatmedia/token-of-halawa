@@ -200,7 +200,7 @@ const campaignersList = [
   { hn: 40, name: "Aneeb", class: "Plus one" }
 ];
 
-export default function DashboardOverview() {
+export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRole?: 'admin' | 'campaigner' }) {
   const { theme, toggleTheme, token, user, organization, setAuth, clearAuth, _hasHydrated } = useAuthStore();
   const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>('en');
   const [isClient, setIsClient] = useState(false);
@@ -208,8 +208,9 @@ export default function DashboardOverview() {
   const t = translations[lang];
 
   // Active Role and Menu Tab States
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>('admin');
-  const [activeTab, setActiveTab] = useState<string>('analytics');
+  // Active Role and Menu Tab States
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>(defaultRole === 'admin' ? 'admin' : 'volunteer');
+  const [activeTab, setActiveTab] = useState<string>(defaultRole === 'admin' ? 'analytics' : 'v-overview');
 
   // Sync role and tab if user is a campaigner
   useEffect(() => {
@@ -234,7 +235,7 @@ export default function DashboardOverview() {
 
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [loginRole, setLoginRole] = useState<'campaigner' | 'admin'>('campaigner');
+  const [loginRole, setLoginRole] = useState<'campaigner' | 'admin'>(defaultRole);
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedHn, setSelectedHn] = useState('');
   const [authEmail, setAuthEmail] = useState('');

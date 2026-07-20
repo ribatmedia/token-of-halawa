@@ -243,11 +243,11 @@ export default function HomePage() {
             </div>
             
             <div className="flex items-center gap-2 md:gap-4">
-              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 font-bold text-xs md:text-sm transition px-2 py-1">
+              <Link href="/admin" className="text-slate-600 hover:text-slate-900 font-bold text-xs md:text-sm transition px-2 py-1">
                 <span className="hidden sm:inline">Live Stats</span>
                 <span className="sm:hidden">Stats</span>
               </Link>
-              <Link href="/dashboard" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
+              <Link href="/campaigner" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl font-black shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
                 <LayoutDashboard className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span className="hidden sm:inline">Campaigner Login</span>
                 <span className="sm:hidden">Login</span>
@@ -327,7 +327,7 @@ export default function HomePage() {
             Welcome to the Token of Halawa donation intelligence engine. Track live collections, verify receipts, and empower campaigns.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link href="/dashboard" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-base px-8 py-4 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2">
+            <Link href="/campaigner" className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-base px-8 py-4 rounded-2xl font-black shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2">
               Campaigner Login <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="#leaderboard" className="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold text-base transition flex items-center justify-center gap-2 shadow-sm">
@@ -453,10 +453,10 @@ export default function HomePage() {
             <div className="text-left">
               <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">Quick Links</h3>
               <ul className="space-y-3.5 text-sm text-slate-400">
-                <li><Link href="/dashboard?role=admin" className="hover:text-white transition">Admin Portal</Link></li>
-                <li><Link href="/dashboard?role=campaigner" className="hover:text-white transition">Campaigner Portal</Link></li>
+                <li><Link href="/admin" className="hover:text-white transition">Admin Portal</Link></li>
+                <li><Link href="/campaigner" className="hover:text-white transition">Campaigner Portal</Link></li>
                 <li><a href="#leaderboard" className="hover:text-white transition">Leaderboard</a></li>
-                <li><Link href="/dashboard" className="hover:text-white transition">Live Stats</Link></li>
+                <li><Link href="/admin" className="hover:text-white transition">Live Stats</Link></li>
               </ul>
             </div>
             

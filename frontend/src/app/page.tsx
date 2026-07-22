@@ -51,9 +51,9 @@ export default function HomePage() {
 
   // Banner images from developer panel
   const [bannerImages, setBannerImages] = useState<string[]>([
-    'https://kommodo.ai/i/NmelkzgwVPlT3nGlRLXA',
-    'https://kommodo.ai/i/hGITCUuUtS16230xQJpU',
-    'https://kommodo.ai/i/MO6TIAqWUIkzTfuemQeH'
+    'https://hub.ahrazdesign.com/wp-content/uploads/2026/07/20260718_081141.jpg-scaled.jpeg',
+    'https://hub.ahrazdesign.com/wp-content/uploads/2026/07/20260718_080221.jpg-scaled.jpeg',
+    'https://hub.ahrazdesign.com/wp-content/uploads/2026/07/20260718_081840.jpg-scaled.jpeg'
   ]);
 
   const [tickerText, setTickerText] = useState('Welcome to Token of Halawa donation program ★ Live tracking of monthly targets and campaign approvals active ★ Direct WhatsApp verification now enabled for all campaigners');

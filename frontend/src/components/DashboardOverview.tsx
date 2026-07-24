@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { 
   Heart, Users, CheckCircle, TrendingUp, Calendar, AlertCircle, 
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
@@ -206,6 +206,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [isClient, setIsClient] = useState(false);
   const [showSyncAlert, setShowSyncAlert] = useState(false);
   const t = translations[lang];
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Active Role and Menu Tab States
   // Active Role and Menu Tab States
@@ -215,6 +217,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   // Sync role and tab if user is a campaigner
   useEffect(() => {
     if (user && (user as any).hn) {
+      if (pathname === '/admin') {
+        router.replace('/campaigner');
+        return;
+      }
       setSelectedRole('volunteer');
       // If the current tab is an admin tab, switch to volunteer overview
       const adminTabs = ['analytics', 'donations', 'verify', 'campaigners', 'campaigners-stats', 'donors', 'rankings', 'class-collections', 'class-dashboard', 'developer'];
@@ -222,6 +228,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         setActiveTab('v-overview');
       }
     } else if (user && !(user as any).hn) {
+      if (pathname === '/campaigner') {
+        router.replace('/admin');
+        return;
+      }
       setSelectedRole('admin');
       // If admin, ensure they don't get stuck on volunteer tabs if they somehow got there
       const volunteerTabs = ['v-overview', 'v-add', 'v-history', 'v-leaderboard', 'v-messages'];
@@ -229,9 +239,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         setActiveTab('analytics');
       }
     } else if (!user) {
-      setSelectedRole('admin');
+      setSelectedRole(defaultRole === 'admin' ? 'admin' : 'volunteer');
     }
-  }, [user]);
+  }, [user, pathname, router, defaultRole]);
 
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');

@@ -218,7 +218,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   useEffect(() => {
     if (user && (user as any).hn) {
       if (pathname === '/admin') {
-        router.replace('/campaigner');
+        clearAuth();
         return;
       }
       setSelectedRole('volunteer');
@@ -229,7 +229,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       }
     } else if (user && !(user as any).hn) {
       if (pathname === '/campaigner') {
-        router.replace('/admin');
+        clearAuth();
         return;
       }
       setSelectedRole('admin');
@@ -241,7 +241,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     } else if (!user) {
       setSelectedRole(defaultRole === 'admin' ? 'admin' : 'volunteer');
     }
-  }, [user, pathname, router, defaultRole]);
+  }, [user, pathname, clearAuth, defaultRole]);
 
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');

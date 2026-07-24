@@ -210,10 +210,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const pathname = usePathname();
 
   // Active Role and Menu Tab States
-  // Active Role and Menu Tab States
   const [selectedRole, setSelectedRole] = useState<'admin' | 'leader' | 'volunteer'>(defaultRole === 'admin' ? 'admin' : 'volunteer');
   const [activeTab, setActiveTab] = useState<string>(defaultRole === 'admin' ? 'analytics' : 'v-overview');
-
   // Sync role and tab if user is a campaigner
   useEffect(() => {
     if (user && (user as any).hn) {
@@ -266,7 +264,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [donations, setDonations] = useState<any[]>([]);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
-  const todayCollectionTotal = verificationQueue.reduce((acc, item) => acc + (item.status === 'APPROVED' || item.status === 'PENDING' ? Number(item.amount) : 0), 0);
+  const todayCollectionTotal = donations.reduce((acc, item) => acc + (item.status === 'APPROVED' || item.status === 'VERIFIED' ? Number(item.amount) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
 
   // Input states for Log Donation form
@@ -818,7 +816,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     // Aggregate monthly data (last 6 months: Feb to Jul)
     const monthlyLabels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
     const monthlyData = [0, 0, 0, 0, 0, 0];
-    verificationQueue.forEach(item => {
+    donations.forEach(item => {
       const date = new Date(item.createdAt);
       const m = date.getMonth(); // Feb=1, Mar=2, Apr=3, May=4, Jun=5, Jul=6
       if (m >= 1 && m <= 6) {
@@ -829,7 +827,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     // Aggregate weekly progress (for current month)
     const weeklyLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
     const weeklyData = [0, 0, 0, 0];
-    verificationQueue.forEach(item => {
+    donations.forEach(item => {
       const date = new Date(item.createdAt);
       const day = date.getDate();
       const weekIdx = Math.min(3, Math.floor((day - 1) / 7));
@@ -1347,19 +1345,23 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
           {/* VIEW: Donation Entries / My Collections History Table */}
           {(activeTab === 'donations' || activeTab === 'v-history') && (() => {
+            const baseData = activeTab === 'v-history' 
+              ? donations.filter(item => item.notes?.match(/Logged by:\s*([^\.]+)/)?.[1]?.trim() === user?.fullName)
+              : donations;
+
             // 1. Calculate Stats
-            const newCollectionTotal = verificationQueue
+            const newCollectionTotal = baseData
               .filter(item => !item.notes?.includes('Renew'))
               .reduce((acc, item) => acc + Number(item.amount), 0);
             
-            const renewCollectionTotal = verificationQueue
+            const renewCollectionTotal = baseData
               .filter(item => item.notes?.includes('Renew'))
               .reduce((acc, item) => acc + Number(item.amount), 0);
 
             const totalCollection = newCollectionTotal + renewCollectionTotal;
 
             // 2. Filter logic
-            const filteredEntries = verificationQueue.filter(item => {
+            const filteredEntries = baseData.filter(item => {
               const query = searchQuery.toLowerCase().trim();
               const matchesSearch = !query ||
                 item.id.toLowerCase().includes(query) ||

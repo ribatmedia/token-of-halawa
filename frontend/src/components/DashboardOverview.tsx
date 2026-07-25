@@ -270,10 +270,43 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [campaignerClassFilter, setCampaignerClassFilter] = useState('ALL');
 
   // Dynamic Live Database States
-  const [donors, setDonors] = useState<any[]>([]);
+  const INITIAL_DONORS = [
+    { id: 'dnr-1', name: 'Muhammed Shafi', phone: '9847012345', location: 'Calicut', category: 'GENERAL' },
+    { id: 'dnr-2', name: 'Abdul Rahiman', phone: '9847054321', location: 'Malappuram', category: 'GENERAL' },
+    { id: 'dnr-3', name: 'Usman Koya', phone: '9847099887', location: 'Wayanad', category: 'GENERAL' }
+  ];
+
+  const INITIAL_DONATIONS = [
+    {
+      id: 'TOH-2026-0001',
+      amount: 100,
+      status: 'APPROVED',
+      createdAt: new Date().toISOString(),
+      donor: INITIAL_DONORS[0],
+      notes: 'Logged by: Asif ali. Class: Final year. Month: July. Status: Paid. Plan: Monthly'
+    },
+    {
+      id: 'TOH-2026-0002',
+      amount: 500,
+      status: 'VERIFIED',
+      createdAt: new Date().toISOString(),
+      donor: INITIAL_DONORS[1],
+      notes: 'Logged by: Aneeb. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
+    },
+    {
+      id: 'TOH-2026-0003',
+      amount: 1000,
+      status: 'APPROVED',
+      createdAt: new Date().toISOString(),
+      donor: INITIAL_DONORS[2],
+      notes: 'Logged by: Swalih. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
+    }
+  ];
+
+  const [donors, setDonors] = useState<any[]>(INITIAL_DONORS);
   const [campaigns, setCampaigns] = useState<any[]>([]);
-  const [donations, setDonations] = useState<any[]>([]);
-  const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
+  const [donations, setDonations] = useState<any[]>(INITIAL_DONATIONS);
+  const [verificationQueue, setVerificationQueue] = useState<any[]>([INITIAL_DONATIONS[1]]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
   const safeDonors = Array.isArray(donors) ? donors : [];
   const safeDonations = Array.isArray(donations) ? donations : [];
@@ -3408,7 +3441,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             const currentUserName = (user?.fullName || '').trim().toLowerCase();
 
             // 1. Calculate stats for logged-in campaigner
-            const myCollections = donations.filter(q => {
+            const myCollections = safeDonations.filter(q => {
               const logged = getLoggedBy(q.notes);
               return logged && (logged === currentUserName || logged.includes(currentUserName) || currentUserName.includes(logged));
             });
@@ -3422,7 +3455,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             // 2. Calculate ranks dynamically from real data
             const calculatedCampaignerStats = campaignersList.map(c => {
               const cNameLower = c.name.trim().toLowerCase();
-              const matches = donations.filter(q => {
+              const matches = safeDonations.filter(q => {
                 const logged = getLoggedBy(q.notes);
                 return logged && (logged === cNameLower || logged.includes(cNameLower) || cNameLower.includes(logged));
               });
@@ -3450,7 +3483,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             const calculatedClassStats = classNames
               .map(className => {
                 const targetClassLower = className.trim().toLowerCase();
-                const matches = donations.filter(q => getClass(q.notes) === targetClassLower);
+                const matches = safeDonations.filter(q => getClass(q.notes) === targetClassLower);
                 const total = matches.reduce((acc, q) => acc + Number(q.amount), 0);
                 const activeCamps = campaignersList.filter(c => c.class.trim().toLowerCase() === targetClassLower).length;
                 const donorIds = new Set(matches.map(q => q.donorId || q.donor?.id || q.id));

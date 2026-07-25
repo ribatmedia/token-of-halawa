@@ -350,6 +350,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   const todayCollectionTotal = safeDonations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item?.status) ? Number(item?.amount || 0) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
+  const activeDonorsCount = new Set(safeDonations.map(q => q.donorId || q.donor?.id || q.donor?.name?.trim()?.toLowerCase()).filter(Boolean)).size;
 
   // Dynamically aggregated list of all available donors across all sections & donations
   const allAvailableDonors = (() => {
@@ -1551,11 +1552,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.pendingVerification}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{verificationQueue.length} Entries</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{safeVerificationQueue.length} Entries</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.activeDonors}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{donors.length} Profiles</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">{activeDonorsCount} Profiles</h3>
                 </div>
               </div>
 

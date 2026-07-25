@@ -278,6 +278,32 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const todayCollectionTotal = donations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item.status) ? Number(item.amount) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
 
+  // Dynamically aggregated list of all available donors across all sections & donations
+  const allAvailableDonors = (() => {
+    const map = new Map<string, any>();
+    donors.forEach(d => {
+      if (d && d.id) map.set(String(d.id), d);
+      else if (d && d.name) map.set(d.name.toLowerCase(), d);
+    });
+    donations.forEach(q => {
+      const d = q.donor;
+      if (d && d.id && !map.has(String(d.id))) {
+        map.set(String(d.id), { id: String(d.id), name: d.name || 'General Donor', phone: d.phone || '', location: d.location || 'Kerala' });
+      } else if (d && d.name && !map.has(d.name.toLowerCase())) {
+        map.set(d.name.toLowerCase(), { id: d.id || `dnr-${Date.now()}`, name: d.name, phone: d.phone || '', location: d.location || 'Kerala' });
+      }
+    });
+    if (map.size === 0) {
+      const defaults = [
+        { id: 'dnr-1', name: 'Muhammed Shafi', phone: '9847012345', location: 'Calicut' },
+        { id: 'dnr-2', name: 'Abdul Rahiman', phone: '9847054321', location: 'Malappuram' },
+        { id: 'dnr-3', name: 'Usman Koya', phone: '9847099887', location: 'Wayanad' }
+      ];
+      defaults.forEach(d => map.set(d.id, d));
+    }
+    return Array.from(map.values());
+  })();
+
   // Input states for Log Donation form
   const [donorIdInput, setDonorIdInput] = useState('');
   const [campaignIdInput, setCampaignIdInput] = useState('');
@@ -751,7 +777,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         
         let finalDonorName = donorNameInput;
         if (donationTab === 'renew' && donorIdInput) {
-          finalDonorName = donors.find(d => d.id === donorIdInput)?.name || 'General Donor';
+          finalDonorName = allAvailableDonors.find(d => d.id === donorIdInput)?.name || renewSearchQuery || 'General Donor';
         }
 
         setSelectedReceiptData({
@@ -1936,7 +1962,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           type="text"
                           required={donationTab === 'renew' && !donorIdInput}
                           placeholder="Search donor name or phone..."
-                          value={isDonorDropdownOpen ? renewSearchQuery : (donors.find(d => d.id === donorIdInput)?.name || renewSearchQuery)}
+                          value={isDonorDropdownOpen ? renewSearchQuery : (allAvailableDonors.find(d => d.id === donorIdInput)?.name || renewSearchQuery)}
                           onFocus={() => {
                             setIsDonorDropdownOpen(true);
                             setRenewSearchQuery(''); // Clear query to show all on focus
@@ -1955,14 +1981,14 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         
                         {isDonorDropdownOpen && (
                           <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl">
-                            {donors.filter(d => 
+                            {allAvailableDonors.filter(d => 
                               !renewSearchQuery || 
                               d.name?.toLowerCase().includes(renewSearchQuery.toLowerCase()) || 
                               d.phone?.includes(renewSearchQuery)
                             ).length === 0 ? (
                               <div className="p-4 text-center text-sm text-slate-500">No donors found</div>
                             ) : (
-                              donors.filter(d => 
+                              allAvailableDonors.filter(d => 
                                 !renewSearchQuery || 
                                 d.name?.toLowerCase().includes(renewSearchQuery.toLowerCase()) || 
                                 d.phone?.includes(renewSearchQuery)

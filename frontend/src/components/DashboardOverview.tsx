@@ -308,9 +308,12 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [donations, setDonations] = useState<any[]>(INITIAL_DONATIONS);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([INITIAL_DONATIONS[1]]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
-  const safeDonors = Array.isArray(donors) ? donors : [];
-  const safeDonations = Array.isArray(donations) ? donations : [];
-  const safeVerificationQueue = Array.isArray(verificationQueue) ? verificationQueue : [];
+  const [deletedDonationIds, setDeletedDonationIds] = useState<string[]>([]);
+  const [deletedDonorIds, setDeletedDonorIds] = useState<string[]>([]);
+
+  const safeDonors = (Array.isArray(donors) ? donors : []).filter(d => d && d.id && !deletedDonorIds.includes(String(d.id)));
+  const safeDonations = (Array.isArray(donations) ? donations : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
+  const safeVerificationQueue = (Array.isArray(verificationQueue) ? verificationQueue : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
 
   const todayCollectionTotal = safeDonations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item?.status) ? Number(item?.amount || 0) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
@@ -958,17 +961,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   const handleDeleteDonation = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this donation entry? This action cannot be undone.')) return;
-    // Immediately update local state so entry vanishes cleanly from table and stats
+    // Track deleted ID so it is permanently excluded from all calculations and state arrays
+    setDeletedDonationIds(prev => [...prev, String(id)]);
     setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     setVerificationQueue(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     try {
-      const res = await fetch(`${API_URL}/donations/${id}`, {
+      await fetch(`${API_URL}/donations/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) {
-        fetchDatabaseData();
-      }
     } catch (err) {
       console.warn('API call failed, applied local state deletion:', err);
     }
@@ -976,14 +977,14 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   const handleDeleteDonor = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this donor profile? All their donation entries will also be removed. This action cannot be undone.')) return;
+    setDeletedDonorIds(prev => [...prev, String(id)]);
     setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
     setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.donorId !== id && item.donor?.id !== id));
     try {
-      const res = await fetch(`${API_URL}/donors/${id}`, {
+      await fetch(`${API_URL}/donors/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) fetchDatabaseData();
     } catch (err) {
       console.warn('API call failed, applied local donor deletion:', err);
     }

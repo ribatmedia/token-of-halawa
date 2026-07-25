@@ -2562,12 +2562,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           {/* VIEW: Campaigners Stats */}
           {activeTab === 'campaigners-stats' && (() => {
             const campaignersStatsData = campaignersList.map((item) => {
-              const collected = donations
-                .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
-                .reduce((acc, q) => acc + Number(q.amount), 0);
+              const itemCampLower = item.name.trim().toLowerCase();
+              const matches = safeDonations.filter(q => {
+                const logged = q.notes?.match(/Logged by:\s*([^\.]+)/i)?.[1]?.trim()?.toLowerCase() || '';
+                return logged && (logged === itemCampLower || logged.includes(itemCampLower) || itemCampLower.includes(logged));
+              });
+              const collected = matches.reduce((acc, q) => acc + Number(q.amount || 0), 0);
               const target = 10000;
               const percent = Math.min(100, Math.round((collected / target) * 100));
-              const receiptsCount = donations.filter(q => q.notes?.includes(`Logged by: ${item.name}`)).length;
+              const receiptsCount = matches.length;
               return { ...item, collected, percent, receiptsCount };
             });
 
@@ -2898,11 +2901,12 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               </div>
 
               {(() => {
-                const classCampaigners = campaignersList.filter(c => c.class === selectedClassDashboard);
+                const targetClassLower = (selectedClassDashboard || '').trim().toLowerCase();
+                const classCampaigners = campaignersList.filter(c => (c.class || '').trim().toLowerCase() === targetClassLower);
                 const totalCampaigners = classCampaigners.length;
-                const collected = donations
-                  .filter(q => q.notes?.includes(`Class: ${selectedClassDashboard}`))
-                  .reduce((acc, q) => acc + Number(q.amount), 0);
+                const collected = safeDonations
+                  .filter(q => (q.notes?.match(/Class:\s*([^\.]+)/i)?.[1]?.trim()?.toLowerCase() || '') === targetClassLower)
+                  .reduce((acc, q) => acc + Number(q.amount || 0), 0);
                 const avgCollected = totalCampaigners > 0 ? Math.round(collected / totalCampaigners) : 0;
                 
                 return (
@@ -2939,9 +2943,13 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <tbody>
                             {[...classCampaigners]
                               .map(item => {
-                                const amount = donations
-                                  .filter(q => q.notes?.includes(`Logged by: ${item.name}`))
-                                  .reduce((acc, q) => acc + Number(q.amount), 0);
+                                const itemCampLower = item.name.trim().toLowerCase();
+                                const amount = safeDonations
+                                  .filter(q => {
+                                    const logged = q.notes?.match(/Logged by:\s*([^\.]+)/i)?.[1]?.trim()?.toLowerCase() || '';
+                                    return logged && (logged === itemCampLower || logged.includes(itemCampLower) || itemCampLower.includes(logged));
+                                  })
+                                  .reduce((acc, q) => acc + Number(q.amount || 0), 0);
                                 return { ...item, amount };
                               })
                               .sort((a, b) => b.amount - a.amount)
@@ -3387,12 +3395,12 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           {(activeTab === 'rankings' || activeTab === 'v-leaderboard') && (() => {
             const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
               .map((className) => {
-                const campaigners = campaignersList.filter(c => c.class === className).length;
-                const collected = donations
-                  .filter(q => q.notes?.includes(`Class: ${className}`))
-                  .reduce((acc, q) => acc + Number(q.amount), 0);
-                const achieved = new Set(donations.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId)).size;
-                return { className, campaigners, collected, achieved };
+                const targetClassLower = className.trim().toLowerCase();
+                const campaignersCount = campaignersList.filter(c => (c.class || '').trim().toLowerCase() === targetClassLower).length;
+                const matches = safeDonations.filter(q => (q.notes?.match(/Class:\s*([^\.]+)/i)?.[1]?.trim()?.toLowerCase() || '') === targetClassLower);
+                const collected = matches.reduce((acc, q) => acc + Number(q.amount || 0), 0);
+                const achieved = new Set(matches.map(q => q.donorId || q.donor?.id || q.donor?.name || q.id)).size;
+                return { className, campaigners: campaignersCount, collected, achieved };
               })
               .sort((a, b) => b.collected - a.collected);
 

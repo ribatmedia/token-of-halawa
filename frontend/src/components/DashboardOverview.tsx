@@ -244,6 +244,17 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   // Input states for Auth forms
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [loginRole, setLoginRole] = useState<'campaigner' | 'admin'>(defaultRole);
+
+  // Sync loginRole with URL pathname
+  useEffect(() => {
+    if (pathname === '/admin') {
+      setLoginRole('admin');
+    } else if (pathname === '/campaigner') {
+      setLoginRole('campaigner');
+    } else {
+      setLoginRole(defaultRole);
+    }
+  }, [pathname, defaultRole]);
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedHn, setSelectedHn] = useState('');
   const [authEmail, setAuthEmail] = useState('');
@@ -1131,7 +1142,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 {loginRole === 'campaigner' ? (
                   <button 
                     type="button" 
-                    onClick={() => { setLoginRole('admin'); setAuthError(''); }}
+                    onClick={() => { 
+                      setLoginRole('admin'); 
+                      setAuthError('');
+                      router.push('/admin'); 
+                    }}
                     className="text-xs text-slate-400 hover:text-emerald-400 font-bold transition underline cursor-pointer"
                   >
                     Are you an Admin? Admin Portal Login
@@ -1139,7 +1154,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 ) : (
                   <button 
                     type="button" 
-                    onClick={() => { setLoginRole('campaigner'); setAuthError(''); }}
+                    onClick={() => { 
+                      setLoginRole('campaigner'); 
+                      setAuthError('');
+                      router.push('/campaigner'); 
+                    }}
                     className="text-xs text-slate-400 hover:text-emerald-400 font-bold transition underline cursor-pointer"
                   >
                     Are you a Campaigner? Campaigner Portal Login

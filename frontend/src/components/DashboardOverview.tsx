@@ -1806,17 +1806,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                     <Receipt className="w-4 h-4" />
                                   </button>
                                   <button
-                                    onClick={() => {
-                                      if (confirm("Are you sure you want to reject this entry?")) {
-                                        handleApproveDonation(item.id, 'REJECTED');
-                                      }
-                                    }}
-                                    className="p-1.5 hover:bg-orange-500/10 text-orange-500 rounded-full transition cursor-pointer"
-                                    title="Reject Entry"
-                                  >
-                                    <XCircle className="w-4 h-4" />
-                                  </button>
-                                  <button
                                     onClick={() => handleDeleteDonation(item.id)}
                                     className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-full transition cursor-pointer"
                                     title="Delete Entry Permanently"

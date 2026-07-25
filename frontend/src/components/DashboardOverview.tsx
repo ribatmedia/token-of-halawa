@@ -308,8 +308,41 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [donations, setDonations] = useState<any[]>(INITIAL_DONATIONS);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([INITIAL_DONATIONS[1]]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
-  const [deletedDonationIds, setDeletedDonationIds] = useState<string[]>([]);
-  const [deletedDonorIds, setDeletedDonorIds] = useState<string[]>([]);
+  const [deletedDonationIds, setDeletedDonationIds] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('toh_deleted_donations');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  const [deletedDonorIds, setDeletedDonorIds] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('toh_deleted_donors');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('toh_deleted_donations', JSON.stringify(deletedDonationIds));
+    }
+  }, [deletedDonationIds]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('toh_deleted_donors', JSON.stringify(deletedDonorIds));
+    }
+  }, [deletedDonorIds]);
 
   const safeDonors = (Array.isArray(donors) ? donors : []).filter(d => d && d.id && !deletedDonorIds.includes(String(d.id)));
   const safeDonations = (Array.isArray(donations) ? donations : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));

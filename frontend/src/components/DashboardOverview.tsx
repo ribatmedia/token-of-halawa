@@ -275,18 +275,22 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [donations, setDonations] = useState<any[]>([]);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
-  const todayCollectionTotal = donations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item.status) ? Number(item.amount) : 0), 0);
+  const safeDonors = Array.isArray(donors) ? donors : [];
+  const safeDonations = Array.isArray(donations) ? donations : [];
+  const safeVerificationQueue = Array.isArray(verificationQueue) ? verificationQueue : [];
+
+  const todayCollectionTotal = safeDonations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item?.status) ? Number(item?.amount || 0) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
 
   // Dynamically aggregated list of all available donors across all sections & donations
   const allAvailableDonors = (() => {
     const map = new Map<string, any>();
-    donors.forEach(d => {
+    safeDonors.forEach(d => {
       if (d && d.id) map.set(String(d.id), d);
       else if (d && d.name) map.set(d.name.toLowerCase(), d);
     });
-    donations.forEach(q => {
-      const d = q.donor;
+    safeDonations.forEach(q => {
+      const d = q?.donor;
       if (d && d.id && !map.has(String(d.id))) {
         map.set(String(d.id), { id: String(d.id), name: d.name || 'General Donor', phone: d.phone || '', location: d.location || 'Kerala' });
       } else if (d && d.name && !map.has(d.name.toLowerCase())) {
@@ -523,10 +527,22 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         fetch(`${API_URL}/donations/all`, { headers })
       ]);
 
-      if (donorsRes.ok) setDonors(await donorsRes.json());
-      if (campaignsRes.ok) setCampaigns(await campaignsRes.json());
-      if (queueRes.ok) setVerificationQueue(await queueRes.json());
-      if (allDonationsRes.ok) setDonations(await allDonationsRes.json());
+      if (donorsRes.ok) {
+        const d = await donorsRes.json();
+        if (Array.isArray(d)) setDonors(d);
+      }
+      if (campaignsRes.ok) {
+        const c = await campaignsRes.json();
+        if (Array.isArray(c)) setCampaigns(c);
+      }
+      if (queueRes.ok) {
+        const q = await queueRes.json();
+        if (Array.isArray(q)) setVerificationQueue(q);
+      }
+      if (allDonationsRes.ok) {
+        const a = await allDonationsRes.json();
+        if (Array.isArray(a)) setDonations(a);
+      }
     } catch (err) {
       console.error('Failed to load database values:', err);
       // Demo fallback data if API server is offline
@@ -941,7 +957,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     // Aggregate monthly data (last 6 months: Feb to Jul)
     const monthlyLabels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
     const monthlyData = [0, 0, 0, 0, 0, 0];
-    donations.forEach(item => {
+    safeDonations.forEach(item => {
       const date = new Date(item.createdAt);
       const m = date.getMonth(); // Feb=1, Mar=2, Apr=3, May=4, Jun=5, Jul=6
       if (m >= 1 && m <= 6) {
@@ -952,7 +968,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     // Aggregate weekly progress (for current month)
     const weeklyLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
     const weeklyData = [0, 0, 0, 0];
-    donations.forEach(item => {
+    safeDonations.forEach(item => {
       const date = new Date(item.createdAt);
       const day = date.getDate();
       const weekIdx = Math.min(3, Math.floor((day - 1) / 7));
@@ -1479,8 +1495,12 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           {/* VIEW: Donation Entries / My Collections History Table */}
           {(activeTab === 'donations' || activeTab === 'v-history') && (() => {
             const baseData = activeTab === 'v-history' 
-              ? donations.filter(item => item.notes?.match(/Logged by:\s*([^\.]+)/)?.[1]?.trim() === user?.fullName)
-              : donations;
+              ? safeDonations.filter(item => {
+                  const loggedBy = item.notes?.match(/Logged by:\s*([^\.]+)/i)?.[1]?.trim()?.toLowerCase() || '';
+                  const uName = (user?.fullName || '').trim().toLowerCase();
+                  return loggedBy && uName && (loggedBy === uName || loggedBy.includes(uName) || uName.includes(loggedBy));
+                })
+              : safeDonations;
 
             // 1. Calculate Stats
             const newCollectionTotal = baseData

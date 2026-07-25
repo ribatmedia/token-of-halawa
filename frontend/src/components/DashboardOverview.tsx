@@ -2968,67 +2968,79 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           {/* VIEW: Donors Directory */}
           {activeTab === 'donors' && (() => {
             
-            const mappedDonors = donors.map(d => {
-              const donorDonations = donations.filter(q => q.donorId === d.id || q.donorId === d.uniqueId);
-              const lastDonation = donorDonations[0];
-              
-              let detectedPlan = 'CUSTOM';
-              if (lastDonation?.notes) {
-                const planMatch = lastDonation.notes.match(/Plan:\s*([^.]+)/);
-                if (planMatch) detectedPlan = planMatch[1].trim().toUpperCase();
-              } else if (d.category) {
-                detectedPlan = d.category.toUpperCase();
-              }
+            const mappedDonors = safeDonors
+              .map(d => {
+                const donorDonations = safeDonations.filter(q => {
+                  const qId = q.donorId || q.donor?.id;
+                  const qName = q.donor?.name?.trim()?.toLowerCase();
+                  const dName = d.name?.trim()?.toLowerCase();
+                  const dId = String(d.id);
+                  if (qId && String(qId) === dId) return true;
+                  if (d.uniqueId && qId && String(qId) === String(d.uniqueId)) return true;
+                  if (qName && dName && qName === dName) return true;
+                  return false;
+                });
 
-              let campaignerName = 'Admin';
-              let campaignerClass = 'NF3';
-              
-              if (donorDonations.length > 0) {
-                const donationWithLogger = donorDonations.find(q => q.notes?.includes('Logged by:'));
-                if (donationWithLogger?.notes) {
-                  const nameMatch = donationWithLogger.notes.match(/Logged by:\s*([^.]+)/i);
-                  if (nameMatch) campaignerName = nameMatch[1].trim();
-                  
-                  const classMatch = donationWithLogger.notes.match(/Class:\s*([^.]+)/i);
-                  if (classMatch) {
-                    campaignerClass = classMatch[1].trim();
+                const lastDonation = donorDonations[0];
+                
+                let detectedPlan = 'CUSTOM';
+                if (lastDonation?.notes) {
+                  const planMatch = lastDonation.notes.match(/Plan:\s*([^.]+)/);
+                  if (planMatch) detectedPlan = planMatch[1].trim().toUpperCase();
+                } else if (d.category) {
+                  detectedPlan = d.category.toUpperCase();
+                }
+
+                let campaignerName = 'Admin';
+                let campaignerClass = 'NF3';
+                
+                if (donorDonations.length > 0) {
+                  const donationWithLogger = donorDonations.find(q => q.notes?.includes('Logged by:'));
+                  if (donationWithLogger?.notes) {
+                    const nameMatch = donationWithLogger.notes.match(/Logged by:\s*([^.]+)/i);
+                    if (nameMatch) campaignerName = nameMatch[1].trim();
+                    
+                    const classMatch = donationWithLogger.notes.match(/Class:\s*([^.]+)/i);
+                    if (classMatch) {
+                      campaignerClass = classMatch[1].trim();
+                    }
                   }
                 }
-              }
 
-              const campRecord = campaignersList.find(c => c.name?.toLowerCase() === campaignerName?.toLowerCase());
-              if (campRecord) {
-                campaignerClass = campRecord.class;
-                campaignerName = campRecord.name;
-              }
+                const campRecord = campaignersList.find(c => c.name?.toLowerCase() === campaignerName?.toLowerCase());
+                if (campRecord) {
+                  campaignerClass = campRecord.class;
+                  campaignerName = campRecord.name;
+                }
 
-              const paidMonths = donorDonations
-                .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
-                .map(q => {
-                  const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
-                  return monthMatch ? monthMatch[1].trim() : '';
-                })
-                .filter(Boolean);
+                const paidMonths = donorDonations
+                  .filter(q => q.status === 'APPROVED' || q.status === 'PENDING' || q.status === 'VERIFIED')
+                  .map(q => {
+                    const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
+                    return monthMatch ? monthMatch[1].trim() : '';
+                  })
+                  .filter(Boolean);
 
-              const totalCollected = donorDonations
-                .filter(q => q.status === 'APPROVED' || q.status === 'PENDING')
-                .reduce((acc, q) => acc + Number(q.amount || 0), 0);
+                const totalCollected = donorDonations
+                  .filter(q => q.status === 'APPROVED' || q.status === 'PENDING' || q.status === 'VERIFIED')
+                  .reduce((acc, q) => acc + Number(q.amount || 0), 0);
 
-              const hasPending = donorDonations.some(q => q.status === 'PENDING');
-              const hasApproved = donorDonations.some(q => q.status === 'APPROVED');
-              const overallStatus = hasPending ? 'PENDING' : (hasApproved ? 'RECEIVED' : 'UNPAID');
+                const hasPending = donorDonations.some(q => q.status === 'PENDING');
+                const hasApproved = donorDonations.some(q => q.status === 'APPROVED' || q.status === 'VERIFIED');
+                const overallStatus = hasPending ? 'PENDING' : (hasApproved ? 'RECEIVED' : 'UNPAID');
 
-              return {
-                ...d,
-                donorDonations,
-                detectedPlan,
-                campaignerName,
-                campaignerClass,
-                paidMonths,
-                totalCollected,
-                overallStatus
-              };
-            });
+                return {
+                  ...d,
+                  donorDonations,
+                  detectedPlan,
+                  campaignerName,
+                  campaignerClass,
+                  paidMonths,
+                  totalCollected,
+                  overallStatus
+                };
+              })
+              .filter(d => d.donorDonations.length > 0 || (d as any).isManual);
 
             const filteredDonors = mappedDonors.filter(d => {
               const query = donorSearchQuery.toLowerCase().trim();

@@ -994,10 +994,39 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   const handleDeleteDonation = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this donation entry? This action cannot be undone.')) return;
+
+    // Find target donation to inspect donor details
+    const targetDonation = safeDonations.find(item => item.id === id);
+    const targetDonorId = targetDonation?.donorId || targetDonation?.donor?.id;
+    const targetDonorName = targetDonation?.donor?.name?.trim()?.toLowerCase();
+
+    // Check if this donor has any OTHER active donations left in safeDonations
+    const otherDonationsForDonor = safeDonations.filter(item => {
+      if (item.id === id) return false;
+      const dId = item.donorId || item.donor?.id;
+      const dName = item.donor?.name?.trim()?.toLowerCase();
+      if (targetDonorId && dId && String(dId) === String(targetDonorId)) return true;
+      if (targetDonorName && dName && dName === targetDonorName) return true;
+      return false;
+    });
+
+    // If no other donations remain for this donor, automatically delete the donor profile too
+    if (otherDonationsForDonor.length === 0) {
+      if (targetDonorId) {
+        setDeletedDonorIds(prev => [...prev, String(targetDonorId)]);
+      }
+      setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => {
+        if (targetDonorId && String(d.id) === String(targetDonorId)) return false;
+        if (targetDonorName && d.name?.trim()?.toLowerCase() === targetDonorName) return false;
+        return true;
+      }));
+    }
+
     // Track deleted ID so it is permanently excluded from all calculations and state arrays
     setDeletedDonationIds(prev => [...prev, String(id)]);
     setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     setVerificationQueue(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
+
     try {
       await fetch(`${API_URL}/donations/${id}`, {
         method: 'DELETE',

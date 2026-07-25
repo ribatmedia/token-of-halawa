@@ -275,7 +275,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [donations, setDonations] = useState<any[]>([]);
   const [verificationQueue, setVerificationQueue] = useState<any[]>([]);
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
-  const todayCollectionTotal = donations.reduce((acc, item) => acc + (item.status === 'APPROVED' || item.status === 'VERIFIED' ? Number(item.amount) : 0), 0);
+  const todayCollectionTotal = donations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item.status) ? Number(item.amount) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
 
   // Input states for Log Donation form
@@ -525,6 +525,14 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           createdAt: new Date().toISOString(),
           donor: mockDonors[1],
           notes: 'Logged by: Swalih. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
+        },
+        {
+          id: 'TOH-2026-0003',
+          amount: 100,
+          status: 'APPROVED',
+          createdAt: new Date().toISOString(),
+          donor: mockDonors[2],
+          notes: 'Logged by: Asif ali. Class: Final year. Month: July. Status: Paid. Plan: Monthly'
         }
       ];
       setDonors(mockDonors);
@@ -3349,18 +3357,29 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
           {/* Fallback Viewport for Volunteer Overview dashboard */}
           {activeTab === 'v-overview' && (() => {
+            const getLoggedBy = (note?: string) => note?.match(/Logged by:\s*([^.]+)/i)?.[1]?.trim()?.toLowerCase() || '';
+            const getClass = (note?: string) => note?.match(/Class:\s*([^.]+)/i)?.[1]?.trim()?.toLowerCase() || '';
+            const currentUserName = (user?.fullName || '').trim().toLowerCase();
+
             // 1. Calculate stats for logged-in campaigner
-            const myCollections = donations.filter(q => q.notes?.includes(`Logged by: ${user?.fullName || 'Campaigner'}`));
+            const myCollections = donations.filter(q => {
+              const logged = getLoggedBy(q.notes);
+              return logged && (logged === currentUserName || logged.includes(currentUserName) || currentUserName.includes(logged));
+            });
             const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount), 0);
             
-            // Expected collections of donors registered by this campaigner (defaults to a sensible base target like ₹5,000)
+            // Expected collections of donors registered by this campaigner
             const myExpectedTotal = 5000; 
             const myNotReceivedTotal = Math.max(0, myExpectedTotal - myCollectedTotal);
-            const myDonorsCount = new Set(myCollections.map(q => q.donorId)).size;
+            const myDonorsCount = new Set(myCollections.map(q => q.donorId || q.donor?.id || q.id)).size;
 
-            // 2. Calculate ranks dynamically from real data only
+            // 2. Calculate ranks dynamically from real data
             const calculatedCampaignerStats = campaignersList.map(c => {
-              const matches = donations.filter(q => q.notes?.includes(`Logged by: ${c.name}`));
+              const cNameLower = c.name.trim().toLowerCase();
+              const matches = donations.filter(q => {
+                const logged = getLoggedBy(q.notes);
+                return logged && (logged === cNameLower || logged.includes(cNameLower) || cNameLower.includes(logged));
+              });
               const total = matches.reduce((acc, q) => acc + Number(q.amount), 0);
               return { name: c.name, class: c.class, donorsCount: matches.length, total };
             });
@@ -3368,27 +3387,27 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             const allCampaignerStats = [...calculatedCampaignerStats].sort((a, b) => b.total - a.total);
 
             // Find index of current campaigner in overall list
-            const overallRankIndex = allCampaignerStats.findIndex(c => c.name?.toLowerCase() === (user?.fullName || '')?.toLowerCase());
+            const overallRankIndex = allCampaignerStats.findIndex(c => c.name?.toLowerCase() === currentUserName);
             const overallRank = overallRankIndex !== -1 ? overallRankIndex + 1 : allCampaignerStats.length + 1;
 
             // Filter for current campaigner's class
-            const myClass = (user as any)?.class || '';
-            const classCampaignerStats = allCampaignerStats.filter(c => c.class === myClass);
-            const classRankIndex = classCampaignerStats.findIndex(c => c.name?.toLowerCase() === (user?.fullName || '')?.toLowerCase());
+            const myClass = ((user as any)?.class || '').trim().toLowerCase();
+            const classCampaignerStats = allCampaignerStats.filter(c => c.class?.trim()?.toLowerCase() === myClass);
+            const classRankIndex = classCampaignerStats.findIndex(c => c.name?.toLowerCase() === currentUserName);
             const classRank = classRankIndex !== -1 ? classRankIndex + 1 : classCampaignerStats.length + 1;
 
             // 3. Leading Collectors (Top 5 Campaigners overall)
             const leadingCollectors = allCampaignerStats.slice(0, 5);
 
-            // 4. Top Batches (Top 5 Classes) — real data only, no mock fallback
+            // 4. Top Batches (Top 5 Classes)
             const classNames = Array.from(new Set(campaignersList.map(c => c.class)));
             const calculatedClassStats = classNames
               .map(className => {
-                const total = donations
-                  .filter(q => q.notes?.includes(`Class: ${className}`))
-                  .reduce((acc, q) => acc + Number(q.amount), 0);
-                const activeCamps = campaignersList.filter(c => c.class === className).length;
-                const donorIds = new Set(donations.filter(q => q.notes?.includes(`Class: ${className}`)).map(q => q.donorId));
+                const targetClassLower = className.trim().toLowerCase();
+                const matches = donations.filter(q => getClass(q.notes) === targetClassLower);
+                const total = matches.reduce((acc, q) => acc + Number(q.amount), 0);
+                const activeCamps = campaignersList.filter(c => c.class.trim().toLowerCase() === targetClassLower).length;
+                const donorIds = new Set(matches.map(q => q.donorId || q.donor?.id || q.id));
                 return { className, total, receivers: activeCamps, donorsCount: donorIds.size };
               })
               .sort((a, b) => b.total - a.total);

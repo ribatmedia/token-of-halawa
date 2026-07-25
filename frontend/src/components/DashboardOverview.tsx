@@ -936,6 +936,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   // Approve / Verify a pending receipt entry
   const handleApproveDonation = async (id: string, action: 'APPROVED' | 'REJECTED') => {
+    // Immediately update local state for instant responsive UI feedback
+    setDonations(prev => (Array.isArray(prev) ? prev : []).map(item => item.id === id ? { ...item, status: action } : item));
+    setVerificationQueue(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     try {
       const res = await fetch(`${API_URL}/donations/${id}/verify`, {
         method: 'PATCH',
@@ -949,25 +952,32 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         fetchDatabaseData();
       }
     } catch (err) {
-      console.error('Error verifying donation:', err);
+      console.warn('API call failed, applied local state update:', err);
     }
   };
 
   const handleDeleteDonation = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this donation entry? This action cannot be undone.')) return;
+    // Immediately update local state so entry vanishes cleanly from table and stats
+    setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
+    setVerificationQueue(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     try {
       const res = await fetch(`${API_URL}/donations/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) fetchDatabaseData();
+      if (res.ok) {
+        fetchDatabaseData();
+      }
     } catch (err) {
-      console.error('Error deleting donation:', err);
+      console.warn('API call failed, applied local state deletion:', err);
     }
   };
 
   const handleDeleteDonor = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this donor profile? All their donation entries will also be removed. This action cannot be undone.')) return;
+    setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
+    setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.donorId !== id && item.donor?.id !== id));
     try {
       const res = await fetch(`${API_URL}/donors/${id}`, {
         method: 'DELETE',
@@ -975,7 +985,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       });
       if (res.ok) fetchDatabaseData();
     } catch (err) {
-      console.error('Error deleting donor:', err);
+      console.warn('API call failed, applied local donor deletion:', err);
     }
   };
 

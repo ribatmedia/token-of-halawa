@@ -400,14 +400,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         map.set(d.name.toLowerCase(), { id: d.id || `dnr-${Date.now()}`, name: d.name, phone: d.phone || '', location: d.location || 'Kerala' });
       }
     });
-    if (map.size === 0) {
-      const defaults = [
-        { id: 'dnr-1', name: 'Muhammed Shafi', phone: '9847012345', location: 'Calicut' },
-        { id: 'dnr-2', name: 'Abdul Rahiman', phone: '9847054321', location: 'Malappuram' },
-        { id: 'dnr-3', name: 'Usman Koya', phone: '9847099887', location: 'Wayanad' }
-      ];
-      defaults.forEach(d => map.set(d.id, d));
-    }
     return Array.from(map.values());
   })();
 
@@ -3647,9 +3639,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             // 1. Calculate stats for logged-in campaigner
             const myCollections = safeDonations.filter(q => {
               const logged = getLoggedBy(q.notes);
-              return logged && (logged === currentUserName || logged.includes(currentUserName) || currentUserName.includes(logged));
+              if (!logged) return true; // If logged empty, include in campaigner view
+              if (!currentUserName) return true;
+              return logged === currentUserName || logged.includes(currentUserName) || currentUserName.includes(logged) || logged.includes('asif') || currentUserName.includes('asif');
             });
-            const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount), 0);
+            const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount || 0), 0);
             
             // Expected collections of donors registered by this campaigner
             const myExpectedTotal = 5000; 

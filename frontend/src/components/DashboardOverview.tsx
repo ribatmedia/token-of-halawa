@@ -303,10 +303,31 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
   ];
 
-  const [donors, setDonors] = useState<any[]>(INITIAL_DONORS);
+  const [donors, setDonors] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('toh_custom_donors');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_DONORS;
+  });
   const [campaigns, setCampaigns] = useState<any[]>([]);
-  const [donations, setDonations] = useState<any[]>(INITIAL_DONATIONS);
-  const [verificationQueue, setVerificationQueue] = useState<any[]>([INITIAL_DONATIONS[1]]);
+  const [donations, setDonations] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('toh_custom_donations');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return INITIAL_DONATIONS;
+  });
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
   const [deletedDonationIds, setDeletedDonationIds] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -344,9 +365,21 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
   }, [deletedDonorIds]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Array.isArray(donations)) {
+      localStorage.setItem('toh_custom_donations', JSON.stringify(donations));
+    }
+  }, [donations]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Array.isArray(donors)) {
+      localStorage.setItem('toh_custom_donors', JSON.stringify(donors));
+    }
+  }, [donors]);
+
   const safeDonors = (Array.isArray(donors) ? donors : []).filter(d => d && d.id && !deletedDonorIds.includes(String(d.id)));
   const safeDonations = (Array.isArray(donations) ? donations : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
-  const safeVerificationQueue = (Array.isArray(verificationQueue) ? verificationQueue : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
+  const safeVerificationQueue = safeDonations.filter(item => item && (item.status === 'PENDING' || item.status === 'Pending'));
 
   const todayCollectionTotal = safeDonations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item?.status) ? Number(item?.amount || 0) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
@@ -570,7 +603,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           setDonations([]);
           setDonors([]);
           setCampaigns([]);
-          setVerificationQueue([]);
         }
       } else if (roleParam === 'campaigner') {
         setLoginRole('campaigner');
@@ -579,7 +611,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           setDonations([]);
           setDonors([]);
           setCampaigns([]);
-          setVerificationQueue([]);
         }
       }
     }
@@ -604,10 +635,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       if (campaignsRes.ok) {
         const c = await campaignsRes.json();
         if (Array.isArray(c)) setCampaigns(c);
-      }
-      if (queueRes.ok) {
-        const q = await queueRes.json();
-        if (Array.isArray(q)) setVerificationQueue(q);
       }
       if (allDonationsRes.ok) {
         const a = await allDonationsRes.json();
@@ -649,7 +676,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       ];
       setDonors(mockDonors);
       setDonations(mockDonations);
-      setVerificationQueue([mockDonations[0]]);
     }
   };
 
@@ -846,10 +872,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             setDonors(prev => [newDonorObj, ...(Array.isArray(prev) ? prev : [])]);
           }
 
+          const entryStatus = amountStatusInput === 'PENDING' ? 'PENDING' : 'VERIFIED';
           const newEntry = {
             id: newDonationId,
             amount: Number(donationAmount) || 100,
-            status: 'VERIFIED',
+            status: entryStatus,
             createdAt: new Date().toISOString(),
             donor: newDonorObj,
             notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`
@@ -952,10 +979,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           setDonors(prev => [newDonorObj, ...(Array.isArray(prev) ? prev : [])]);
         }
 
+        const entryStatus = amountStatusInput === 'PENDING' ? 'PENDING' : 'VERIFIED';
         const newEntry = {
           id: newDonationId,
           amount: Number(donationAmount) || 100,
-          status: 'VERIFIED',
+          status: entryStatus,
           createdAt: new Date().toISOString(),
           donor: newDonorObj,
           notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`
@@ -1070,7 +1098,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const handleApproveDonation = async (id: string, action: 'APPROVED' | 'REJECTED') => {
     // Immediately update local state for instant responsive UI feedback
     setDonations(prev => (Array.isArray(prev) ? prev : []).map(item => item.id === id ? { ...item, status: action } : item));
-    setVerificationQueue(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     try {
       const res = await fetch(`${API_URL}/donations/${id}/verify`, {
         method: 'PATCH',
@@ -1121,7 +1148,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     // Track deleted ID so it is permanently excluded from all calculations and state arrays
     setDeletedDonationIds(prev => [...prev, String(id)]);
     setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
-    setVerificationQueue(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
 
     try {
       await fetch(`${API_URL}/donations/${id}`, {
@@ -1993,7 +2019,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <p className="text-xs opacity-60 mb-6">Verify and approve physical donation entries logged by campaigners.</p>
 
               <div className="overflow-x-auto">
-                {verificationQueue.length === 0 ? (
+                {safeVerificationQueue.length === 0 ? (
                   <div className="text-center py-12 text-slate-400">
                     <ShieldCheck className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p className="font-bold">All collections verified. Queue is empty.</p>
@@ -2010,7 +2036,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       </tr>
                     </thead>
                     <tbody>
-                      {verificationQueue.map((item) => (
+                      {safeVerificationQueue.map((item) => (
                         <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono text-xs truncate max-w-[120px]">{item.id}</td>
                           <td className="py-4 px-4 font-bold">{item.donor?.name || 'General Donor'}</td>

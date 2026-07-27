@@ -559,15 +559,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
   };
 
-  // Synchronize first HN of class when changing class selector
+  // Reset selected HN code when changing class selector so no student is auto-selected
   useEffect(() => {
-    const listForClass = campaignersList.filter(c => c.class === selectedClass);
-    if (listForClass.length > 0) {
-      const exists = listForClass.some(c => String(c.hn) === selectedHn);
-      if (!exists) {
-        setSelectedHn(String(listForClass[0].hn));
-      }
-    }
+    setSelectedHn('');
   }, [selectedClass]);
 
   const searchParams = useSearchParams();
@@ -1343,13 +1337,13 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select HN Code</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select HN Code / Student Name</label>
                   <select
                     value={selectedHn}
                     onChange={(e) => setSelectedHn(e.target.value)}
-                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
+                    className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer font-bold"
                   >
-                    <option value="" disabled className="text-slate-850">Select HN Code</option>
+                    <option value="">-- Select Student / വിദ്യാർത്ഥിയെ തിരഞ്ഞെടുക്കുക --</option>
                     {campaignersList.filter(c => c.class === selectedClass).map(c => (
                       <option key={c.hn} value={c.hn} className="text-slate-800">HN {c.hn} ({c.name})</option>
                     ))}
@@ -1366,7 +1360,13 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full font-bold">Class: {selectedClass}</span>
                       </div>
                     </div>
-                  ) : null;
+                  ) : (
+                    <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left">
+                      <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 block">
+                        ⚠️ Please select a student from the HN list above
+                      </span>
+                    </div>
+                  );
                 })()}
               </>
             ) : (

@@ -432,6 +432,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   // Receipt Modal State
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [selectedReceiptData, setSelectedReceiptData] = useState<any>(null);
+  const [whatsAppAutoShare, setWhatsAppAutoShare] = useState(false);
   
   // Custom Donor Search State
   const [renewSearchQuery, setRenewSearchQuery] = useState('');
@@ -1942,19 +1943,20 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                   )}
                                   <button
                                     onClick={() => {
-                                      const text = `*Receipt from Token of Halawa*\n\n` +
-                                        `Receipt No: ${receiptNo}\n` +
-                                        `Donor: ${item.donor?.name || 'General Donor'}\n` +
-                                        `Amount: ₹${item.amount}\n` +
-                                        `Status: ${item.status === 'APPROVED' ? 'Verified' : 'Pending'}\n` +
-                                        `Date: ${new Date(item.createdAt).toLocaleDateString()}`;
-                                      const phone = item.donor?.phone ? item.donor.phone.replace(/\D/g, '') : '';
-                                      if (phone) {
-                                        window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`, '_blank');
-                                      } else {
-                                        navigator.clipboard.writeText(text);
-                                        alert("Receipt details copied! You can now send it on WhatsApp.");
-                                      }
+                                      const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '';
+                                      const itemPlan = item.notes?.match(/Plan:\s*([^\.]+)/)?.[1] || '';
+                                      setSelectedReceiptData({
+                                        receiptNo: receiptNo,
+                                        date: item.createdAt,
+                                        name: item.donor?.name || 'General Donor',
+                                        place: item.donor?.category || 'Kerala',
+                                        phone: item.donor?.phone || '',
+                                        amount: item.amount,
+                                        month: itemMonth,
+                                        plan: itemPlan
+                                      });
+                                      setWhatsAppAutoShare(true);
+                                      setShowReceiptModal(true);
                                     }}
                                     className="p-1.5 hover:bg-emerald-500/10 text-emerald-500 rounded-full transition cursor-pointer"
                                     title="Send WhatsApp Receipt"
@@ -3870,8 +3872,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       
       <ReceiptModal 
         isOpen={showReceiptModal} 
-        onClose={() => setShowReceiptModal(false)} 
-        receiptData={selectedReceiptData} 
+        onClose={() => { setShowReceiptModal(false); setWhatsAppAutoShare(false); }} 
+        receiptData={selectedReceiptData}
+        autoShareWhatsApp={whatsAppAutoShare}
       />
     </div>
   );

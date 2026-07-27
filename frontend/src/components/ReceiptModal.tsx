@@ -21,11 +21,13 @@ interface ReceiptModalProps {
   receiptData: ReceiptData | null;
   customLayout?: any;
   previewMode?: boolean;
+  autoShareWhatsApp?: boolean;
 }
 
-export default function ReceiptModal({ isOpen, onClose, receiptData, customLayout, previewMode }: ReceiptModalProps) {
+export default function ReceiptModal({ isOpen, onClose, receiptData, customLayout, previewMode, autoShareWhatsApp }: ReceiptModalProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const autoShareTriggered = React.useRef(false);
 
   const defaultReceiptLayout = {
     receiptNo: { dx: 0, dy: 0, size: 28 },
@@ -46,6 +48,22 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
       }
     }
   }, [isOpen, customLayout]);
+
+  // Auto-trigger WhatsApp share when modal opens with autoShareWhatsApp prop
+  React.useEffect(() => {
+    if (autoShareWhatsApp && isOpen && receiptData && !autoShareTriggered.current) {
+      autoShareTriggered.current = true;
+      // Small delay to ensure receipt is fully rendered before capturing
+      const timer = setTimeout(() => {
+        handleWhatsAppShare();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+    if (!isOpen) {
+      autoShareTriggered.current = false;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, autoShareWhatsApp, receiptData]);
 
   if (!previewMode && (!isOpen || !receiptData)) return null;
 

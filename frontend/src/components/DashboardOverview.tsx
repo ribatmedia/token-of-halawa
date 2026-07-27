@@ -859,14 +859,17 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             setDonors(prev => [newDonorObj, ...(Array.isArray(prev) ? prev : [])]);
           }
 
-          const entryStatus = amountStatusInput === 'PENDING' ? 'PENDING' : 'VERIFIED';
+          // All campaigner-logged entries are PENDING admin verification.
+          // Payment status (whether cash is received or not) is tracked in notes.
+          const paymentStatus = amountStatusInput === 'PENDING' ? 'NOT_RECEIVED' : 'RECEIVED';
+          const entryStatus = 'PENDING';
           const newEntry = {
             id: newDonationId,
             amount: Number(donationAmount) || 100,
             status: entryStatus,
             createdAt: new Date().toISOString(),
             donor: newDonorObj,
-            notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`
+            notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Payment: ${paymentStatus})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Payment: ${paymentStatus}. Plan: ${monthPlanInput}`
           };
 
           setDonations(prev => [newEntry, ...(Array.isArray(prev) ? prev : [])]);
@@ -966,14 +969,17 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           setDonors(prev => [newDonorObj, ...(Array.isArray(prev) ? prev : [])]);
         }
 
-        const entryStatus = amountStatusInput === 'PENDING' ? 'PENDING' : 'VERIFIED';
+        // All campaigner-logged entries are PENDING admin verification.
+        // Payment status (whether cash is received or not) is tracked in notes.
+        const paymentStatus = amountStatusInput === 'PENDING' ? 'NOT_RECEIVED' : 'RECEIVED';
+        const entryStatus = 'PENDING';
         const newEntry = {
           id: newDonationId,
           amount: Number(donationAmount) || 100,
           status: entryStatus,
           createdAt: new Date().toISOString(),
           donor: newDonorObj,
-          notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`
+          notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Payment: ${paymentStatus})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Payment: ${paymentStatus}. Plan: ${monthPlanInput}`
         };
 
         setDonations(prev => [newEntry, ...(Array.isArray(prev) ? prev : [])]);
@@ -2022,19 +2028,30 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                        <th className="py-3 px-4">ID</th>
+                        <th className="py-3 px-4">Receipt ID</th>
                         <th className="py-3 px-4">Donor Name</th>
                         <th className="py-3 px-4">Amount</th>
-                        <th className="py-3 px-4">Logged Date</th>
+                        <th className="py-3 px-4">Payment</th>
+                        <th className="py-3 px-4">Logged By</th>
+                        <th className="py-3 px-4">Date</th>
                         <th className="py-3 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {safeVerificationQueue.map((item) => (
+                      {safeVerificationQueue.map((item) => {
+                        const paymentReceived = item.notes?.includes('Payment: RECEIVED');
+                        const loggedBy = item.notes?.match(/Logged by:\s*([^.]+)/)?.[1]?.trim() || 'Campaigner';
+                        return (
                         <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono text-xs truncate max-w-[120px]">{item.id}</td>
                           <td className="py-4 px-4 font-bold">{item.donor?.name || 'General Donor'}</td>
                           <td className="py-4 px-4 text-emerald-500 font-bold">₹{item.amount}</td>
+                          <td className="py-4 px-4">
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${paymentReceived ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'}`}>
+                              {paymentReceived ? '✓ Cash Received' : '⏳ Cash Pending'}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4 text-xs opacity-70">{loggedBy}</td>
                           <td className="py-4 px-4 text-xs">{new Date(item.createdAt).toLocaleDateString()}</td>
                           <td className="py-4 px-4 text-right flex justify-end gap-2">
                             <button 
@@ -2051,7 +2068,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                             </button>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}

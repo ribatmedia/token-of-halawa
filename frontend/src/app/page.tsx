@@ -453,7 +453,9 @@ export default function HomePage() {
             <div className="text-left">
               <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">Quick Links</h3>
               <ul className="space-y-3.5 text-sm text-slate-400">
-                <li><Link href="/admin" className="hover:text-white transition">Admin Portal</Link></li>
+                <li>              <Link href="/admin" className="hover:text-white transition">Admin Portal</Link>
+              <Link href="/admin/mahabba" className="hover:text-white transition">Admin (Mahabba)</Link>
+              <Link href="/leader" className="hover:text-white transition">Class Leader</Link></li>
                 <li><Link href="/campaigner" className="hover:text-white transition">Campaigner Portal</Link></li>
                 <li><a href="#leaderboard" className="hover:text-white transition">Leaderboard</a></li>
                 <li><Link href="/admin" className="hover:text-white transition">Live Stats</Link></li>

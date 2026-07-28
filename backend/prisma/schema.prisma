@@ -40,6 +40,7 @@ model Organization {
   systemLogs    SystemLog[]
   announcements Announcement[]
   donors        Donor[]
+  handovers     ClassHandover[]
 }
 
 // -------------------------------------------------------------
@@ -197,6 +198,8 @@ model Volunteer {
   userId         String       @unique
   unitId         String?
   classId        String?
+  hnNumber       String?      // HN code for campaigner identification
+  className      String?      // Denormalized class name
   dailyTarget    Decimal      @default(0.00) @db.Decimal(12, 2)
   monthlyTarget  Decimal      @default(0.00) @db.Decimal(12, 2)
   status         String       @default("ACTIVE") // ACTIVE, INACTIVE, LEAVE
@@ -364,26 +367,37 @@ model CampaignMember {
 // 7. Donations, Payments & Receipts
 // -------------------------------------------------------------
 model Donation {
-  id             String       @id @default(uuid())
-  donorId        String
-  volunteerId    String?
-  campaignId     String?
-  donationType   String       @default("GENERAL") // MONTHLY, ZAKAT, SADAQAH, EMERGENCY, EDUCATION, GENERAL
-  frequency      String       @default("ONE_OFF") // ONE_OFF, MONTHLY, YEARLY
-  amount         Decimal      @db.Decimal(12, 2)
-  status         String       @default("PENDING") // PENDING, VERIFIED, REJECTED, HOLD, CANCELLED, REFUNDED
-  notes          String?
-  offlineSynced  Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  deletedAt      DateTime?
+  id               String       @id @default(uuid())
+  donorId          String
+  volunteerId      String?
+  campaignId       String?
+  donationType     String       @default("GENERAL") // MONTHLY, ZAKAT, SADAQAH, EMERGENCY, EDUCATION, GENERAL
+  frequency        String       @default("ONE_OFF") // ONE_OFF, MONTHLY, YEARLY
+  amount           Decimal      @db.Decimal(12, 2)
+  status           String       @default("PENDING") // PENDING, VERIFIED, REJECTED, HOLD, CANCELLED, REFUNDED
+  notes            String?
+  offlineSynced    Boolean      @default(false)
 
-  donor          Donor        @relation(fields: [donorId], references: [id])
-  volunteer      Volunteer?   @relation(fields: [volunteerId], references: [id])
-  campaign       Campaign?    @relation(fields: [campaignId], references: [id])
-  payments       Payment[]
-  receipts       Receipt[]
-  workflowLogs   WorkflowLog[]
+  // Mahabba-specific fields
+  donationMonth    String?      // Months covered: e.g. "Jun, Jul, Aug"
+  monthPlan        String?      // Plan rate: e.g. "100/month"
+  isVerified       Boolean      @default(false)
+  verifiedMonths   String?      // Comma-separated verified months
+  initialAmount    Decimal?     @db.Decimal(12, 2) // First transaction amount
+  campaignerName   String?      // Denormalized campaigner name
+  campaignerClass  String?      // Denormalized campaigner class
+  receiptNo        String?      // Unique receipt number: MHB-YEAR-XXXX
+
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  deletedAt        DateTime?
+
+  donor            Donor        @relation(fields: [donorId], references: [id])
+  volunteer        Volunteer?   @relation(fields: [volunteerId], references: [id])
+  campaign         Campaign?    @relation(fields: [campaignId], references: [id])
+  payments         Payment[]
+  receipts         Receipt[]
+  workflowLogs     WorkflowLog[]
 }
 
 model Payment {
@@ -760,4 +774,21 @@ model Attendance {
 
   volunteer      Volunteer @relation("VolunteerAttendance", fields: [volunteerId], references: [id], onDelete: Cascade)
   recorder       User      @relation("RecorderUser", fields: [recordedById], references: [id])
+}
+
+// Mahabba: Class Handover model - when a class leader hands over collected amount to admin
+model ClassHandover {
+  id             String    @id @default(uuid())
+  organizationId String
+  className      String
+  handoverMonth  String
+  leaderName     String
+  leaderPhone    String?
+  amount         Decimal   @db.Decimal(12, 2)
+  adminName      String?
+  receiptNo      String    @unique // e.g., HND-2026-XXXX
+  notes          String?
+  createdAt      DateTime  @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }

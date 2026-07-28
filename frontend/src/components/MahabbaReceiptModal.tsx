@@ -22,9 +22,18 @@ interface MahabbaReceiptModalProps {
   onClose: () => void;
   receiptData: ReceiptData | null;
   previewMode?: boolean;
+  customLayout?: any;
 }
 
-export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, previewMode }: MahabbaReceiptModalProps) {
+const POS: Record<string, { x: number; y: number; s: number; centered?: boolean }> = {
+  receiptNo: { x: 340, y: 210, s: 26 },
+  date: { x: 340, y: 252, s: 26 },
+  name: { x: 540, y: 400, s: 64, centered: true },
+  placePhone: { x: 540, y: 478, s: 34, centered: true },
+  amount: { x: 540, y: 560, s: 70, centered: true },
+};
+
+export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, previewMode, customLayout }: MahabbaReceiptModalProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -81,56 +90,42 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
   };
 
   const selectedMonth = receiptData?.month?.substring(0, 3) || '';
+  const lay = customLayout as Record<string, { dx: number; dy: number; size: number }> | undefined;
+  const p = (key: string) => {
+    const el = lay?.[key];
+    const dx = el?.dx ?? 0;
+    const dy = el?.dy ?? 0;
+    const s = el?.size ?? POS[key]?.s ?? 26;
+    const top = `${POS[key].y + dy}px`;
+    const fs = `${s}px`;
+    if (POS[key].centered) return { top, left: '50%', transform: 'translateX(-50%)', fontSize: fs } as const;
+    return { top, left: `${POS[key].x + dx}px`, fontSize: fs } as const;
+  };
 
   const receiptContent = (
     <div className="relative" style={{ width: '1080px', height: '1350px' }}>
-      {/* SVG Background */}
       <img
         src="/receipt-template.svg"
         alt="Receipt Template"
         className="absolute inset-0 w-full h-full"
         style={{ width: '1080px', height: '1350px' }}
       />
-
-      {/* Overlay Text - positioned to match SVG template */}
       <div className="absolute inset-0" style={{ width: '1080px', height: '1350px' }}>
-        {/* Receipt No */}
-        <div style={{ position: 'absolute', top: '210px', left: '340px', fontSize: '26px', fontWeight: 700, color: '#111' }}>
+        <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 700, color: '#111' }}>
           : {receiptData?.receiptNo || 'N/A'}
         </div>
-
-        {/* Date */}
-        <div style={{ position: 'absolute', top: '252px', left: '340px', fontSize: '26px', fontWeight: 700, color: '#111' }}>
+        <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 700, color: '#111' }}>
           : {formattedDate}
         </div>
-
-        {/* Donor Name - large centered */}
-        <div style={{
-          position: 'absolute', top: '400px', left: '50%', transform: 'translateX(-50%)',
-          fontSize: '64px', fontWeight: 800, color: '#111', textAlign: 'center', width: '100%', padding: '0 60px',
-          lineHeight: 1.1, fontFamily: "'Outfit', sans-serif"
-        }}>
+        <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '100%', padding: '0 60px', lineHeight: 1.1 }}>
           {receiptData?.name || ''}
         </div>
-
-        {/* Place */}
-        <div style={{
-          position: 'absolute', top: '478px', left: '50%', transform: 'translateX(-50%)',
-          fontSize: '34px', fontWeight: 500, color: '#333', textAlign: 'center', width: '100%'
-        }}>
+        <div style={{ position: 'absolute', ...p('placePhone'), fontWeight: 500, color: '#333', textAlign: 'center', width: '100%' }}>
           {receiptData?.place || ''}
         </div>
-
-        {/* Amount */}
-        <div style={{
-          position: 'absolute', top: '560px', left: '50%', transform: 'translateX(-50%)',
-          backgroundColor: '#18A66A', borderRadius: '60px', padding: '14px 70px',
-          color: 'white', fontSize: '70px', fontWeight: 800, textAlign: 'center'
-        }}>
+        <div style={{ position: 'absolute', ...p('amount'), color: '#18A66A', fontWeight: 800, textAlign: 'center' }}>
           ₹ {receiptData?.amount || '0'}
         </div>
-
-        {/* Month Badges */}
         <div style={{
           position: 'absolute', top: '660px', left: '50%', transform: 'translateX(-50%)',
           display: 'flex', gap: '8px', justifyContent: 'center'
@@ -145,8 +140,6 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
             </div>
           ))}
         </div>
-
-        {/* Plan */}
         <div style={{
           position: 'absolute', top: '720px', left: '50%', transform: 'translateX(-50%)',
           fontSize: '22px', color: '#555', fontWeight: 500

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
+import MahabbaReceiptModal from '@/components/MahabbaReceiptModal';
 import { Heart, LogOut, Users, User, RefreshCw, IndianRupee, ChevronDown, ChevronUp, Search, Download, Share2, X, CheckCircle, Wallet } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
@@ -251,46 +252,11 @@ export default function LeaderDashboardPage() {
         </div>
       )}
 
-      {receiptModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="apple-glass rounded-2xl max-w-md w-full p-6 relative animate-in fade-in">
-            <button onClick={() => setReceiptModal({ open: false, data: null })} className="absolute top-3 right-3 p-1 hover:bg-white/10 rounded-lg transition">
-              <X className="w-5 h-5" />
-            </button>
-            <div className="text-center mb-4">
-              <div className="text-emerald-400 text-2xl font-bold" style={{ fontFamily: "'Satisfy', cursive" }}>Token of</div>
-              <h2 className="text-3xl font-black text-emerald-400">Halawa</h2>
-              <p className="text-lg font-bold text-slate-200">മഹബ്ബ പ്രവർത്തന ഫണ്ട്</p>
-            </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-slate-400">Receipt No</span><span className="font-medium">{receiptModal.data?.receiptNo || 'N/A'}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Date</span><span className="font-medium">{receiptModal.data?.date ? new Date(receiptModal.data.date).toLocaleDateString() : new Date().toLocaleDateString()}</span></div>
-              <div className="border-t border-white/10 my-2" />
-              <p className="text-center text-lg" style={{ fontFamily: "'Satisfy', cursive" }}>Thank you</p>
-              <p className="text-center text-xl font-bold">{receiptModal.data?.name || ''}</p>
-              <p className="text-center text-slate-400">{receiptModal.data?.place || ''}</p>
-              <p className="text-center">for your kind contribution</p>
-              <div className="bg-emerald-600 text-white text-3xl font-black text-center py-3 rounded-xl mx-auto max-w-[200px]">₹ {receiptModal.data?.amount || '0'}</div>
-              <div className="flex justify-center gap-1.5 mt-3">
-                {MONTHS.map(m => (
-                  <span key={m} className={`px-2 py-1 rounded text-xs font-medium ${m === receiptModal.data?.month?.substring(0, 3) ? 'bg-emerald-600 text-white' : 'bg-white/5 text-slate-500'}`}>{m}</span>
-                ))}
-              </div>
-              <p className="text-center text-xs text-slate-400">Plan: {receiptModal.data?.plan || 'N/A'}/month</p>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <button onClick={() => { const w = window.open(); if (w) { w.document.write('<pre>' + JSON.stringify(receiptModal.data, null, 2) + '</pre>'); w.print(); } }}
-                className="flex-1 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
-                <Download className="w-4 h-4" /> Download
-              </button>
-              <button onClick={() => { const text = `Receipt: ${receiptModal.data?.receiptNo}\nAmount: ₹${receiptModal.data?.amount}`; window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }}
-                className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
-                <Share2 className="w-4 h-4" /> WhatsApp
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MahabbaReceiptModal
+        isOpen={receiptModal.open}
+        onClose={() => setReceiptModal({ open: false, data: null })}
+        receiptData={receiptModal.data}
+      />
     </div>
   );
 }

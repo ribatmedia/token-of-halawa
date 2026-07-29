@@ -162,7 +162,12 @@ export default function DeveloperPage() {
       const savedLayout = localStorage.getItem('receipt_layout_settings');
       if (savedLayout) {
         try {
-          setReceiptLayout(JSON.parse(savedLayout));
+          const parsed = JSON.parse(savedLayout);
+          const merged = { ...defaultReceiptLayout };
+          for (const key of Object.keys(defaultReceiptLayout)) {
+            if (parsed[key]) merged[key as keyof typeof defaultReceiptLayout] = parsed[key];
+          }
+          setReceiptLayout(merged);
         } catch (e) {
           console.error("Failed to parse receipt_layout_settings from localStorage", e);
         }

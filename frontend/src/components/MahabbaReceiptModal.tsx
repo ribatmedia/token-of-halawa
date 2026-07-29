@@ -102,7 +102,7 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
     const s = el?.size ?? POS[key]?.s ?? 26;
     const top = `${POS[key].y + dy}px`;
     const fs = `${s}px`;
-    if (POS[key].centered) return { top, left: '50%', transform: 'translateX(-50%)', fontSize: fs } as const;
+    if (POS[key].centered) return { top, left: `calc(50% + ${dx}px)`, transform: 'translateX(-50%)', fontSize: fs } as const;
     return { top, left: `${POS[key].x + dx}px`, fontSize: fs } as const;
   };
 

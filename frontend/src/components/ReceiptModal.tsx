@@ -115,7 +115,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
       const s = el?.size ?? POS[key]?.s ?? 26;
       const top = `${((POS[key].y + dy) / 1350) * 100}%`;
       const fs = `${(s / 1080) * 100}cqw`;
-      if (POS[key].centered) return { top, left: '50%', transform: 'translateX(-50%)', fontSize: fs } as const;
+      if (POS[key].centered) return { top, left: `calc(50% + ${dx / 10.8}%)`, transform: 'translateX(-50%)', fontSize: fs } as const;
       return { top, left: `${((POS[key].x + dx) / 1080) * 100}%`, fontSize: fs } as const;
     };
 

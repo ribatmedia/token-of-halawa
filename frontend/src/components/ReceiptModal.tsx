@@ -24,12 +24,16 @@ interface ReceiptModalProps {
   autoShareWhatsApp?: boolean;
 }
 
+const MONTH_ROWS = [MONTHS.slice(0, 5), MONTHS.slice(5)];
+
 const POS: Record<string, { x: number; y: number; s: number; centered?: boolean }> = {
   receiptNo: { x: 340, y: 305, s: 26 },
   date: { x: 340, y: 349, s: 26 },
   name: { x: 540, y: 400, s: 64, centered: true },
   placePhone: { x: 540, y: 478, s: 34, centered: true },
   amount: { x: 540, y: 560, s: 70, centered: true },
+  months: { x: 540, y: 960, s: 16, centered: true },
+  plan: { x: 540, y: 1060, s: 22, centered: true },
 };
 
 export default function ReceiptModal({ isOpen, onClose, receiptData, customLayout, previewMode, autoShareWhatsApp }: ReceiptModalProps) {
@@ -143,14 +147,18 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
             ₹ {receiptData?.amount || '0'}
           </div>
-          <div style={{ position: 'absolute', top: '48.9%', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.7cqw', justifyContent: 'center', width: '90%', flexWrap: 'wrap' }}>
-            {MONTHS.map(m => (
-              <div key={m} style={{ backgroundColor: m === selectedMonth ? '#18A66A' : '#eef2f6', color: m === selectedMonth ? 'white' : '#64748b', borderRadius: '0.9cqw', padding: '0.5cqw 0.9cqw', fontSize: '1.5cqw', fontWeight: m === selectedMonth ? 700 : 500 }}>
-                {m}
+          <div style={{ position: 'absolute', ...p('months'), display: 'flex', flexDirection: 'column', gap: '0.5cqw', alignItems: 'center', width: '90%' }}>
+            {MONTH_ROWS.map((row, ri) => (
+              <div key={ri} style={{ display: 'flex', gap: '0.7cqw', justifyContent: 'center' }}>
+                {row.map(m => (
+                  <div key={m} style={{ backgroundColor: m === selectedMonth ? '#18A66A' : '#eef2f6', color: m === selectedMonth ? 'white' : '#64748b', borderRadius: '0.9cqw', padding: '0.5cqw 0.9cqw', fontSize: `${(POS.months.s / 1080) * 100}cqw`, fontWeight: m === selectedMonth ? 700 : 500 }}>
+                    {m}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-          <div style={{ position: 'absolute', top: '53.3%', left: '50%', transform: 'translateX(-50%)', fontSize: '2cqw', color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
+          <div style={{ position: 'absolute', ...p('plan'), color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
             Plan: {receiptData?.plan || 'N/A'}/month
           </div>
         </div>

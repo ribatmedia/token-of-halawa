@@ -112,7 +112,9 @@ export default function DeveloperPage() {
     date: { dx: 0, dy: 0, size: 28 },
     name: { dx: 0, dy: 0, size: 72 },
     placePhone: { dx: 0, dy: 0, size: 52 },
-    amount: { dx: 0, dy: 0, size: 78 }
+    amount: { dx: 0, dy: 0, size: 78 },
+    months: { dx: 0, dy: 0, size: 16 },
+    plan: { dx: 0, dy: 0, size: 22 }
   };
   type ElementKey = keyof typeof defaultReceiptLayout;
   const [selectedElement, setSelectedElement] = useState<ElementKey>('name');
@@ -747,6 +749,8 @@ export default function DeveloperPage() {
                       <option value="placePhone" className="text-slate-800">Place & Phone</option>
                       <option value="date" className="text-slate-800">Date</option>
                       <option value="receiptNo" className="text-slate-800">Receipt No</option>
+                      <option value="months" className="text-slate-800">Month Buttons</option>
+                      <option value="plan" className="text-slate-800">Plan Text</option>
                     </select>
                   </div>
 

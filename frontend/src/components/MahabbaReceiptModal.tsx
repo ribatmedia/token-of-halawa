@@ -25,12 +25,16 @@ interface MahabbaReceiptModalProps {
   customLayout?: any;
 }
 
+const MONTH_ROWS = [MONTHS.slice(0, 5), MONTHS.slice(5)];
+
 const POS: Record<string, { x: number; y: number; s: number; centered?: boolean }> = {
   receiptNo: { x: 340, y: 210, s: 26 },
   date: { x: 340, y: 252, s: 26 },
   name: { x: 540, y: 400, s: 64, centered: true },
   placePhone: { x: 540, y: 478, s: 34, centered: true },
   amount: { x: 540, y: 560, s: 70, centered: true },
+  months: { x: 540, y: 960, s: 16, centered: true },
+  plan: { x: 540, y: 1060, s: 22, centered: true },
 };
 
 export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, previewMode, customLayout }: MahabbaReceiptModalProps) {
@@ -126,24 +130,22 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
         <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center' }}>
           ₹ {receiptData?.amount || '0'}
         </div>
-        <div style={{
-          position: 'absolute', top: '660px', left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', gap: '8px', justifyContent: 'center'
-        }}>
-          {MONTHS.map(m => (
-            <div key={m} style={{
-              backgroundColor: m === selectedMonth ? '#18A66A' : '#eef2f6',
-              color: m === selectedMonth ? 'white' : '#64748b',
-              borderRadius: '10px', padding: '5px 10px', fontSize: '16px', fontWeight: m === selectedMonth ? 700 : 500
-            }}>
-              {m}
+        <div style={{ position: 'absolute', ...p('months'), display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center', width: '90%' }}>
+          {MONTH_ROWS.map((row, ri) => (
+            <div key={ri} style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+              {row.map(m => (
+                <div key={m} style={{
+                  backgroundColor: m === selectedMonth ? '#18A66A' : '#eef2f6',
+                  color: m === selectedMonth ? 'white' : '#64748b',
+                  borderRadius: '10px', padding: '5px 10px', fontSize: `${p('months').fontSize}`, fontWeight: m === selectedMonth ? 700 : 500
+                }}>
+                  {m}
+                </div>
+              ))}
             </div>
           ))}
         </div>
-        <div style={{
-          position: 'absolute', top: '720px', left: '50%', transform: 'translateX(-50%)',
-          fontSize: '22px', color: '#555', fontWeight: 500
-        }}>
+        <div style={{ position: 'absolute', ...p('plan'), color: '#555', fontWeight: 500 }}>
           Plan: {receiptData?.plan || 'N/A'}/month
         </div>
       </div>

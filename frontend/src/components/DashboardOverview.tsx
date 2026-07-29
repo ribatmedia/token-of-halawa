@@ -379,7 +379,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   const safeDonors = (Array.isArray(donors) ? donors : []).filter(d => d && d.id && !deletedDonorIds.includes(String(d.id)));
   const safeDonations = (Array.isArray(donations) ? donations : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
-  const safeVerificationQueue = safeDonations.filter(item => item && (item.status === 'PENDING' || item.status === 'Pending'));
+  const safeVerificationQueue = safeDonations.filter(item => item && (item.status === 'PENDING' || item.status === 'Pending' || item.status === 'VERIFIED'));
 
   const todayCollectionTotal = safeDonations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item?.status) ? Number(item?.amount || 0) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
@@ -783,6 +783,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     setFormError('');
     setFormSuccess(false);
 
+    let monthCount = 1;
+    if (donationMonthInput.startsWith('Custom:')) {
+      const monthsArr = donationMonthInput.replace('Custom:', '').split(',').filter(m => m.trim());
+      monthCount = monthsArr.length > 0 ? monthsArr.length : 1;
+    }
+    const splitAmount = Math.floor(Number(donationAmount) / monthCount);
+    const extraAmount = Number(donationAmount) - (splitAmount * (monthCount - 1));
+    const monthSplitStr = monthCount > 1 ? ` (Split: ${monthCount-1}x₹${splitAmount}, 1x₹${extraAmount})` : '';
+
     if (!donorIdInput && donationTab === 'renew') {
       setFormError('Please select an existing donor');
       return;
@@ -869,7 +878,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             status: entryStatus,
             createdAt: new Date().toISOString(),
             donor: newDonorObj,
-            notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Payment: ${paymentStatus})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Payment: ${paymentStatus}. Plan: ${monthPlanInput}`
+            notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Payment: ${paymentStatus})${monthSplitStr}` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}${monthSplitStr}. Payment: ${paymentStatus}. Plan: ${monthPlanInput}`
           };
 
           setDonations(prev => [newEntry, ...(Array.isArray(prev) ? prev : [])]);
@@ -912,7 +921,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           campaignId: campaignIdInput || undefined,
           donationType,
           amount: Number(donationAmount),
-          notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
+          notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})${monthSplitStr}` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}${monthSplitStr}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`,
           paymentMethod
         })
       });
@@ -2394,9 +2403,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           const paidMonths = donorIdInput 
                             ? donations
                                 .filter(q => q.donorId === donorIdInput)
-                                .map(q => {
+                                .flatMap(q => {
                                   const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
-                                  return monthMatch ? monthMatch[1].trim() : '';
+                                  if (!monthMatch) return [];
+                                  return monthMatch[1].replace('Custom:', '').split(',').map((m: string) => m.trim());
                                 })
                                 .filter(Boolean)
                             : [];
@@ -3110,7 +3120,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           {/* VIEW: Donors Directory */}
           {activeTab === 'donors' && (() => {
             
-            const mappedDonors = safeDonors
+            const mappedDonors = allAvailableDonors
               .map(d => {
                 const donorDonations = safeDonations.filter(q => {
                   const qId = q.donorId || q.donor?.id;
@@ -3157,9 +3167,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
                 const paidMonths = donorDonations
                   .filter(q => q.status === 'APPROVED' || q.status === 'PENDING' || q.status === 'VERIFIED')
-                  .map(q => {
+                  .flatMap(q => {
                     const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
-                    return monthMatch ? monthMatch[1].trim() : '';
+                    if (!monthMatch) return [];
+                    return monthMatch[1].replace('Custom:', '').split(',').map((m: string) => m.trim());
                   })
                   .filter(Boolean);
 
@@ -3674,6 +3685,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             const calculatedCampaignerStats = campaignersList.map(c => {
               const cNameLower = c.name.trim().toLowerCase();
               const matches = safeDonations.filter(q => {
+                const isValid = ['APPROVED', 'VERIFIED', 'PENDING'].includes(q.status);
+                if (!isValid) return false;
                 const logged = getLoggedBy(q.notes);
                 return logged && (logged === cNameLower || logged.includes(cNameLower) || cNameLower.includes(logged));
               });
@@ -3701,7 +3714,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             const calculatedClassStats = classNames
               .map(className => {
                 const targetClassLower = className.trim().toLowerCase();
-                const matches = safeDonations.filter(q => getClass(q.notes) === targetClassLower);
+                const matches = safeDonations.filter(q => {
+                  const isValid = ['APPROVED', 'VERIFIED', 'PENDING'].includes(q.status);
+                  if (!isValid) return false;
+                  return getClass(q.notes) === targetClassLower;
+                });
                 const total = matches.reduce((acc, q) => acc + Number(q.amount), 0);
                 const activeCamps = campaignersList.filter(c => c.class.trim().toLowerCase() === targetClassLower).length;
                 const donorIds = new Set(matches.map(q => q.donorId || q.donor?.id || q.id));

@@ -140,7 +140,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           <div style={{ position: 'absolute', ...p('placePhone'), fontWeight: 500, color: '#333', textAlign: 'center', width: '80%' }}>
             {receiptData?.place || ''}
           </div>
-          <div style={{ position: 'absolute', ...p('amount'), color: '#18A66A', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
+          <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
             ₹ {receiptData?.amount || '0'}
           </div>
           <div style={{ position: 'absolute', top: '48.9%', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.7cqw', justifyContent: 'center', width: '90%', flexWrap: 'wrap' }}>

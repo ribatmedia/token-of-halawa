@@ -123,7 +123,7 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
         <div style={{ position: 'absolute', ...p('placePhone'), fontWeight: 500, color: '#333', textAlign: 'center', width: '100%' }}>
           {receiptData?.place || ''}
         </div>
-        <div style={{ position: 'absolute', ...p('amount'), color: '#18A66A', fontWeight: 800, textAlign: 'center' }}>
+        <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center' }}>
           ₹ {receiptData?.amount || '0'}
         </div>
         <div style={{

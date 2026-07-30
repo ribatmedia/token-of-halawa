@@ -159,7 +159,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
             ))}
           </div>
           <div style={{ position: 'absolute', ...p('plan'), color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
-            Plan: {receiptData?.plan || 'N/A'}/month
+            Plan: {receiptData?.plan || 'N/A'}
           </div>
         </div>
       </div>

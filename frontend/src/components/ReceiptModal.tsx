@@ -138,10 +138,10 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
             : {formattedDate}
           </div>
-          <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '90%', lineHeight: 1.1 }}>
+          <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', 'Anek Malayalam', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '90%', lineHeight: 1.1 }}>
             {receiptData?.name || ''}
           </div>
-          <div style={{ position: 'absolute', ...p('placePhone'), fontWeight: 500, color: '#333', textAlign: 'center', width: '80%' }}>
+          <div style={{ position: 'absolute', ...p('placePhone'), fontFamily: "'Inter', 'Anek Malayalam', sans-serif", fontWeight: 500, color: '#333', textAlign: 'center', width: '80%' }}>
             {receiptData?.place || ''}
           </div>
           <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -158,7 +158,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
               </div>
             ))}
           </div>
-          <div style={{ position: 'absolute', ...p('plan'), color: '#555', fontWeight: 500, whiteSpace: 'nowrap' }}>
+          <div style={{ position: 'absolute', ...p('plan'), color: '#334155', backgroundColor: '#e2e8f0', border: '1px solid #cbd5e1', borderRadius: '4cqw', padding: '0.8cqw 2.5cqw', fontWeight: 800, whiteSpace: 'nowrap' }}>
             Plan: {receiptData?.plan || 'N/A'}
           </div>
         </div>

@@ -232,7 +232,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       }
       setSelectedRole('admin');
       // If admin, ensure they don't get stuck on volunteer tabs if they somehow got there
-      const volunteerTabs = ['v-overview', 'v-add', 'v-history', 'v-leaderboard', 'v-messages'];
+      const volunteerTabs = ['v-overview', 'v-history', 'v-leaderboard', 'v-messages'];
       if (volunteerTabs.includes(activeTab)) {
         setActiveTab('analytics');
       }
@@ -424,6 +424,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState('');
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showAdminGuide, setShowAdminGuide] = useState(false);
   const [customSelectedMonths, setCustomSelectedMonths] = useState<string[]>([]);
   const [campaignerAvatar, setCampaignerAvatar] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -3933,6 +3934,59 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 className="bg-[#0f4c81] hover:bg-[#135c9b] text-white border border-[#2370ae] px-12 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95 text-sm uppercase tracking-wider cursor-pointer"
               >
                 OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAdminGuide && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-[#0b1120] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl flex flex-col transform animate-in zoom-in-95 duration-350">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+              <h3 className="text-lg font-black tracking-wide text-slate-900 dark:text-white flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-emerald-500" /> അഡ്മിൻ ഗൈഡ് (Admin Guide)
+              </h3>
+              <button onClick={() => setShowAdminGuide(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition duration-200">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 md:p-8 space-y-6 font-malayalam text-sm md:text-base leading-relaxed overflow-y-auto max-h-[70vh]">
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                  <h4 className="font-extrabold text-emerald-600 dark:text-emerald-400 mb-2">1. Analytics (അനലിറ്റിക്സ്)</h4>
+                  <p>എത്ര രൂപ കളക്ട് ചെയ്തു, ടാർഗെറ്റ് എത്ര ബാക്കിയുണ്ട്, പുതിയ എൻട്രികൾ എന്നിവയുടെ പൂർണ്ണരൂപം ഇവിടെ കാണാം.</p>
+                </div>
+
+                <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                  <h4 className="font-extrabold text-emerald-600 dark:text-emerald-400 mb-2">2. Donation Entries (ഡൊണേഷൻ എൻട്രികൾ)</h4>
+                  <p>എല്ലാ കുട്ടികളും (ക്യാമ്പയിനർമാർ) ആഡ് ചെയ്ത ഡൊണേഷൻ വിവരങ്ങളും ഇതിന്റെ സ്റ്റാറ്റസും ഇവിടെ പരിശോധിക്കാം. അവർ നേരിട്ട് പണം സ്വീകരിച്ചതാണോ അതോ അക്കൗണ്ടിലേക്ക് അയച്ചതാണോ എന്നും അറിയാൻ കഴിയും.</p>
+                </div>
+
+                <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                  <h4 className="font-extrabold text-emerald-600 dark:text-emerald-400 mb-2">3. Verify Physical (പണം വെരിഫൈ ചെയ്യാൻ)</h4>
+                  <p>കുട്ടികൾ നേരിട്ട് പണം വാങ്ങിയാൽ (Physical Cash), അവർ ആ പണം അഡ്മിനെ ഏൽപ്പിക്കുമ്പോൾ ഇവിടെ നിന്ന് 'Verify' ചെയ്യാവുന്നതാണ്. ഇത് വഴി അക്കൗണ്ടിംഗ് കൃത്യമായി നിലനിർത്താം.</p>
+                </div>
+
+                <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                  <h4 className="font-extrabold text-emerald-600 dark:text-emerald-400 mb-2">4. Manage Campaigners (ക്യാമ്പയിനർമാരെ നിയന്ത്രിക്കാൻ)</h4>
+                  <p>പുതിയ കുട്ടികളെ (ക്യാമ്പയിനർമാരെ) ആഡ് ചെയ്യാനും, എഡിറ്റ് ചെയ്യാനും, ഡിലീറ്റ് ചെയ്യാനും ഈ ഭാഗം ഉപയോഗിക്കാം. അവരുടെ പാസ്സ്‌വേർഡ് റീസെറ്റ് ചെയ്യാനും ഇവിടെ ഓപ്ഷൻ ഉണ്ട്.</p>
+                </div>
+
+                <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                  <h4 className="font-extrabold text-emerald-600 dark:text-emerald-400 mb-2">5. Donors Directory (ഡോണേഴ്സ് ഡയറക്ടറി)</h4>
+                  <p>ഇതുവരെ സംഭാവന നൽകിയ എല്ലാവരുടെയും വിവരങ്ങൾ ഇവിടെ ലഭിക്കും. ഓരോരുത്തർക്കും പുതിയ റീസിപ്റ്റ് അയക്കാനും, പഴയ പ്ലാൻ പുതുക്കാനും (Renew) 'Add Receipt' അല്ലെങ്കിൽ 'Renew' ബട്ടൺ ഉപയോഗിക്കാം.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 pt-0 flex justify-end border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 mt-4">
+              <button
+                onClick={() => setShowAdminGuide(false)}
+                className="mt-4 bg-slate-800 dark:bg-white text-white dark:text-slate-900 px-8 py-2.5 rounded-xl font-bold transition-all shadow-md active:scale-95 text-sm cursor-pointer"
+              >
+                മനസ്സിലായി (Close)
               </button>
             </div>
           </div>

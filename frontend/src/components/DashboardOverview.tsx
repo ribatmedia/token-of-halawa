@@ -801,7 +801,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
     const splitAmount = Math.floor(Number(donationAmount) / monthCount);
     const extraAmount = Number(donationAmount) - (splitAmount * (monthCount - 1));
-    const monthSplitStr = monthCount > 1 ? ` (Split: ${monthCount-1}xâ‚¹${splitAmount}, 1xâ‚¹${extraAmount})` : '';
+    const monthSplitStr = monthCount > 1 ? ` (Split: ${monthCount-1}x₹${splitAmount}, 1x₹${extraAmount})` : '';
 
     if (!donorIdInput && donationTab === 'renew') {
       setFormError('Please select an existing donor');
@@ -1223,7 +1223,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         data: {
           labels: monthlyLabels,
           datasets: [{
-            label: 'Collected (â‚¹)',
+            label: 'Collected (₹)',
             data: monthlyData,
             backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.85)' : 'rgba(37, 136, 75, 0.85)',
             borderColor: theme === 'dark' ? 'rgba(16, 185, 129, 1)' : 'rgba(37, 136, 75, 1)',
@@ -1684,11 +1684,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.todayCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">â‚¹{todayCollectionTotal}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{todayCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.monthlyCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">â‚¹{monthlyCollectionTotal}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{monthlyCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.pendingVerification}</span>
@@ -1801,15 +1801,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className={`p-6 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total New Collection</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">â‚¹{newCollectionTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{newCollectionTotal.toLocaleString()}.00</h3>
                   </div>
                   <div className={`p-6 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Renew Collection</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">â‚¹{renewCollectionTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{renewCollectionTotal.toLocaleString()}.00</h3>
                   </div>
                   <div className={`p-6 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Collection</span>
-                    <h3 className="text-2xl font-black text-emerald-500 mt-2">â‚¹{totalCollection.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-emerald-500 mt-2">₹{totalCollection.toLocaleString()}.00</h3>
                   </div>
                 </div>
 
@@ -1946,7 +1946,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                 <span className="font-extrabold block text-slate-900 dark:text-white uppercase">{itemCamp}</span>
                                 <span className="opacity-50 text-[9px] block mt-0.5 uppercase font-bold">{itemClass}</span>
                               </td>
-                              <td className="py-4 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">â‚¹{Number(item.amount).toLocaleString()}.00</td>
+                              <td className="py-4 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">₹{Number(item.amount).toLocaleString()}.00</td>
                               <td className="py-4 px-4">
                                 <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
                                   item.status === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :
@@ -2065,7 +2065,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono text-xs truncate max-w-[120px]">{item.id}</td>
                           <td className="py-4 px-4 font-bold">{item.donor?.name || 'General Donor'}</td>
-                          <td className="py-4 px-4 text-emerald-500 font-bold">â‚¹{item.amount}</td>
+                          <td className="py-4 px-4 text-emerald-500 font-bold">₹{item.amount}</td>
                           <td className="py-4 px-4">
                             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${paymentReceived ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'}`}>
                               {paymentReceived ? 'âœ“ Cash Received' : 'â³ Cash Pending'}
@@ -2127,15 +2127,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="p-3.5 rounded-2xl bg-slate-200/50 dark:bg-black/10 border border-slate-300 dark:border-white/5 text-center">
                   <span className="text-[9px] uppercase font-bold opacity-60 block">New Collection</span>
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">â‚¹{todayCollectionTotal || 0}.00</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{todayCollectionTotal || 0}.00</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-emerald-50/5 dark:bg-emerald-500/5 border border-emerald-500/15 text-center">
                   <span className="text-[9px] uppercase font-bold opacity-60 block">Renew Collection</span>
-                  <span className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-1 block">â‚¹0.00</span>
+                  <span className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-1 block">₹0.00</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-slate-200/50 dark:bg-black/10 border border-slate-300 dark:border-white/5 text-center">
                   <span className="text-[9px] uppercase font-bold opacity-60 block">Total Collection</span>
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">â‚¹{todayCollectionTotal || 0}.00</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{todayCollectionTotal || 0}.00</span>
                 </div>
               </div>
 
@@ -2318,7 +2318,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black">
-                            â‚¹{donationAmount || '0'}/month
+                            ₹{donationAmount || '0'}/month
                           </div>
                           <span className="text-xs text-slate-400">Plan: {monthPlanInput}</span>
                         </div>
@@ -2330,7 +2330,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         <div className="flex items-center gap-2 mt-2">
                           <label className="text-[10px] font-bold text-slate-400 uppercase">Override Amount:</label>
                           <div className="relative flex-1">
-                            <span className="absolute left-3 top-2 text-slate-500 font-bold text-sm">â‚¹</span>
+                            <span className="absolute left-3 top-2 text-slate-500 font-bold text-sm">₹</span>
                             <input 
                               type="number" 
                               value={donationAmount}
@@ -2381,11 +2381,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 {donationTab === 'new' && (monthPlanInput === 'Custom Amount' || monthPlanInput === 'No specific plan') && (
                   <div className="animate-in slide-in-from-top-2 duration-200">
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Custom Amount (â‚¹) *</label>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Custom Amount (₹) *</label>
                       <span className="text-[9px] text-slate-400 block">à´¤àµà´• à´¨àµ½à´•àµà´•</span>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-4 top-3 text-slate-500 font-bold">â‚¹</span>
+                      <span className="absolute left-4 top-3 text-slate-500 font-bold">₹</span>
                       <input 
                         type="number" 
                         required 
@@ -2788,7 +2788,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
                           <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
                           <td className="py-4 px-4">{item.class}</td>
-                          <td className="py-4 px-4 font-bold text-emerald-500">â‚¹{item.collected.toLocaleString()}</td>
+                          <td className="py-4 px-4 font-bold text-emerald-500">₹{item.collected.toLocaleString()}</td>
                           <td className="py-4 px-4 font-bold">{item.receiptsCount}</td>
                           <td className="py-4 px-4 min-w-[150px]">
                             <div className="flex items-center gap-2">
@@ -2864,7 +2864,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <div class="item-row"><span class="label">Month:</span><span class="val">${ho.month}</span></div>
                       <div class="item-row"><span class="label">Received By:</span><span class="val">${ho.admin || 'Admin'}</span></div>
                       <div class="item-row"><span class="label">Logged Date:</span><span class="val">${ho.date}</span></div>
-                      <div class="item-row total"><span class="label">Amount Received:</span><span class="val">â‚¹${ho.amount.toLocaleString()}.00</span></div>
+                      <div class="item-row total"><span class="label">Amount Received:</span><span class="val">₹${ho.amount.toLocaleString()}.00</span></div>
                       <p class="footer-note">Generated by Token of Halawa Admin Portal</p>
                     </div>
                     <script>
@@ -2924,7 +2924,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Amount Received (â‚¹)</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Amount Received (₹)</label>
                       <input 
                         type="number"
                         required
@@ -3016,7 +3016,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               <span className="opacity-50 text-[9px] block mt-0.5">{ho.phone}</span>
                             </td>
                             <td className="py-4 px-4">
-                              <span className="font-bold block text-emerald-500">â‚¹{ho.amount.toLocaleString()}.00</span>
+                              <span className="font-bold block text-emerald-500">₹{ho.amount.toLocaleString()}.00</span>
                               <span className="opacity-50 text-[9px] block mt-0.5">For {ho.month}</span>
                             </td>
                             <td className="py-4 px-4 text-xs opacity-65">{ho.date}</td>
@@ -3080,7 +3080,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
                         <span className="text-[10px] font-bold opacity-50 uppercase">Total Class Collection</span>
-                        <h4 className="text-2xl font-black text-emerald-500 mt-1">â‚¹{collected.toLocaleString()}</h4>
+                        <h4 className="text-2xl font-black text-emerald-500 mt-1">₹{collected.toLocaleString()}</h4>
                       </div>
                       <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
                         <span className="text-[10px] font-bold opacity-50 uppercase">Active Campaigners</span>
@@ -3088,7 +3088,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       </div>
                       <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
                         <span className="text-[10px] font-bold opacity-50 uppercase">Average Student Collection</span>
-                        <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">â‚¹{avgCollected.toLocaleString()}</h4>
+                        <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">₹{avgCollected.toLocaleString()}</h4>
                       </div>
                     </div>
 
@@ -3125,7 +3125,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                     <td className="py-3.5 px-4 font-extrabold text-slate-500">#{index + 1}</td>
                                     <td className="py-3.5 px-4 font-bold text-emerald-500">#{item.hn}</td>
                                     <td className="py-3.5 px-4 font-bold uppercase">{item.name}</td>
-                                    <td className="py-3.5 px-4 font-extrabold text-emerald-500">â‚¹{amount.toLocaleString()}</td>
+                                    <td className="py-3.5 px-4 font-extrabold text-emerald-500">₹{amount.toLocaleString()}</td>
                                   </tr>
                                 );
                               })}
@@ -3509,7 +3509,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               {/* Total Collected Amount */}
                               <td className="py-4 px-4 text-right">
                                 <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">
-                                  â‚¹{d.totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  ₹{d.totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                               </td>
 
@@ -3530,11 +3530,25 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         setDonorPhoneInput(d.phone);
                                         setDonorNameInput(d.name);
                                         setDonorIdInput(d.uniqueId || d.id);
+                                        setDonationTab('new');
                                         setActiveTab('add-donation');
                                       }}
-                                      className="flex-1 bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-3 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase"
+                                      className="flex-1 bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-1 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase text-center"
                                     >
                                       Add Receipt
+                                    </button>
+                                    <button 
+                                      onClick={() => {
+                                        setDonorPhoneInput(d.phone);
+                                        setDonorNameInput(d.name);
+                                        setDonorIdInput(d.uniqueId || d.id);
+                                        setRenewSearchQuery(d.name || '');
+                                        setDonationTab('renew');
+                                        setActiveTab('add-donation');
+                                      }}
+                                      className="flex-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-1 py-1 rounded text-[10px] font-black transition border border-emerald-500/20 uppercase text-center"
+                                    >
+                                      Renew
                                     </button>
                                     <button
                                       onClick={() => handleDeleteDonor(d.id)}
@@ -3642,7 +3656,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               </div>
                               <span className="text-[8px] opacity-50 block mt-0.5">{item.achieved} / {targetDonors} Donors</span>
                             </td>
-                            <td className="py-4 px-4 text-right font-black text-emerald-500 text-sm">â‚¹{item.collected.toLocaleString()}.00</td>
+                            <td className="py-4 px-4 text-right font-black text-emerald-500 text-sm">₹{item.collected.toLocaleString()}.00</td>
                           </tr>
                         );
                       })}
@@ -3666,7 +3680,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Receipt Notification Template</h4>
-                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of â‚¹{{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
+                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of ₹{{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>
@@ -3674,7 +3688,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Renewal Reminder Template</h4>
-                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of â‚¹{{amount}} is due. Click here to pay: {{pay_url}}."}</p>
+                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of ₹{{amount}} is due. Click here to pay: {{pay_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>
@@ -3768,7 +3782,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Collected</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">â‚¹{myCollectedTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{myCollectedTotal.toLocaleString()}.00</h3>
                   </div>
                   
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
@@ -3814,7 +3828,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               <p className="text-white/80 text-[10px] mt-0.5 font-medium">{item.class} Â· {item.donorsCount} donors</p>
                             </div>
                           </div>
-                          <span className="font-black text-white text-sm">â‚¹{item.total.toLocaleString()}</span>
+                          <span className="font-black text-white text-sm">₹{item.total.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
@@ -3851,7 +3865,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                 <p className="opacity-60 text-[10px] mt-0.5">{item.receivers} receivers Â· {item.donorsCount} donors</p>
                               </div>
                             </div>
-                            <span className="font-black text-[#0c7ae6] dark:text-[#38bdf8] text-sm">â‚¹{item.total.toLocaleString()}</span>
+                            <span className="font-black text-[#0c7ae6] dark:text-[#38bdf8] text-sm">₹{item.total.toLocaleString()}</span>
                           </div>
                         );
                       })}

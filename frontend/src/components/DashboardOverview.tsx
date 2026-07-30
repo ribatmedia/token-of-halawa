@@ -9,7 +9,7 @@ import {
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
   Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy,
-  Receipt, FileSpreadsheet, List
+  Receipt, FileSpreadsheet, List, BookOpen
 } from 'lucide-react';
 import ReceiptModal from './ReceiptModal';
 import { ExportMenu } from './ExportMenu';

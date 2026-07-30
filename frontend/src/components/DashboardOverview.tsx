@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
@@ -1108,7 +1108,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   };
 
   // Approve / Verify a pending receipt entry
-  const handleApproveDonation = async (id: string, action: 'APPROVED' | 'REJECTED') => {
+  const handleApproveDonation = async (id: string, action: 'APPROVED' | 'REJECTED' | 'PENDING') => {
     // Immediately update local state for instant responsive UI feedback
     setDonations(prev => (Array.isArray(prev) ? prev : []).map(item => item.id === id ? { ...item, status: action } : item));
     try {

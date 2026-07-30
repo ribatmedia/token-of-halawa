@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
@@ -55,97 +55,97 @@ const translations = {
     expectedTotal: 'Expected Total'
   },
   ml: {
-    title: 'ഇന്റലിജന്റ് ഡൊണേഷൻ ഹബ്',
-    subtitle: 'ടോക്കൺ ഓഫ് ഹലാവ ഡൊണേഷൻ സിസ്റ്റം',
-    todayCollection: 'ഇന്നത്തെ സംഭാവന',
-    monthlyCollection: 'പ്രതിമാസ സംഭാവന',
-    pendingVerification: 'പരിശോധനയിലുള്ളവ',
-    activeDonors: 'സജീവ ദാതാക്കൾ',
-    quickActions: 'ദ്രുത പ്രക്രിയകൾ',
-    logDonation: 'ഡൊണേഷൻ രേഖപ്പെടുത്തുക',
-    registerDonor: 'ദാതാവിനെ ചേർക്കുക',
-    verifyDonations: 'ഡൊണേഷൻ വെриഫൈ ചെയ്യുക',
-    whatsappReceipt: 'വാട്സാപ്പ് ബ്രോഡ്കാസ്റ്റ്',
-    topVolunteers: 'മികച്ച ക്യാമ്പയിനർമാർ',
-    topClasses: 'മികച്ച ക്ലാസുകൾ',
-    recentActivity: 'സമീപകാല പ്രവർത്തനങ്ങൾ',
-    heatmap: 'ഡൊണേഷൻ വെലോസിറ്റി ഹീറ്റ്മാപ്പ്',
-    chartGrowth: 'പ്രതിമാസ വളർച്ചാ നിരക്ക്',
-    chartTrend: 'ക്യാമ്പയിൻ പുരോഗതി',
-    searchPlaceholder: 'തിരയുക...',
-    outstandingAmount: 'ബാക്കിയുള്ള കുടിശ്ശിക',
-    themeToggle: 'തീം മാറ്റുക',
-    languageToggle: 'ഭാഷ മാറ്റുക',
-    syncStatus: 'ഓഫ്‌ലൈൻ ക്യൂ സമന്വയിപ്പിച്ചു',
-    targetDonors: 'ലക്ഷ്യമിട്ട ദാതാക്കൾ',
-    totalDonors: 'ആകെ ദാതാക്കൾ',
-    achievedPercent: 'ലഭിച്ച ശതമാനം',
-    totalCollected: 'ആകെ ശേഖരിച്ചത്',
-    targetProgress: 'ലക്ഷ്യ പൂർത്തീകരണ പുരോഗതി',
-    liveRankings: 'തത്സമയ റാങ്കിംഗ്',
-    expectedTotal: 'പ്രതീക്ഷിക്കുന്ന തുക'
+    title: 'à´‡à´¨àµà´±à´²à´¿à´œà´¨àµà´±àµ à´¡àµŠà´£àµ‡à´·àµ» à´¹à´¬àµ',
+    subtitle: 'à´Ÿàµ‹à´•àµà´•àµº à´“à´«àµ à´¹à´²à´¾à´µ à´¡àµŠà´£àµ‡à´·àµ» à´¸à´¿à´¸àµà´±àµà´±à´‚',
+    todayCollection: 'à´‡à´¨àµà´¨à´¤àµà´¤àµ† à´¸à´‚à´­à´¾à´µà´¨',
+    monthlyCollection: 'à´ªàµà´°à´¤à´¿à´®à´¾à´¸ à´¸à´‚à´­à´¾à´µà´¨',
+    pendingVerification: 'à´ªà´°à´¿à´¶àµ‹à´§à´¨à´¯à´¿à´²àµà´³àµà´³à´µ',
+    activeDonors: 'à´¸à´œàµ€à´µ à´¦à´¾à´¤à´¾à´•àµà´•àµ¾',
+    quickActions: 'à´¦àµà´°àµà´¤ à´ªàµà´°à´•àµà´°à´¿à´¯à´•àµ¾',
+    logDonation: 'à´¡àµŠà´£àµ‡à´·àµ» à´°àµ‡à´–à´ªàµà´ªàµ†à´Ÿàµà´¤àµà´¤àµà´•',
+    registerDonor: 'à´¦à´¾à´¤à´¾à´µà´¿à´¨àµ† à´šàµ‡àµ¼à´•àµà´•àµà´•',
+    verifyDonations: 'à´¡àµŠà´£àµ‡à´·àµ» à´µàµ†Ñ€Ð¸à´«àµˆ à´šàµ†à´¯àµà´¯àµà´•',
+    whatsappReceipt: 'à´µà´¾à´Ÿàµà´¸à´¾à´ªàµà´ªàµ à´¬àµà´°àµ‹à´¡àµà´•à´¾à´¸àµà´±àµà´±àµ',
+    topVolunteers: 'à´®à´¿à´•à´šàµà´š à´•àµà´¯à´¾à´®àµà´ªà´¯à´¿à´¨àµ¼à´®à´¾àµ¼',
+    topClasses: 'à´®à´¿à´•à´šàµà´š à´•àµà´²à´¾à´¸àµà´•àµ¾',
+    recentActivity: 'à´¸à´®àµ€à´ªà´•à´¾à´² à´ªàµà´°à´µàµ¼à´¤àµà´¤à´¨à´™àµà´™àµ¾',
+    heatmap: 'à´¡àµŠà´£àµ‡à´·àµ» à´µàµ†à´²àµ‹à´¸à´¿à´±àµà´±à´¿ à´¹àµ€à´±àµà´±àµà´®à´¾à´ªàµà´ªàµ',
+    chartGrowth: 'à´ªàµà´°à´¤à´¿à´®à´¾à´¸ à´µà´³àµ¼à´šàµà´šà´¾ à´¨à´¿à´°à´•àµà´•àµ',
+    chartTrend: 'à´•àµà´¯à´¾à´®àµà´ªà´¯à´¿àµ» à´ªàµà´°àµ‹à´—à´¤à´¿',
+    searchPlaceholder: 'à´¤à´¿à´°à´¯àµà´•...',
+    outstandingAmount: 'à´¬à´¾à´•àµà´•à´¿à´¯àµà´³àµà´³ à´•àµà´Ÿà´¿à´¶àµà´¶à´¿à´•',
+    themeToggle: 'à´¤àµ€à´‚ à´®à´¾à´±àµà´±àµà´•',
+    languageToggle: 'à´­à´¾à´· à´®à´¾à´±àµà´±àµà´•',
+    syncStatus: 'à´“à´«àµâ€Œà´²àµˆàµ» à´•àµà´¯àµ‚ à´¸à´®à´¨àµà´µà´¯à´¿à´ªàµà´ªà´¿à´šàµà´šàµ',
+    targetDonors: 'à´²à´•àµà´·àµà´¯à´®à´¿à´Ÿàµà´Ÿ à´¦à´¾à´¤à´¾à´•àµà´•àµ¾',
+    totalDonors: 'à´†à´•àµ† à´¦à´¾à´¤à´¾à´•àµà´•àµ¾',
+    achievedPercent: 'à´²à´­à´¿à´šàµà´š à´¶à´¤à´®à´¾à´¨à´‚',
+    totalCollected: 'à´†à´•àµ† à´¶àµ‡à´–à´°à´¿à´šàµà´šà´¤àµ',
+    targetProgress: 'à´²à´•àµà´·àµà´¯ à´ªàµ‚àµ¼à´¤àµà´¤àµ€à´•à´°à´£ à´ªàµà´°àµ‹à´—à´¤à´¿',
+    liveRankings: 'à´¤à´¤àµà´¸à´®à´¯ à´±à´¾à´™àµà´•à´¿à´‚à´—àµ',
+    expectedTotal: 'à´ªàµà´°à´¤àµ€à´•àµà´·à´¿à´•àµà´•àµà´¨àµà´¨ à´¤àµà´•'
   },
   ar: {
-    title: 'مركز التبرعات الذكي',
-    subtitle: 'نظام إدارة التبرعات توكن الحلاوة',
-    todayCollection: 'تبرعات اليوم',
-    monthlyCollection: 'التبرعات الشهرية',
-    pendingVerification: 'في انتظار التحقق',
-    activeDonors: 'المتبرعين النشطين',
-    quickActions: 'إجراءات سريعة',
-    logDonation: 'تسجيل تبرع',
-    registerDonor: 'تسجيل متبرع',
-    verifyDonations: 'التحقق من التبرعات',
-    whatsappReceipt: 'بث واتساب',
-    topVolunteers: 'قائمة المتصدرين من المنظمين',
-    topClasses: 'أفضل الفصول الدراسية',
-    recentActivity: 'سجلات النشاط الحديثة',
-    heatmap: 'خريطة سرعة التبرع الأسبوعية',
-    chartGrowth: 'مسار النمو الشهري',
-    chartTrend: 'تقدم جمع الحملة',
-    searchPlaceholder: 'بحث...',
-    outstandingAmount: 'الرصيد المستحق للتجديد',
-    themeToggle: 'تغيير المظهر',
-    languageToggle: 'تغيير اللغة',
-    syncStatus: 'تم مزامنة البيانات بدون إنترنت',
-    targetDonors: 'المتبرعين المستهدفين',
-    totalDonors: 'إجمالي المتبرعين',
-    achievedPercent: 'نسبة الإنجاز',
-    totalCollected: 'إجمالي المجموع',
-    targetProgress: 'التقدم نحو الهدف',
-    liveRankings: 'الترتيب المباشر',
-    expectedTotal: 'المجموع المتوقع'
+    title: 'Ù…Ø±ÙƒØ² Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª Ø§Ù„Ø°ÙƒÙŠ',
+    subtitle: 'Ù†Ø¸Ø§Ù… Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª ØªÙˆÙƒÙ† Ø§Ù„Ø­Ù„Ø§ÙˆØ©',
+    todayCollection: 'ØªØ¨Ø±Ø¹Ø§Øª Ø§Ù„ÙŠÙˆÙ…',
+    monthlyCollection: 'Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª Ø§Ù„Ø´Ù‡Ø±ÙŠØ©',
+    pendingVerification: 'ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ­Ù‚Ù‚',
+    activeDonors: 'Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ†',
+    quickActions: 'Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø³Ø±ÙŠØ¹Ø©',
+    logDonation: 'ØªØ³Ø¬ÙŠÙ„ ØªØ¨Ø±Ø¹',
+    registerDonor: 'ØªØ³Ø¬ÙŠÙ„ Ù…ØªØ¨Ø±Ø¹',
+    verifyDonations: 'Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª',
+    whatsappReceipt: 'Ø¨Ø« ÙˆØ§ØªØ³Ø§Ø¨',
+    topVolunteers: 'Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…ØªØµØ¯Ø±ÙŠÙ† Ù…Ù† Ø§Ù„Ù…Ù†Ø¸Ù…ÙŠÙ†',
+    topClasses: 'Ø£ÙØ¶Ù„ Ø§Ù„ÙØµÙˆÙ„ Ø§Ù„Ø¯Ø±Ø§Ø³ÙŠØ©',
+    recentActivity: 'Ø³Ø¬Ù„Ø§Øª Ø§Ù„Ù†Ø´Ø§Ø· Ø§Ù„Ø­Ø¯ÙŠØ«Ø©',
+    heatmap: 'Ø®Ø±ÙŠØ·Ø© Ø³Ø±Ø¹Ø© Ø§Ù„ØªØ¨Ø±Ø¹ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹ÙŠØ©',
+    chartGrowth: 'Ù…Ø³Ø§Ø± Ø§Ù„Ù†Ù…Ùˆ Ø§Ù„Ø´Ù‡Ø±ÙŠ',
+    chartTrend: 'ØªÙ‚Ø¯Ù… Ø¬Ù…Ø¹ Ø§Ù„Ø­Ù…Ù„Ø©',
+    searchPlaceholder: 'Ø¨Ø­Ø«...',
+    outstandingAmount: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø³ØªØ­Ù‚ Ù„Ù„ØªØ¬Ø¯ÙŠØ¯',
+    themeToggle: 'ØªØºÙŠÙŠØ± Ø§Ù„Ù…Ø¸Ù‡Ø±',
+    languageToggle: 'ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ©',
+    syncStatus: 'ØªÙ… Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø¨Ø¯ÙˆÙ† Ø¥Ù†ØªØ±Ù†Øª',
+    targetDonors: 'Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ† Ø§Ù„Ù…Ø³ØªÙ‡Ø¯ÙÙŠÙ†',
+    totalDonors: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ†',
+    achievedPercent: 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²',
+    totalCollected: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹',
+    targetProgress: 'Ø§Ù„ØªÙ‚Ø¯Ù… Ù†Ø­Ùˆ Ø§Ù„Ù‡Ø¯Ù',
+    liveRankings: 'Ø§Ù„ØªØ±ØªÙŠØ¨ Ø§Ù„Ù…Ø¨Ø§Ø´Ø±',
+    expectedTotal: 'Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ù…ØªÙˆÙ‚Ø¹'
   },
   ta: {
-    title: 'புத்திசாலித்தனமான நன்கொடை மையம்',
-    subtitle: 'டோக்கன் ஆஃப் ஹலாவா நன்கொடை இயந்திரம்',
-    todayCollection: 'இன்றைய நன்கொடை',
-    monthlyCollection: 'மாதாந்திர நன்கொடை',
-    pendingVerification: 'சரிபார்ப்பு நிலுவையில் உள்ளது',
-    activeDonors: 'செயலில் உள்ள நன்கொடையாளர்கள்',
-    quickActions: 'விரைவான செயல்கள்',
-    logDonation: 'நன்கொடை பதிவுசெய்',
-    registerDonor: 'நன்கொடையாளர் பதிவு',
-    verifyDonations: 'நன்கொடைகளை சரிபார்',
-    whatsappReceipt: 'வாட்ஸ்அப் ஒளிபரப்பு',
-    topVolunteers: 'முன்னணி பிரச்சாரகர்கள்',
-    topClasses: 'முன்னணி வகுப்புகள்',
-    recentActivity: 'சமீபத்திய நடவடிக்கைகள்',
-    heatmap: 'வாராந்திர நன்கொடை வெப்ப வரைபடம்',
-    chartGrowth: 'மாதாந்திர நன்கொடை வளர்ச்சி',
-    chartTrend: 'அரசு நிதிப் போக்கு',
-    searchPlaceholder: 'தேடுக...',
-    outstandingAmount: 'நிலுவையில் உள்ள தொகை',
-    themeToggle: 'வண்ண தீம் மாற்றம்',
-    languageToggle: 'மொழியை மாற்றுக',
-    syncStatus: 'ஆஃப்லைன் தரவு ஒத்திசைக்கப்பட்டது',
-    targetDonors: 'இலக்கு நன்கொடையாளர்கள்',
-    totalDonors: 'மொத்த நன்கொடையாளர்கள்',
-    achievedPercent: 'அடைந்த சதவீதம்',
-    totalCollected: 'மொத்தம் வசூலிக்கப்பட்டது',
-    targetProgress: 'இலக்கு நிறைவு முன்னேற்றம்',
-    liveRankings: 'நேரடி தரவரிசை',
-    expectedTotal: 'எதிர்பார்க்கப்படும் மொத்தம்'
+    title: 'à®ªà¯à®¤à¯à®¤à®¿à®šà®¾à®²à®¿à®¤à¯à®¤à®©à®®à®¾à®© à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®®à¯ˆà®¯à®®à¯',
+    subtitle: 'à®Ÿà¯‹à®•à¯à®•à®©à¯ à®†à®ƒà®ªà¯ à®¹à®²à®¾à®µà®¾ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®‡à®¯à®¨à¯à®¤à®¿à®°à®®à¯',
+    todayCollection: 'à®‡à®©à¯à®±à¯ˆà®¯ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ',
+    monthlyCollection: 'à®®à®¾à®¤à®¾à®¨à¯à®¤à®¿à®° à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ',
+    pendingVerification: 'à®šà®°à®¿à®ªà®¾à®°à¯à®ªà¯à®ªà¯ à®¨à®¿à®²à¯à®µà¯ˆà®¯à®¿à®²à¯ à®‰à®³à¯à®³à®¤à¯',
+    activeDonors: 'à®šà¯†à®¯à®²à®¿à®²à¯ à®‰à®³à¯à®³ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯à®•à®³à¯',
+    quickActions: 'à®µà®¿à®°à¯ˆà®µà®¾à®© à®šà¯†à®¯à®²à¯à®•à®³à¯',
+    logDonation: 'à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®ªà®¤à®¿à®µà¯à®šà¯†à®¯à¯',
+    registerDonor: 'à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯ à®ªà®¤à®¿à®µà¯',
+    verifyDonations: 'à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®•à®³à¯ˆ à®šà®°à®¿à®ªà®¾à®°à¯',
+    whatsappReceipt: 'à®µà®¾à®Ÿà¯à®¸à¯à®…à®ªà¯ à®’à®³à®¿à®ªà®°à®ªà¯à®ªà¯',
+    topVolunteers: 'à®®à¯à®©à¯à®©à®£à®¿ à®ªà®¿à®°à®šà¯à®šà®¾à®°à®•à®°à¯à®•à®³à¯',
+    topClasses: 'à®®à¯à®©à¯à®©à®£à®¿ à®µà®•à¯à®ªà¯à®ªà¯à®•à®³à¯',
+    recentActivity: 'à®šà®®à¯€à®ªà®¤à¯à®¤à®¿à®¯ à®¨à®Ÿà®µà®Ÿà®¿à®•à¯à®•à¯ˆà®•à®³à¯',
+    heatmap: 'à®µà®¾à®°à®¾à®¨à¯à®¤à®¿à®° à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®µà¯†à®ªà¯à®ª à®µà®°à¯ˆà®ªà®Ÿà®®à¯',
+    chartGrowth: 'à®®à®¾à®¤à®¾à®¨à¯à®¤à®¿à®° à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®µà®³à®°à¯à®šà¯à®šà®¿',
+    chartTrend: 'à®…à®°à®šà¯ à®¨à®¿à®¤à®¿à®ªà¯ à®ªà¯‹à®•à¯à®•à¯',
+    searchPlaceholder: 'à®¤à¯‡à®Ÿà¯à®•...',
+    outstandingAmount: 'à®¨à®¿à®²à¯à®µà¯ˆà®¯à®¿à®²à¯ à®‰à®³à¯à®³ à®¤à¯Šà®•à¯ˆ',
+    themeToggle: 'à®µà®£à¯à®£ à®¤à¯€à®®à¯ à®®à®¾à®±à¯à®±à®®à¯',
+    languageToggle: 'à®®à¯Šà®´à®¿à®¯à¯ˆ à®®à®¾à®±à¯à®±à¯à®•',
+    syncStatus: 'à®†à®ƒà®ªà¯à®²à¯ˆà®©à¯ à®¤à®°à®µà¯ à®’à®¤à¯à®¤à®¿à®šà¯ˆà®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®Ÿà®¤à¯',
+    targetDonors: 'à®‡à®²à®•à¯à®•à¯ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯à®•à®³à¯',
+    totalDonors: 'à®®à¯Šà®¤à¯à®¤ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯à®•à®³à¯',
+    achievedPercent: 'à®…à®Ÿà¯ˆà®¨à¯à®¤ à®šà®¤à®µà¯€à®¤à®®à¯',
+    totalCollected: 'à®®à¯Šà®¤à¯à®¤à®®à¯ à®µà®šà¯‚à®²à®¿à®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®Ÿà®¤à¯',
+    targetProgress: 'à®‡à®²à®•à¯à®•à¯ à®¨à®¿à®±à¯ˆà®µà¯ à®®à¯à®©à¯à®©à¯‡à®±à¯à®±à®®à¯',
+    liveRankings: 'à®¨à¯‡à®°à®Ÿà®¿ à®¤à®°à®µà®°à®¿à®šà¯ˆ',
+    expectedTotal: 'à®Žà®¤à®¿à®°à¯à®ªà®¾à®°à¯à®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®®à¯ à®®à¯Šà®¤à¯à®¤à®®à¯'
   }
 };
 
@@ -329,6 +329,17 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     return INITIAL_DONATIONS;
   });
   const [systemLogs, setSystemLogs] = useState<any[]>([]);
+  const [customLayout, setCustomLayout] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('receipt_layout_settings');
+        return saved ? JSON.parse(saved) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
   const [deletedDonationIds, setDeletedDonationIds] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -379,7 +390,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
   const safeDonors = (Array.isArray(donors) ? donors : []).filter(d => d && d.id && !deletedDonorIds.includes(String(d.id)));
   const safeDonations = (Array.isArray(donations) ? donations : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
-  const safeVerificationQueue = safeDonations.filter(item => item && (item.status === 'PENDING' || item.status === 'Pending' || item.status === 'VERIFIED'));
+  const safeVerificationQueue = safeDonations.filter(item => item && (item.status === 'PENDING' || item.status === 'Pending' || item.status === 'VERIFIED' || item.status === 'APPROVED'));
 
   const todayCollectionTotal = safeDonations.reduce((acc, item) => acc + (['APPROVED', 'VERIFIED', 'PENDING'].includes(item?.status) ? Number(item?.amount || 0) : 0), 0);
   const monthlyCollectionTotal = todayCollectionTotal;
@@ -790,7 +801,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
     const splitAmount = Math.floor(Number(donationAmount) / monthCount);
     const extraAmount = Number(donationAmount) - (splitAmount * (monthCount - 1));
-    const monthSplitStr = monthCount > 1 ? ` (Split: ${monthCount-1}x₹${splitAmount}, 1x₹${extraAmount})` : '';
+    const monthSplitStr = monthCount > 1 ? ` (Split: ${monthCount-1}xâ‚¹${splitAmount}, 1xâ‚¹${extraAmount})` : '';
 
     if (!donorIdInput && donationTab === 'renew') {
       setFormError('Please select an existing donor');
@@ -840,7 +851,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
         // Handle Duplicate Phone Number Conflict (409)
         if (!donorRes.ok && donorRes.status === 409 && donorData.error?.includes('duplicate')) {
-          const confirmForce = window.confirm("ഈ ഫോൺ നമ്പർ ഉപയോഗിച്ച് ഇതിനകം ഒരു ഡോണർ ഉണ്ട്. എങ്കിലും പുതിയൊരു ഡോണറായി തുടരണമെന്നുറപ്പാണോ?\n\n(This phone number is already registered. Are you sure you want to create a new, separate donor profile?)");
+          const confirmForce = window.confirm("à´ˆ à´«àµ‹àµº à´¨à´®àµà´ªàµ¼ à´‰à´ªà´¯àµ‹à´—à´¿à´šàµà´šàµ à´‡à´¤à´¿à´¨à´•à´‚ à´’à´°àµ à´¡àµ‹à´£àµ¼ à´‰à´£àµà´Ÿàµ. à´Žà´™àµà´•à´¿à´²àµà´‚ à´ªàµà´¤à´¿à´¯àµŠà´°àµ à´¡àµ‹à´£à´±à´¾à´¯à´¿ à´¤àµà´Ÿà´°à´£à´®àµ†à´¨àµà´¨àµà´±à´ªàµà´ªà´¾à´£àµ‹?\n\n(This phone number is already registered. Are you sure you want to create a new, separate donor profile?)");
           if (confirmForce) {
             const retry = await attemptDonorCreate(true);
             donorRes = retry.res;
@@ -1212,7 +1223,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         data: {
           labels: monthlyLabels,
           datasets: [{
-            label: 'Collected (₹)',
+            label: 'Collected (â‚¹)',
             data: monthlyData,
             backgroundColor: theme === 'dark' ? 'rgba(16, 185, 129, 0.85)' : 'rgba(37, 136, 75, 0.85)',
             borderColor: theme === 'dark' ? 'rgba(16, 185, 129, 1)' : 'rgba(37, 136, 75, 1)',
@@ -1359,7 +1370,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     onChange={(e) => setSelectedHn(e.target.value)}
                     className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer font-bold"
                   >
-                    <option value="">-- Select Student / വിദ്യാർത്ഥിയെ തിരഞ്ഞെടുക്കുക --</option>
+                    <option value="" disabled>-- Select Student / വിദ്യാർത്ഥியை തിരഞ്ഞെടുക്കുക --</option>
                     {campaignersList.filter(c => c.class === selectedClass).map(c => (
                       <option key={c.hn} value={c.hn} className="text-slate-800">HN {c.hn} ({c.name})</option>
                     ))}
@@ -1379,7 +1390,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   ) : (
                     <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left">
                       <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 block">
-                        ⚠️ Please select a student from the HN list above
+                        âš ï¸ Please select a student from the HN list above
                       </span>
                     </div>
                   );
@@ -1408,7 +1419,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 required 
                 value={authPassword}
                 onChange={(e) => setAuthPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>
@@ -1568,7 +1579,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </button>
               </div>
               <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} · ID: {(user as any)?.hn || '001'}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} Â· ID: {(user as any)?.hn || '001'}</p>
               <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                 Approved Active
               </span>
@@ -1646,9 +1657,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 className="bg-transparent outline-none cursor-pointer font-bold text-slate-700 dark:text-slate-300 pr-1"
               >
                 <option value="en" className="text-slate-850">English</option>
-                <option value="ml" className="text-slate-850">മലയാളം</option>
-                <option value="ar" className="text-slate-850">العربية</option>
-                <option value="ta" className="text-slate-850">தமிழ்</option>
+                <option value="ml" className="text-slate-850">à´®à´²à´¯à´¾à´³à´‚</option>
+                <option value="ar" className="text-slate-850">Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©</option>
+                <option value="ta" className="text-slate-850">à®¤à®®à®¿à®´à¯</option>
               </select>
             </div>
 
@@ -1673,11 +1684,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.todayCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{todayCollectionTotal}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">â‚¹{todayCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.monthlyCollection}</span>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">₹{monthlyCollectionTotal}</h3>
+                  <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-2">â‚¹{monthlyCollectionTotal}</h3>
                 </div>
                 <div className={`p-6 rounded-3xl ${glassClass}`}>
                   <span className="text-xs font-bold opacity-60 uppercase">{t.pendingVerification}</span>
@@ -1790,15 +1801,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className={`p-6 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total New Collection</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{newCollectionTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">â‚¹{newCollectionTotal.toLocaleString()}.00</h3>
                   </div>
                   <div className={`p-6 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Renew Collection</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{renewCollectionTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">â‚¹{renewCollectionTotal.toLocaleString()}.00</h3>
                   </div>
                   <div className={`p-6 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Collection</span>
-                    <h3 className="text-2xl font-black text-emerald-500 mt-2">₹{totalCollection.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-emerald-500 mt-2">â‚¹{totalCollection.toLocaleString()}.00</h3>
                   </div>
                 </div>
 
@@ -1935,7 +1946,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                 <span className="font-extrabold block text-slate-900 dark:text-white uppercase">{itemCamp}</span>
                                 <span className="opacity-50 text-[9px] block mt-0.5 uppercase font-bold">{itemClass}</span>
                               </td>
-                              <td className="py-4 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">₹{Number(item.amount).toLocaleString()}.00</td>
+                              <td className="py-4 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">â‚¹{Number(item.amount).toLocaleString()}.00</td>
                               <td className="py-4 px-4">
                                 <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
                                   item.status === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :
@@ -2054,27 +2065,38 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300">
                           <td className="py-4 px-4 font-mono text-xs truncate max-w-[120px]">{item.id}</td>
                           <td className="py-4 px-4 font-bold">{item.donor?.name || 'General Donor'}</td>
-                          <td className="py-4 px-4 text-emerald-500 font-bold">₹{item.amount}</td>
+                          <td className="py-4 px-4 text-emerald-500 font-bold">â‚¹{item.amount}</td>
                           <td className="py-4 px-4">
                             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${paymentReceived ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'}`}>
-                              {paymentReceived ? '✓ Cash Received' : '⏳ Cash Pending'}
+                              {paymentReceived ? 'âœ“ Cash Received' : 'â³ Cash Pending'}
                             </span>
                           </td>
                           <td className="py-4 px-4 text-xs opacity-70">{loggedBy}</td>
                           <td className="py-4 px-4 text-xs">{new Date(item.createdAt).toLocaleDateString()}</td>
                           <td className="py-4 px-4 text-right flex justify-end gap-2">
-                            <button 
-                              onClick={() => handleApproveDonation(item.id, 'APPROVED')}
-                              className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs px-3 py-1.5 rounded-xl font-bold"
-                            >
-                              <CheckSquare className="w-3.5 h-3.5" /> Approve
-                            </button>
-                            <button 
-                              onClick={() => handleApproveDonation(item.id, 'REJECTED')}
-                              className="flex items-center gap-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-600 dark:text-red-400 text-xs px-3 py-1.5 rounded-xl font-bold"
-                            >
-                              <XCircle className="w-3.5 h-3.5" /> Reject
-                            </button>
+                            {item.status === 'APPROVED' || item.status === 'VERIFIED' ? (
+                              <button 
+                                onClick={() => handleApproveDonation(item.id, 'PENDING')}
+                                className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/25 text-amber-600 dark:text-amber-400 text-xs px-3 py-1.5 rounded-xl font-bold"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" /> Unverify
+                              </button>
+                            ) : (
+                              <>
+                                <button 
+                                  onClick={() => handleApproveDonation(item.id, 'APPROVED')}
+                                  className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs px-3 py-1.5 rounded-xl font-bold"
+                                >
+                                  <CheckSquare className="w-3.5 h-3.5" /> Approve
+                                </button>
+                                <button 
+                                  onClick={() => handleApproveDonation(item.id, 'REJECTED')}
+                                  className="flex items-center gap-1 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-600 dark:text-red-400 text-xs px-3 py-1.5 rounded-xl font-bold"
+                                >
+                                  <XCircle className="w-3.5 h-3.5" /> Reject
+                                </button>
+                              </>
+                            )}
                           </td>
                         </tr>
                         );
@@ -2105,15 +2127,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="p-3.5 rounded-2xl bg-slate-200/50 dark:bg-black/10 border border-slate-300 dark:border-white/5 text-center">
                   <span className="text-[9px] uppercase font-bold opacity-60 block">New Collection</span>
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{todayCollectionTotal || 0}.00</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">â‚¹{todayCollectionTotal || 0}.00</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-emerald-50/5 dark:bg-emerald-500/5 border border-emerald-500/15 text-center">
                   <span className="text-[9px] uppercase font-bold opacity-60 block">Renew Collection</span>
-                  <span className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-1 block">₹0.00</span>
+                  <span className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-1 block">â‚¹0.00</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-slate-200/50 dark:bg-black/10 border border-slate-300 dark:border-white/5 text-center">
                   <span className="text-[9px] uppercase font-bold opacity-60 block">Total Collection</span>
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{todayCollectionTotal || 0}.00</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">â‚¹{todayCollectionTotal || 0}.00</span>
                 </div>
               </div>
 
@@ -2165,7 +2187,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">പേര് നൽകുക</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´ªàµ‡à´°àµ à´¨àµ½à´•àµà´•</span>
                       </div>
                       <input 
                         type="text" 
@@ -2179,7 +2201,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">ഫോൺ നമ്പർ</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´«àµ‹àµº à´¨à´®àµà´ªàµ¼</span>
                       </div>
                       <input 
                         type="tel" 
@@ -2193,7 +2215,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Place</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">സ്ഥലം നൽകുക</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´¸àµà´¥à´²à´‚ à´¨àµ½à´•àµà´•</span>
                       </div>
                       <input 
                         type="text" 
@@ -2212,7 +2234,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div className="relative">
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Search & Select) *</label>
-                        <span className="text-[9px] text-slate-400 block">വരിക്കാരനെ തിരഞ്ഞെടുക്കുക</span>
+                        <span className="text-[9px] text-slate-400 block">à´µà´°à´¿à´•àµà´•à´¾à´°à´¨àµ† à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•àµà´•</span>
                       </div>
                       
                       <div className="relative">
@@ -2292,23 +2314,23 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 space-y-2 animate-in fade-in duration-300">
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Auto-detected Plan</span>
-                          <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">സ്വയം കണ്ടെത്തിയ പ്ലാൻ</span>
+                          <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">à´¸àµà´µà´¯à´‚ à´•à´£àµà´Ÿàµ†à´¤àµà´¤à´¿à´¯ à´ªàµà´²à´¾àµ»</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black">
-                            ₹{donationAmount || '0'}/month
+                            â‚¹{donationAmount || '0'}/month
                           </div>
                           <span className="text-xs text-slate-400">Plan: {monthPlanInput}</span>
                         </div>
                         <p className="text-[10px] text-sky-600 dark:text-sky-400 font-bold flex items-start gap-1 mt-1">
-                          <span>ⓘ</span>
-                          <span>ഡോണറുടെ മുൻ പ്ലാൻ അനുസരിച്ച് തുക സ്വയം സെറ്റ് ആയി. മാറ്റം വേണമെങ്കിൽ താഴെ എഡിറ്റ് ചെയ്യാം.</span>
+                          <span>â“˜</span>
+                          <span>à´¡àµ‹à´£à´±àµà´Ÿàµ† à´®àµàµ» à´ªàµà´²à´¾àµ» à´…à´¨àµà´¸à´°à´¿à´šàµà´šàµ à´¤àµà´• à´¸àµà´µà´¯à´‚ à´¸àµ†à´±àµà´±àµ à´†à´¯à´¿. à´®à´¾à´±àµà´±à´‚ à´µàµ‡à´£à´®àµ†à´™àµà´•à´¿àµ½ à´¤à´¾à´´àµ† à´Žà´¡à´¿à´±àµà´±àµ à´šàµ†à´¯àµà´¯à´¾à´‚.</span>
                         </p>
                         {/* Allow manual override */}
                         <div className="flex items-center gap-2 mt-2">
                           <label className="text-[10px] font-bold text-slate-400 uppercase">Override Amount:</label>
                           <div className="relative flex-1">
-                            <span className="absolute left-3 top-2 text-slate-500 font-bold text-sm">₹</span>
+                            <span className="absolute left-3 top-2 text-slate-500 font-bold text-sm">â‚¹</span>
                             <input 
                               type="number" 
                               value={donationAmount}
@@ -2322,12 +2344,12 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   </div>
                 )}
 
-                {/* Amount / Plan Dropdown Selector — only for NEW DONOR tab */}
+                {/* Amount / Plan Dropdown Selector â€” only for NEW DONOR tab */}
                 {donationTab === 'new' && (
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Amount *</label>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">തുക തിരഞ്ഞെടുക്കുക</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´¤àµà´• à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•àµà´•</span>
                   </div>
                   <select 
                     value={monthPlanInput}
@@ -2355,15 +2377,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </div>
                 )}
 
-                {/* Conditional Custom Amount Input — only for NEW DONOR tab */}
+                {/* Conditional Custom Amount Input â€” only for NEW DONOR tab */}
                 {donationTab === 'new' && (monthPlanInput === 'Custom Amount' || monthPlanInput === 'No specific plan') && (
                   <div className="animate-in slide-in-from-top-2 duration-200">
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Custom Amount (₹) *</label>
-                      <span className="text-[9px] text-slate-400 block">തുക നൽകുക</span>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Custom Amount (â‚¹) *</label>
+                      <span className="text-[9px] text-slate-400 block">à´¤àµà´• à´¨àµ½à´•àµà´•</span>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-4 top-3 text-slate-500 font-bold">₹</span>
+                      <span className="absolute left-4 top-3 text-slate-500 font-bold">â‚¹</span>
                       <input 
                         type="number" 
                         required 
@@ -2381,7 +2403,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">For Month *</label>
-                      <span className="text-[9px] text-slate-400 block font-bold">ഏത് മാസത്തെ വരിസംഖ്യയാണെന്ന് തിരഞ്ഞെടുക്കുക</span>
+                      <span className="text-[9px] text-slate-400 block font-bold">à´à´¤àµ à´®à´¾à´¸à´¤àµà´¤àµ† à´µà´°à´¿à´¸à´‚à´–àµà´¯à´¯à´¾à´£àµ†à´¨àµà´¨àµ à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•àµà´•</span>
                     </div>
                     <select 
                       value={donationMonthInput}
@@ -2426,8 +2448,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     
                     {/* Information Tip */}
                     <p className="text-[10px] text-sky-600 dark:text-sky-400 font-bold mt-2 flex items-start gap-1">
-                      <span>ⓘ</span>
-                      <span>പ്രതിമാസ വരിസംഖ്യാ പ്ലാൻ തിരഞ്ഞെടുക്കാത്തവർക്ക് One Time Payment എന്ന ഓപ്ഷൻ തിരഞ്ഞെടുക്കാം.</span>
+                      <span>â“˜</span>
+                      <span>à´ªàµà´°à´¤à´¿à´®à´¾à´¸ à´µà´°à´¿à´¸à´‚à´–àµà´¯à´¾ à´ªàµà´²à´¾àµ» à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•à´¾à´¤àµà´¤à´µàµ¼à´•àµà´•àµ One Time Payment à´Žà´¨àµà´¨ à´“à´ªàµà´·àµ» à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•à´¾à´‚.</span>
                     </p>
 
                     {/* Custom Selection Checkboxes Grid */}
@@ -2766,7 +2788,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <td className="py-4 px-4 font-mono font-bold text-emerald-500">#{item.hn}</td>
                           <td className="py-4 px-4 font-bold uppercase">{item.name}</td>
                           <td className="py-4 px-4">{item.class}</td>
-                          <td className="py-4 px-4 font-bold text-emerald-500">₹{item.collected.toLocaleString()}</td>
+                          <td className="py-4 px-4 font-bold text-emerald-500">â‚¹{item.collected.toLocaleString()}</td>
                           <td className="py-4 px-4 font-bold">{item.receiptsCount}</td>
                           <td className="py-4 px-4 min-w-[150px]">
                             <div className="flex items-center gap-2">
@@ -2842,7 +2864,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <div class="item-row"><span class="label">Month:</span><span class="val">${ho.month}</span></div>
                       <div class="item-row"><span class="label">Received By:</span><span class="val">${ho.admin || 'Admin'}</span></div>
                       <div class="item-row"><span class="label">Logged Date:</span><span class="val">${ho.date}</span></div>
-                      <div class="item-row total"><span class="label">Amount Received:</span><span class="val">₹${ho.amount.toLocaleString()}.00</span></div>
+                      <div class="item-row total"><span class="label">Amount Received:</span><span class="val">â‚¹${ho.amount.toLocaleString()}.00</span></div>
                       <p class="footer-note">Generated by Token of Halawa Admin Portal</p>
                     </div>
                     <script>
@@ -2902,7 +2924,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Amount Received (₹)</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Amount Received (â‚¹)</label>
                       <input 
                         type="number"
                         required
@@ -2994,7 +3016,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               <span className="opacity-50 text-[9px] block mt-0.5">{ho.phone}</span>
                             </td>
                             <td className="py-4 px-4">
-                              <span className="font-bold block text-emerald-500">₹{ho.amount.toLocaleString()}.00</span>
+                              <span className="font-bold block text-emerald-500">â‚¹{ho.amount.toLocaleString()}.00</span>
                               <span className="opacity-50 text-[9px] block mt-0.5">For {ho.month}</span>
                             </td>
                             <td className="py-4 px-4 text-xs opacity-65">{ho.date}</td>
@@ -3058,7 +3080,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
                         <span className="text-[10px] font-bold opacity-50 uppercase">Total Class Collection</span>
-                        <h4 className="text-2xl font-black text-emerald-500 mt-1">₹{collected.toLocaleString()}</h4>
+                        <h4 className="text-2xl font-black text-emerald-500 mt-1">â‚¹{collected.toLocaleString()}</h4>
                       </div>
                       <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
                         <span className="text-[10px] font-bold opacity-50 uppercase">Active Campaigners</span>
@@ -3066,7 +3088,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       </div>
                       <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
                         <span className="text-[10px] font-bold opacity-50 uppercase">Average Student Collection</span>
-                        <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">₹{avgCollected.toLocaleString()}</h4>
+                        <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">â‚¹{avgCollected.toLocaleString()}</h4>
                       </div>
                     </div>
 
@@ -3103,7 +3125,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                     <td className="py-3.5 px-4 font-extrabold text-slate-500">#{index + 1}</td>
                                     <td className="py-3.5 px-4 font-bold text-emerald-500">#{item.hn}</td>
                                     <td className="py-3.5 px-4 font-bold uppercase">{item.name}</td>
-                                    <td className="py-3.5 px-4 font-extrabold text-emerald-500">₹{amount.toLocaleString()}</td>
+                                    <td className="py-3.5 px-4 font-extrabold text-emerald-500">â‚¹{amount.toLocaleString()}</td>
                                   </tr>
                                 );
                               })}
@@ -3487,7 +3509,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               {/* Total Collected Amount */}
                               <td className="py-4 px-4 text-right">
                                 <span className="font-black text-sm text-emerald-600 dark:text-emerald-400">
-                                  ₹{d.totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  â‚¹{d.totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                               </td>
 
@@ -3620,7 +3642,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               </div>
                               <span className="text-[8px] opacity-50 block mt-0.5">{item.achieved} / {targetDonors} Donors</span>
                             </td>
-                            <td className="py-4 px-4 text-right font-black text-emerald-500 text-sm">₹{item.collected.toLocaleString()}.00</td>
+                            <td className="py-4 px-4 text-right font-black text-emerald-500 text-sm">â‚¹{item.collected.toLocaleString()}.00</td>
                           </tr>
                         );
                       })}
@@ -3644,7 +3666,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Receipt Notification Template</h4>
-                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of ₹{{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
+                  <p className="text-xs opacity-60">{"Dear {{donor_name}}, thank you for your contribution of â‚¹{{amount}} to Token of Halawa. Receipt: {{receipt_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>
@@ -3652,7 +3674,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                   <h4 className="font-bold text-slate-800 dark:text-white">Renewal Reminder Template</h4>
-                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of ₹{{amount}} is due. Click here to pay: {{pay_url}}."}</p>
+                  <p className="text-xs opacity-60">{"Assalamu Alaikum {{donor_name}}, your monthly contribution renewal of â‚¹{{amount}} is due. Click here to pay: {{pay_url}}."}</p>
                   <button className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-bold">
                     <Share2 className="w-3.5 h-3.5" /> Push Broadcast
                   </button>
@@ -3746,7 +3768,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Collected</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{myCollectedTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">â‚¹{myCollectedTotal.toLocaleString()}.00</h3>
                   </div>
                   
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
@@ -3789,10 +3811,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                             </span>
                             <div>
                               <p className="font-extrabold uppercase text-slate-50 tracking-wide text-xs">{item.name}</p>
-                              <p className="text-white/80 text-[10px] mt-0.5 font-medium">{item.class} · {item.donorsCount} donors</p>
+                              <p className="text-white/80 text-[10px] mt-0.5 font-medium">{item.class} Â· {item.donorsCount} donors</p>
                             </div>
                           </div>
-                          <span className="font-black text-white text-sm">₹{item.total.toLocaleString()}</span>
+                          <span className="font-black text-white text-sm">â‚¹{item.total.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
@@ -3826,10 +3848,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               </span>
                               <div>
                                 <p className="font-extrabold uppercase text-[#0f4c81] dark:text-[#9cd4ff] tracking-wide text-xs">{item.className}</p>
-                                <p className="opacity-60 text-[10px] mt-0.5">{item.receivers} receivers · {item.donorsCount} donors</p>
+                                <p className="opacity-60 text-[10px] mt-0.5">{item.receivers} receivers Â· {item.donorsCount} donors</p>
                               </div>
                             </div>
-                            <span className="font-black text-[#0c7ae6] dark:text-[#38bdf8] text-sm">₹{item.total.toLocaleString()}</span>
+                            <span className="font-black text-[#0c7ae6] dark:text-[#38bdf8] text-sm">â‚¹{item.total.toLocaleString()}</span>
                           </div>
                         );
                       })}
@@ -3870,22 +3892,22 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             <div className="p-6 md:p-8 space-y-6 font-medium text-sm md:text-base leading-relaxed text-left text-slate-200 overflow-y-auto max-h-[70vh]">
               <div className="flex gap-3">
                 <span className="font-extrabold text-[#9cd4ff] shrink-0">1.</span>
-                <p className="font-malayalam text-slate-100 font-bold leading-relaxed">പൊതുജനങ്ങളിൽ നിന്നും വരിക്കാരിൽ നിന്നും ശേഖരിക്കുന്ന തുക നിങ്ങളുടെ ബാങ്ക് അക്കൗണ്ടിലോ കൈകളിലോ പൂർണ്ണ ഉത്തരവാദിത്തത്തോടെ ഭദ്രമായി സൂക്ഷിക്കേണ്ടതാണ്.</p>
+                <p className="font-malayalam text-slate-100 font-bold leading-relaxed">à´ªàµŠà´¤àµà´œà´¨à´™àµà´™à´³à´¿àµ½ à´¨à´¿à´¨àµà´¨àµà´‚ à´µà´°à´¿à´•àµà´•à´¾à´°à´¿àµ½ à´¨à´¿à´¨àµà´¨àµà´‚ à´¶àµ‡à´–à´°à´¿à´•àµà´•àµà´¨àµà´¨ à´¤àµà´• à´¨à´¿à´™àµà´™à´³àµà´Ÿàµ† à´¬à´¾à´™àµà´•àµ à´…à´•àµà´•àµ—à´£àµà´Ÿà´¿à´²àµ‹ à´•àµˆà´•à´³à´¿à´²àµ‹ à´ªàµ‚àµ¼à´£àµà´£ à´‰à´¤àµà´¤à´°à´µà´¾à´¦à´¿à´¤àµà´¤à´¤àµà´¤àµ‹à´Ÿàµ† à´­à´¦àµà´°à´®à´¾à´¯à´¿ à´¸àµ‚à´•àµà´·à´¿à´•àµà´•àµ‡à´£àµà´Ÿà´¤à´¾à´£àµ.</p>
               </div>
 
               <div className="flex gap-3">
                 <span className="font-extrabold text-[#9cd4ff] shrink-0">2.</span>
                 <div>
                   <p className="font-extrabold text-[#9cd4ff] mb-1">Advance Collection:</p>
-                  <p className="font-malayalam text-slate-100 font-bold leading-relaxed">താൽപര്യമുള്ള വരിക്കാരിൽ നിന്നും ഒന്നിലധികം മാസങ്ങളിലെ വരിസംഖ്യ ഒന്നിച്ചു (മുൻകൂറായി) കൈപ്പറ്റാവുന്നതാണ്.</p>
+                  <p className="font-malayalam text-slate-100 font-bold leading-relaxed">à´¤à´¾àµ½à´ªà´°àµà´¯à´®àµà´³àµà´³ à´µà´°à´¿à´•àµà´•à´¾à´°à´¿àµ½ à´¨à´¿à´¨àµà´¨àµà´‚ à´’à´¨àµà´¨à´¿à´²à´§à´¿à´•à´‚ à´®à´¾à´¸à´™àµà´™à´³à´¿à´²àµ† à´µà´°à´¿à´¸à´‚à´–àµà´¯ à´’à´¨àµà´¨à´¿à´šàµà´šàµ (à´®àµàµ»à´•àµ‚à´±à´¾à´¯à´¿) à´•àµˆà´ªàµà´ªà´±àµà´±à´¾à´µàµà´¨àµà´¨à´¤à´¾à´£àµ.</p>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <span className="font-extrabold text-[#9cd4ff] shrink-0">3.</span>
                 <div>
-                  <p className="font-extrabold text-[#9cd4ff] mb-1">തുടർ ശേഖരണ സംവിധാനം:</p>
-                  <p className="font-malayalam text-slate-100 font-bold leading-relaxed">രണ്ടാം മാസം മുതൽ വരിക്കാരിൽ നിന്ന് വരിസംഖ്യ ശേഖരിക്കുന്നതിനായി പ്രത്യേക സമിതി പ്രവർത്തിക്കുന്നതാണ്. അതിനാൽ, തുക നേരിട്ട് ശേഖരിക്കുന്നതിൽ പ്രയാസം നേരിടുന്ന വിദ്യാർത്ഥികൾ ഇതുസംബന്ധിച്ച് ആശങ്കപ്പെടേണ്ടതില്ല.</p>
+                  <p className="font-extrabold text-[#9cd4ff] mb-1">à´¤àµà´Ÿàµ¼ à´¶àµ‡à´–à´°à´£ à´¸à´‚à´µà´¿à´§à´¾à´¨à´‚:</p>
+                  <p className="font-malayalam text-slate-100 font-bold leading-relaxed">à´°à´£àµà´Ÿà´¾à´‚ à´®à´¾à´¸à´‚ à´®àµà´¤àµ½ à´µà´°à´¿à´•àµà´•à´¾à´°à´¿àµ½ à´¨à´¿à´¨àµà´¨àµ à´µà´°à´¿à´¸à´‚à´–àµà´¯ à´¶àµ‡à´–à´°à´¿à´•àµà´•àµà´¨àµà´¨à´¤à´¿à´¨à´¾à´¯à´¿ à´ªàµà´°à´¤àµà´¯àµ‡à´• à´¸à´®à´¿à´¤à´¿ à´ªàµà´°à´µàµ¼à´¤àµà´¤à´¿à´•àµà´•àµà´¨àµà´¨à´¤à´¾à´£àµ. à´…à´¤à´¿à´¨à´¾àµ½, à´¤àµà´• à´¨àµ‡à´°à´¿à´Ÿàµà´Ÿàµ à´¶àµ‡à´–à´°à´¿à´•àµà´•àµà´¨àµà´¨à´¤à´¿àµ½ à´ªàµà´°à´¯à´¾à´¸à´‚ à´¨àµ‡à´°à´¿à´Ÿàµà´¨àµà´¨ à´µà´¿à´¦àµà´¯à´¾àµ¼à´¤àµà´¥à´¿à´•àµ¾ à´‡à´¤àµà´¸à´‚à´¬à´¨àµà´§à´¿à´šàµà´šàµ à´†à´¶à´™àµà´•à´ªàµà´ªàµ†à´Ÿàµ‡à´£àµà´Ÿà´¤à´¿à´²àµà´².</p>
                 </div>
               </div>
             </div>
@@ -3909,6 +3931,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         isOpen={showReceiptModal} 
         onClose={() => { setShowReceiptModal(false); setWhatsAppAutoShare(false); }} 
         receiptData={selectedReceiptData}
+        customLayout={customLayout}
         autoShareWhatsApp={whatsAppAutoShare}
       />
     </div>

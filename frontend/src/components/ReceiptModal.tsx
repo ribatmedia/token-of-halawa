@@ -57,14 +57,31 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
     day: '2-digit', month: 'short', year: 'numeric'
   });
 
+  const normalizeToShortMonth = (str: string): string => {
+    if (!str) return '';
+    const clean = str.trim().toLowerCase();
+    if (clean.includes('jun')) return 'Jun';
+    if (clean.includes('jul')) return 'Jul';
+    if (clean.includes('aug')) return 'Aug';
+    if (clean.includes('sep')) return 'Sep';
+    if (clean.includes('oct')) return 'Oct';
+    if (clean.includes('nov')) return 'Nov';
+    if (clean.includes('dec')) return 'Dec';
+    if (clean.includes('jan')) return 'Jan';
+    if (clean.includes('feb')) return 'Feb';
+    if (clean.includes('mar')) return 'Mar';
+    return str.trim().substring(0, 3);
+  };
+
   const currentMonthsList = (receiptData?.month || '')
+    .replace('Custom:', '')
     .split(',')
-    .map(s => s.trim().substring(0, 3))
+    .map(s => normalizeToShortMonth(s))
     .filter(Boolean);
 
   const paidMonthsList = (receiptData?.paidMonths || [])
-    .flatMap(m => typeof m === 'string' ? m.split(',') : [])
-    .map(s => s.trim().substring(0, 3))
+    .flatMap(m => typeof m === 'string' ? m.replace('Custom:', '').split(',') : [])
+    .map(s => normalizeToShortMonth(s))
     .filter(Boolean);
 
   const generateImage = async (): Promise<string | null> => {

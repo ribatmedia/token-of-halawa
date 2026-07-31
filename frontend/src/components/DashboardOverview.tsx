@@ -2144,6 +2144,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         phone: item.donor?.phone || '',
                                         amount: item.amount,
                                         month: itemMonth,
+                                        paidMonths: paidMonths,
                                         plan: itemPlan
                                       });
                                       setShowReceiptModal(true);
@@ -3719,6 +3720,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                                   place: d.location || d.category || 'General',
                                                   amount: donation.amount,
                                                   month: month,
+                                                  paidMonths: d.paidMonths || [],
                                                   plan: itemPlan
                                                 });
                                                 setShowReceiptModal(true);

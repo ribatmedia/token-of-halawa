@@ -3531,18 +3531,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         setDonorPhoneInput(d.phone);
                                         setDonorNameInput(d.name);
                                         setDonorIdInput(d.uniqueId || d.id);
-                                        setDonationTab('new');
-                                        setActiveTab('v-add');
-                                      }}
-                                      className="flex-1 bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-1 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase text-center"
-                                    >
-                                      Add Receipt
-                                    </button>
-                                    <button 
-                                      onClick={() => {
-                                        setDonorPhoneInput(d.phone);
-                                        setDonorNameInput(d.name);
-                                        setDonorIdInput(d.uniqueId || d.id);
                                         setRenewSearchQuery(d.name || '');
                                         setDonationTab('renew');
                                         setActiveTab('v-add');

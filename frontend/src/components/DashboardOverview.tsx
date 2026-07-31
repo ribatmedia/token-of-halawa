@@ -852,7 +852,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
         // Handle Duplicate Phone Number Conflict (409)
         if (!donorRes.ok && donorRes.status === 409 && donorData.error?.includes('duplicate')) {
-          const confirmForce = window.confirm("à´ˆ à´«àµ‹àµº à´¨à´®àµà´ªàµ¼ à´‰à´ªà´¯àµ‹à´—à´¿à´šàµà´šàµ à´‡à´¤à´¿à´¨à´•à´‚ à´’à´°àµ à´¡àµ‹à´£àµ¼ à´‰à´£àµà´Ÿàµ. à´Žà´™àµà´•à´¿à´²àµà´‚ à´ªàµà´¤à´¿à´¯àµŠà´°àµ à´¡àµ‹à´£à´±à´¾à´¯à´¿ à´¤àµà´Ÿà´°à´£à´®àµ†à´¨àµà´¨àµà´±à´ªàµà´ªà´¾à´£àµ‹?\n\n(This phone number is already registered. Are you sure you want to create a new, separate donor profile?)");
+          const confirmForce = window.confirm(Buffer.from("4LSIIOC0q+C1i+C1uiDgtKjgtK7gtY3gtKrgtbwg4LSJ4LSq4LSv4LWL4LSX4LS/4LSa4LWN4LSa4LWNIOC0h+C0pOC0v+C0qOC0leC0giDgtJLgtLDgtYEg4LSh4LWL4LSj4LW8IOC0ieC0o+C1jeC0n+C1jS4g4LSO4LSZ4LWN4LSV4LS/4LSy4LWB4LSCIOC0quC1geC0pOC0v+C0r+C1iuC0sOC1gSDgtKHgtYvgtKPgtLHgtL7gtK/gtL8g4LSk4LWB4LSf4LSw4LSj4LSu4LWG4LSo4LWN4LSo4LWB4LSx4LSq4LWN4LSq4LS+4LSj4LWLPw==", "base64").toString("utf8") + "\n\n(This phone number is already registered. Are you sure you want to create a new, separate donor profile?)");
           if (confirmForce) {
             const retry = await attemptDonorCreate(true);
             donorRes = retry.res;
@@ -969,7 +969,18 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         setDonorAddressInput('');
         setDonationAmount('');
         setNotes('');
+        
+        const newEntry = {
+          id: data.donation?.id || data.id,
+          amount: Number(donationAmount),
+          status: 'PENDING',
+          createdAt: new Date().toISOString(),
+          donor: { id: donorId, name: finalDonorName, phone: donorPhoneInput || '', location: donorAddressInput || 'Kerala' },
+          notes: data.donation?.notes || data.notes || `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`
+        };
+        setDonations(prev => [newEntry, ...(Array.isArray(prev) ? prev : [])]);
         fetchDatabaseData(); // refresh list
+
       } else {
         console.warn('Donation API creation error, executing local fallback logging:', data);
         const newDonationId = `TOH-2026-${Math.floor(1000 + Math.random() * 9000)}`;

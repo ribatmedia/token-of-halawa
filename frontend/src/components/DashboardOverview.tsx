@@ -2294,47 +2294,93 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
               <form onSubmit={handleAddDonation} className="space-y-5">
 
-                {/* NEW DONOR: Donor Name Input */}
+                {/* NEW DONOR: Form Fields */}
                 {donationTab === 'new' && (
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">പേര് നൽകുക</span>
+                        <span className="text-[9px] text-slate-400 font-bold block">വരിാകാരന്റെ പൂര്‍ണ്ണമായ പേര് നൽകുക</span>
                       </div>
                       <input 
                         type="text" 
                         required={donationTab === 'new'}
                         value={donorNameInput}
                         onChange={(e) => setDonorNameInput(e.target.value)}
-                        placeholder="Enter Donor Name"
+                        placeholder="Full name of donor"
                         className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
                       />
                     </div>
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">ഫോൺ നമ്പർ</span>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
+                          <span className="text-[9px] text-slate-400 font-bold block">വരിാകാരന്റെ ഫോൺ നമ്പർ നൽകുക</span>
+                        </div>
+                        <input 
+                          type="tel" 
+                          required={donationTab === 'new'}
+                          value={donorPhoneInput}
+                          onChange={(e) => {
+                            setDonorPhoneInput(e.target.value);
+                            if (!donorWhatsAppInput) {
+                              setDonorWhatsAppInput(e.target.value);
+                            }
+                          }}
+                          placeholder="10-digit number"
+                          className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                        />
                       </div>
-                      <input 
-                        type="tel" 
-                        required={donationTab === 'new'}
-                        value={donorPhoneInput}
-                        onChange={(e) => setDonorPhoneInput(e.target.value)}
-                        placeholder="Enter 10 digit Phone Number"
-                        className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
-                      />
+
+                      <div>
+                        <div className="flex justify-between items-center mb-1 flex-wrap gap-1">
+                          <div>
+                            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">WhatsApp Number *</label>
+                            <span className="text-[9px] text-slate-400 font-bold block">രസീത് അയക്കുന്നതിനുള്ള വാട്സാപ് നമ്പർ</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setDonorWhatsAppInput(donorPhoneInput)}
+                              className="px-2.5 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold rounded-xl transition border border-blue-500/20 flex items-center gap-1 cursor-pointer"
+                              title="Copy Phone Number"
+                            >
+                              <Copy className="w-3 h-3" /> Copy
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDonorWhatsAppInput(donorPhoneInput)}
+                              className="px-2.5 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold rounded-xl transition border border-emerald-500/30 cursor-pointer"
+                              title="Use Phone Number as WhatsApp Number"
+                            >
+                              Same as phone
+                            </button>
+                          </div>
+                        </div>
+                        <div className="relative flex items-center">
+                          <MessageSquare className="w-4 h-4 text-emerald-500 absolute left-3.5 pointer-events-none" />
+                          <input 
+                            type="tel" 
+                            value={donorWhatsAppInput}
+                            onChange={(e) => setDonorWhatsAppInput(e.target.value)}
+                            placeholder="For sending receipt"
+                            className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
+                          />
+                        </div>
+                      </div>
                     </div>
+
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Place</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">സ്ഥലം നൽകുക</span>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Address / Place *</label>
+                        <span className="text-[9px] text-slate-400 font-bold block">വരിാകാരന്റെ സ്ഥലം അല്ലെങ്കിൽ വീട്ടുപേര് നൽകുക</span>
                       </div>
                       <input 
                         type="text" 
                         value={donorAddressInput}
                         onChange={(e) => setDonorAddressInput(e.target.value)}
-                        placeholder="Enter Place / Location"
+                        placeholder="City or Town"
                         className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-850 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 font-bold"
                       />
                     </div>

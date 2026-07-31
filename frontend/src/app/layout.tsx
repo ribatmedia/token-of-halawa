@@ -5,7 +5,12 @@ export const metadata: Metadata = {
   title: 'Token of Halawa | Intelligent Donation Management',
   description: 'Enterprise donation management software for NGOs, charities, schools, and religious institutions. Manage campaigns, volunteers, and digital receipts.',
   keywords: ['donation srv', 'donation management', 'mosque donation', 'madrasa', 'charity saas', 'digital receipts'],
-  authors: [{ name: 'Token of Halawa Team' }]
+  authors: [{ name: 'Token of Halawa Team' }],
+  icons: {
+    icon: '/ribat-logo.png',
+    shortcut: '/favicon.ico',
+    apple: '/ribat-logo.png',
+  }
 };
 
 export default function RootLayout({
@@ -16,6 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/ribat-logo.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/ribat-logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />

@@ -87,19 +87,34 @@ export class MahabbaDonationService {
       return { donation, donor, isExisting: true };
     }
 
-    const donorUniqueId = `TOH-D-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-    const donor = await prisma.donor.create({
-      data: {
-        organizationId: orgId,
-        uniqueId: donorUniqueId,
-        name: validated.donorName,
-        phone: validated.donorPhone || '',
-        whatsApp: validated.donorWhatsApp,
-        location: validated.donorAddress,
-        uniqueHash: donorKey,
-        status: 'ACTIVE'
-      }
+    let donor = await prisma.donor.findFirst({
+      where: { uniqueHash: donorKey, organizationId: orgId }
     });
+
+    if (!donor && validated.donorPhone) {
+      const normPhone = validated.donorPhone.trim().replace(/\s+/g, '');
+      if (normPhone) {
+        donor = await prisma.donor.findFirst({
+          where: { phone: normPhone, organizationId: orgId }
+        });
+      }
+    }
+
+    if (!donor) {
+      const donorUniqueId = `TOH-D-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      donor = await prisma.donor.create({
+        data: {
+          organizationId: orgId,
+          uniqueId: donorUniqueId,
+          name: validated.donorName,
+          phone: validated.donorPhone || '',
+          whatsApp: validated.donorWhatsApp,
+          location: validated.donorAddress,
+          uniqueHash: donorKey,
+          status: 'ACTIVE'
+        }
+      });
+    }
 
     const donation = await prisma.donation.create({
       data: {

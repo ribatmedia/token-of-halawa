@@ -396,21 +396,51 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const monthlyCollectionTotal = todayCollectionTotal;
   const activeDonorsCount = new Set(safeDonations.map(q => q.donorId || q.donor?.id || q.donor?.name?.trim()?.toLowerCase()).filter(Boolean)).size;
 
-  // Dynamically aggregated list of all available donors across all sections & donations
+  // Dynamically aggregated list of all available donors across all sections & donations (deduplicated by phone/name)
   const allAvailableDonors = (() => {
     const map = new Map<string, any>();
+    
+    const getDonorKey = (d: any) => {
+      const phone = (d?.phone || '').trim().replace(/\D/g, '');
+      const name = (d?.name || '').trim().toLowerCase();
+      if (phone && phone.length >= 7) return `phone:${phone}`;
+      if (name) return `name:${name}`;
+      return `id:${d?.id || Math.random()}`;
+    };
+
     safeDonors.forEach(d => {
-      if (d && d.id) map.set(String(d.id), d);
-      else if (d && d.name) map.set(d.name.toLowerCase(), d);
-    });
-    safeDonations.forEach(q => {
-      const d = q?.donor;
-      if (d && d.id && !map.has(String(d.id))) {
-        map.set(String(d.id), { id: String(d.id), name: d.name || 'General Donor', phone: d.phone || '', location: d.location || 'Kerala' });
-      } else if (d && d.name && !map.has(d.name.toLowerCase())) {
-        map.set(d.name.toLowerCase(), { id: d.id || `dnr-${Date.now()}`, name: d.name, phone: d.phone || '', location: d.location || 'Kerala' });
+      if (d && (d.id || d.name || d.phone)) {
+        const key = getDonorKey(d);
+        if (!map.has(key)) {
+          map.set(key, d);
+        } else {
+          const existing = map.get(key);
+          map.set(key, {
+            ...existing,
+            phone: existing.phone || d.phone || '',
+            location: existing.location || d.location || '',
+            uniqueId: existing.uniqueId || d.uniqueId
+          });
+        }
       }
     });
+
+    safeDonations.forEach(q => {
+      const d = q?.donor;
+      if (d && (d.id || d.name || d.phone)) {
+        const key = getDonorKey(d);
+        if (!map.has(key)) {
+          map.set(key, {
+            id: d.id || `dnr-${Date.now()}`,
+            name: d.name || 'General Donor',
+            phone: d.phone || '',
+            location: d.location || 'Kerala',
+            uniqueId: d.uniqueId
+          });
+        }
+      }
+    });
+
     return Array.from(map.values());
   })();
 
@@ -868,7 +898,19 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           const newDonationId = `TOH-2026-${Math.floor(1000 + Math.random() * 9000)}`;
           let finalDonorName = donorNameInput || 'General Donor';
 
-          const newDonorObj = { 
+          const cleanPhone = (donorPhoneInput || '').trim().replace(/\D/g, '');
+          const cleanName = (finalDonorName || '').trim().toLowerCase();
+
+          const existingDonorObj = allAvailableDonors.find(d => {
+            const dPhone = (d.phone || '').trim().replace(/\D/g, '');
+            const dName = (d.name || '').trim().toLowerCase();
+            if (cleanPhone && cleanPhone.length >= 7 && dPhone === cleanPhone) return true;
+            if (cleanName && cleanName.length > 1 && dName === cleanName) return true;
+            if (donorIdInput && String(d.id) === String(donorIdInput)) return true;
+            return false;
+          });
+
+          const newDonorObj = existingDonorObj || { 
             id: `dnr-${Date.now()}`, 
             name: finalDonorName, 
             phone: donorPhoneInput || '', 
@@ -876,7 +918,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             category: donationType
           };
 
-          if (donationTab === 'new') {
+          if (!existingDonorObj && donationTab === 'new') {
             setDonors(prev => [newDonorObj, ...(Array.isArray(prev) ? prev : [])]);
           }
 
@@ -989,7 +1031,19 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           finalDonorName = allAvailableDonors.find(d => d.id === donorIdInput)?.name || renewSearchQuery || 'General Donor';
         }
 
-        const newDonorObj = { 
+        const cleanPhone = (donorPhoneInput || '').trim().replace(/\D/g, '');
+        const cleanName = (finalDonorName || '').trim().toLowerCase();
+
+        const existingDonorObj = allAvailableDonors.find(d => {
+          const dPhone = (d.phone || '').trim().replace(/\D/g, '');
+          const dName = (d.name || '').trim().toLowerCase();
+          if (cleanPhone && cleanPhone.length >= 7 && dPhone === cleanPhone) return true;
+          if (cleanName && cleanName.length > 1 && dName === cleanName) return true;
+          if (donorIdInput && String(d.id) === String(donorIdInput)) return true;
+          return false;
+        });
+
+        const newDonorObj = existingDonorObj || { 
           id: donorIdInput || `dnr-${Date.now()}`, 
           name: finalDonorName, 
           phone: donorPhoneInput || '', 
@@ -997,7 +1051,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           category: donationType
         };
 
-        if (donationTab === 'new') {
+        if (!existingDonorObj && donationTab === 'new') {
           setDonors(prev => [newDonorObj, ...(Array.isArray(prev) ? prev : [])]);
         }
 

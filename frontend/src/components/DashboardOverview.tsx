@@ -2235,7 +2235,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div className="relative">
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Profile (Search & Select) *</label>
-                        <span className="text-[9px] text-slate-400 block">à´µà´°à´¿à´•àµà´•à´¾à´°à´¨àµ† à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•àµà´•</span>
+                        <span className="text-[9px] text-slate-400 block">തുക നൽകുക</span>
                       </div>
                       
                       <div className="relative">
@@ -2315,7 +2315,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 space-y-2 animate-in fade-in duration-300">
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Auto-detected Plan</span>
-                          <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">à´¸àµà´µà´¯à´‚ à´•à´£àµà´Ÿàµ†à´¤àµà´¤à´¿à´¯ à´ªàµà´²à´¾àµ»</span>
+                          <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-wider">സ്വയം കണ്ടെത്തിയ പ്ലാൻ</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-sm font-black">
@@ -2324,8 +2324,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <span className="text-xs text-slate-400">Plan: {monthPlanInput}</span>
                         </div>
                         <p className="text-[10px] text-sky-600 dark:text-sky-400 font-bold flex items-start gap-1 mt-1">
-                          <span>â“˜</span>
-                          <span>à´¡àµ‹à´£à´±àµà´Ÿàµ† à´®àµàµ» à´ªàµà´²à´¾àµ» à´…à´¨àµà´¸à´°à´¿à´šàµà´šàµ à´¤àµà´• à´¸àµà´µà´¯à´‚ à´¸àµ†à´±àµà´±àµ à´†à´¯à´¿. à´®à´¾à´±àµà´±à´‚ à´µàµ‡à´£à´®àµ†à´™àµà´•à´¿àµ½ à´¤à´¾à´´àµ† à´Žà´¡à´¿à´±àµà´±àµ à´šàµ†à´¯àµà´¯à´¾à´‚.</span>
+                          <span>ⓘ</span>
+                          <span>ഡോണറുടെ മുൻ പ്ലാൻ അനുസരിച്ച് തുക സ്വയം സെറ്റ് ആയി. മാറ്റം വേണമെങ്കിൽ താഴെ എഡിറ്റ് ചെയ്യാം.</span>
                         </p>
                         {/* Allow manual override */}
                         <div className="flex items-center gap-2 mt-2">
@@ -2449,8 +2449,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     
                     {/* Information Tip */}
                     <p className="text-[10px] text-sky-600 dark:text-sky-400 font-bold mt-2 flex items-start gap-1">
-                      <span>â“˜</span>
-                      <span>à´ªàµà´°à´¤à´¿à´®à´¾à´¸ à´µà´°à´¿à´¸à´‚à´–àµà´¯à´¾ à´ªàµà´²à´¾àµ» à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•à´¾à´¤àµà´¤à´µàµ¼à´•àµà´•àµ One Time Payment à´Žà´¨àµà´¨ à´“à´ªàµà´·àµ» à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•à´¾à´‚.</span>
+                      <span>ⓘ</span>
+                      <span>പ്രതിമാസ വരിസംഖ്യാ പ്ലാൻ തിരഞ്ഞെടുക്കാത്തവർക്ക് One Time Payment എന്ന ഓപ്ഷൻ തിരഞ്ഞെടുക്കാം.</span>
                     </p>
 
                     {/* Custom Selection Checkboxes Grid */}

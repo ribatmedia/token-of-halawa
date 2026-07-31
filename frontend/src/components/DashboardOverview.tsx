@@ -1420,7 +1420,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 required 
                 value={authPassword}
                 onChange={(e) => setAuthPassword(e.target.value)}
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
                 className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>
@@ -2069,7 +2069,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <td className="py-4 px-4 text-emerald-500 font-bold">₹{item.amount}</td>
                           <td className="py-4 px-4">
                             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${paymentReceived ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'}`}>
-                              {paymentReceived ? 'âœ“ Cash Received' : 'â³ Cash Pending'}
+                              {paymentReceived ? '✅ Cash Received' : '⏳ Cash Pending'}
                             </span>
                           </td>
                           <td className="py-4 px-4 text-xs opacity-70">{loggedBy}</td>
@@ -3532,7 +3532,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         setDonorNameInput(d.name);
                                         setDonorIdInput(d.uniqueId || d.id);
                                         setDonationTab('new');
-                                        setActiveTab('add-donation');
+                                        setActiveTab('v-add');
                                       }}
                                       className="flex-1 bg-slate-200/50 hover:bg-slate-350/50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 px-1 py-1 rounded text-[10px] font-black transition border border-slate-300/40 dark:border-white/5 uppercase text-center"
                                     >
@@ -3545,7 +3545,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         setDonorIdInput(d.uniqueId || d.id);
                                         setRenewSearchQuery(d.name || '');
                                         setDonationTab('renew');
-                                        setActiveTab('add-donation');
+                                        setActiveTab('v-add');
                                       }}
                                       className="flex-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-1 py-1 rounded text-[10px] font-black transition border border-emerald-500/20 uppercase text-center"
                                     >

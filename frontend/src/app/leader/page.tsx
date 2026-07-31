@@ -8,7 +8,7 @@ import { Heart, LogOut, Users, User, RefreshCw, IndianRupee, ChevronDown, Chevro
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 const MONTHS = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
-const CLASSES = ['Plus one', 'Plus two', 'Degree first year', 'Degree second year', 'Degree Third year', 'Final year'];
+const CLASSES = ['Plus one', 'Plus two', 'D1', 'D2', 'D3', 'Final year'];
 
 export default function LeaderDashboardPage() {
   const { token, user, organization, clearAuth } = useAuthStore();

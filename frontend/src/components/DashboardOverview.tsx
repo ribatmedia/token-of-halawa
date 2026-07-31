@@ -159,19 +159,19 @@ const campaignersList = [
   { hn: 4, name: "Sinan Cheekod", class: "Final year" },
   { hn: 5, name: "Sinan rafi", class: "Final year" },
   { hn: 6, name: "Ubayy Valliyad", class: "Final year" },
-  // Degree Third year
-  { hn: 7, name: "Adhil Ameen", class: "Degree Third year" },
-  { hn: 8, name: "Hashir puthoor", class: "Degree Third year" },
-  { hn: 9, name: "Muhammed shaheer", class: "Degree Third year" },
-  { hn: 10, name: "Muhammed Riswan", class: "Degree Third year" },
-  // Degree second year
-  { hn: 11, name: "Muhammed Ali", class: "Degree second year" },
-  { hn: 12, name: "Muhammed Fayis", class: "Degree second year" },
-  { hn: 13, name: "Sinan k", class: "Degree second year" },
-  { hn: 14, name: "Yaseen kondotty", class: "Degree second year" },
-  // Degree first year
-  { hn: 15, name: "Muhammed Melattoor", class: "Degree first year" },
-  { hn: 16, name: "Nihal valliyad", class: "Degree first year" },
+  // D3
+  { hn: 7, name: "Adhil Ameen", class: "D3" },
+  { hn: 8, name: "Hashir puthoor", class: "D3" },
+  { hn: 9, name: "Muhammed shaheer", class: "D3" },
+  { hn: 10, name: "Muhammed Riswan", class: "D3" },
+  // D2
+  { hn: 11, name: "Muhammed Ali", class: "D2" },
+  { hn: 12, name: "Muhammed Fayis", class: "D2" },
+  { hn: 13, name: "Sinan k", class: "D2" },
+  { hn: 14, name: "Yaseen kondotty", class: "D2" },
+  // D1
+  { hn: 15, name: "Muhammed Melattoor", class: "D1" },
+  { hn: 16, name: "Nihal valliyad", class: "D1" },
   // Plus two
   { hn: 17, name: "Anas Rahman", class: "Plus two" },
   { hn: 18, name: "Anas koduvally", class: "Plus two" },
@@ -572,7 +572,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
   };
 
-  // Reset selected HN code when changing class selector so no student is auto-selected
+  // Reset selected Roll No when changing class selector so no student is auto-selected
   useEffect(() => {
     setSelectedHn('');
   }, [selectedClass]);
@@ -696,7 +696,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
         if (loginRole === 'campaigner') {
           if (!selectedHn) {
-            setAuthError('Please select your HN code');
+            setAuthError('Please select your Roll No');
             setAuthLoading(false);
             return;
           }
@@ -1358,14 +1358,14 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
                   >
                     <option value="" disabled className="text-slate-850">Select Class</option>
-                    {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
+                    {['Final year', 'D3', 'D2', 'D1', 'Plus two', 'Plus one'].map(c => (
                       <option key={c} value={c} className="text-slate-800">{c}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select HN Code / Student Name</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select Roll No / Student Name</label>
                   <select
                     value={selectedHn}
                     onChange={(e) => setSelectedHn(e.target.value)}
@@ -1580,7 +1580,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </button>
               </div>
               <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} Â· ID: {(user as any)?.hn || '001'}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} Â· Roll No: {(user as any)?.hn || '001'}</p>
               <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                 Approved Active
               </span>
@@ -1823,7 +1823,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
                     >
                       <option value="ALL">All Classes</option>
-                      {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
+                      {['Final year', 'D3', 'D2', 'D1', 'Plus two', 'Plus one'].map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
@@ -2188,7 +2188,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Donor Name *</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´ªàµ‡à´°àµ à´¨àµ½à´•àµà´•</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">പേര് നൽകുക</span>
                       </div>
                       <input 
                         type="text" 
@@ -2202,7 +2202,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Phone Number *</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´«àµ‹àµº à´¨à´®àµà´ªàµ¼</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">ഫോൺ നമ്പർ</span>
                       </div>
                       <input 
                         type="tel" 
@@ -2216,7 +2216,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Place</label>
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´¸àµà´¥à´²à´‚ à´¨àµ½à´•àµà´•</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">സ്ഥലം നൽകുക</span>
                       </div>
                       <input 
                         type="text" 
@@ -2350,7 +2350,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Amount *</label>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">à´¤àµà´• à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•àµà´•</span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">തുക തിരഞ്ഞെടുക്കുക</span>
                   </div>
                   <select 
                     value={monthPlanInput}
@@ -2404,7 +2404,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">For Month *</label>
-                      <span className="text-[9px] text-slate-400 block font-bold">à´à´¤àµ à´®à´¾à´¸à´¤àµà´¤àµ† à´µà´°à´¿à´¸à´‚à´–àµà´¯à´¯à´¾à´£àµ†à´¨àµà´¨àµ à´¤à´¿à´°à´žàµà´žàµ†à´Ÿàµà´•àµà´•àµà´•</span>
+                      <span className="text-[9px] text-slate-400 block font-bold">ഏത് മാസത്തെ പണമാണ്? (മുൻകൂറായി നൽകാൻ ഒന്നിലധികം മാസം തിരഞ്ഞെടുക്കാം)</span>
                     </div>
                     <select 
                       value={donationMonthInput}
@@ -2617,7 +2617,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             });
 
             const campaignersExportColumns = [
-              { id: 'hn', label: 'HN', getValue: (c: any) => String(c.hn) },
+              { id: 'hn', label: 'Roll No', getValue: (c: any) => String(c.hn) },
               { id: 'name', label: 'Name', getValue: (c: any) => c.name },
               { id: 'class', label: 'Class', getValue: (c: any) => c.class },
             ];
@@ -2630,7 +2630,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <Users className="w-5 h-5 text-emerald-400" />
                       Campaigners Directory
                     </h3>
-                    <p className="text-xs opacity-60 mt-1">Full list of registered campaigners, classes, and Hall Numbers (HN).</p>
+                    <p className="text-xs opacity-60 mt-1">Full list of registered campaigners, classes, and Roll Numbers (Roll No).</p>
                   </div>
                 </div>
 
@@ -2642,7 +2642,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       type="text" 
                       value={campaignerSearch}
                       onChange={(e) => setCampaignerSearch(e.target.value)}
-                      placeholder="Search campaigner by name or HN..."
+                      placeholder="Search campaigner by name or Roll No..."
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
                     />
                   </div>
@@ -2654,9 +2654,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     >
                       <option value="ALL" className="text-slate-800">All Classes</option>
                       <option value="Final year" className="text-slate-800">Final year</option>
-                      <option value="Degree Third year" className="text-slate-800">Degree Third year</option>
-                      <option value="Degree second year" className="text-slate-800">Degree second year</option>
-                      <option value="Degree first year" className="text-slate-800">Degree first year</option>
+                      <option value="D3" className="text-slate-800">D3</option>
+                      <option value="D2" className="text-slate-800">D2</option>
+                      <option value="D1" className="text-slate-800">D1</option>
                       <option value="Plus two" className="text-slate-800">Plus two</option>
                       <option value="Plus one" className="text-slate-800">Plus one</option>
                     </select>
@@ -2676,7 +2676,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                        <th className="py-3 px-4">HN</th>
+                        <th className="py-3 px-4">Roll No</th>
                         <th className="py-3 px-4">Name</th>
                         <th className="py-3 px-4">Class / Batch</th>
                         <th className="py-3 px-4">Role</th>
@@ -2741,7 +2741,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             });
 
             const campaignersStatsExportColumns = [
-              { id: 'hn', label: 'HN', getValue: (c: any) => String(c.hn) },
+              { id: 'hn', label: 'Roll No', getValue: (c: any) => String(c.hn) },
               { id: 'name', label: 'Name', getValue: (c: any) => c.name },
               { id: 'class', label: 'Class', getValue: (c: any) => c.class },
               { id: 'collected', label: 'Collected', getValue: (c: any) => String(c.collected) },
@@ -2774,7 +2774,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
-                        <th className="py-3 px-4">HN</th>
+                        <th className="py-3 px-4">Roll No</th>
                         <th className="py-3 px-4">Name</th>
                         <th className="py-3 px-4">Class</th>
                         <th className="py-3 px-4">Collected</th>
@@ -2908,7 +2908,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         onChange={(e) => setHandoverClass(e.target.value)}
                         className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
                       >
-                        {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(c => (
+                        {['Final year', 'D3', 'D2', 'D1', 'Plus two', 'Plus one'].map(c => (
                           <option key={c} value={c} className="text-slate-800">{c}</option>
                         ))}
                       </select>
@@ -3059,7 +3059,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                     onChange={(e) => setSelectedClassDashboard(e.target.value)}
                     className="bg-white/10 border border-white/10 rounded-2xl px-4 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/40 text-slate-800 dark:text-white"
                   >
-                    {['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one'].map(name => (
+                    {['Final year', 'D3', 'D2', 'D1', 'Plus two', 'Plus one'].map(name => (
                       <option key={name} value={name} className="text-slate-800">{name}</option>
                     ))}
                   </select>
@@ -3101,7 +3101,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <thead>
                             <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
                               <th className="py-2.5 px-4">Class Rank</th>
-                              <th className="py-2.5 px-4">HN</th>
+                              <th className="py-2.5 px-4">Roll No</th>
                               <th className="py-2.5 px-4">Name</th>
                               <th className="py-2.5 px-4">Collected</th>
                             </tr>
@@ -3574,7 +3574,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
           {/* VIEW: Class Rankings / Leaderboard */}
           {(activeTab === 'rankings' || activeTab === 'v-leaderboard') && (() => {
-            const rankedClasses = ['Final year', 'Degree Third year', 'Degree second year', 'Degree first year', 'Plus two', 'Plus one']
+            const rankedClasses = ['Final year', 'D3', 'D2', 'D1', 'Plus two', 'Plus one']
               .map((className) => {
                 const targetClassLower = className.trim().toLowerCase();
                 const campaignersCount = campaignersList.filter(c => (c.class || '').trim().toLowerCase() === targetClassLower).length;

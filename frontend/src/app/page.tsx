@@ -126,25 +126,25 @@ export default function HomePage() {
     { name: "Asif ali", unit: "Final year", total: 0, donors: 0 },
     { name: "Bishrul wafa", unit: "Final year", total: 0, donors: 0 },
     { name: "Muhammed Falil", unit: "Final year", total: 0, donors: 0 },
-    { name: "Adhil Ameen", unit: "Degree Third year", total: 0, donors: 0 },
-    { name: "Muhammed Ali", unit: "Degree second year", total: 0, donors: 0 }
+    { name: "Adhil Ameen", unit: "D3", total: 0, donors: 0 },
+    { name: "Muhammed Ali", unit: "D2", total: 0, donors: 0 }
   ]);
 
   const [todayVolunteers, setTodayVolunteers] = useState<VolunteerData[]>([
     { name: "Sinan Cheekod", unit: "Final year", total: 0, donors: 0 },
-    { name: "Muhammed Melattoor", unit: "Degree first year", total: 0, donors: 0 }
+    { name: "Muhammed Melattoor", unit: "D1", total: 0, donors: 0 }
   ]);
 
   const [topClasses, setTopClasses] = useState<ClassData[]>([
     { className: "Final year", total: 0, donors: 0 },
-    { className: "Degree Third year", total: 0, donors: 0 },
-    { className: "Degree second year", total: 0, donors: 0 },
+    { className: "D3", total: 0, donors: 0 },
+    { className: "D2", total: 0, donors: 0 },
     { className: "Plus two", total: 0, donors: 0 }
   ]);
 
   const [todayClasses, setTodayClasses] = useState<ClassData[]>([
     { className: "Final year", total: 0, donors: 0 },
-    { className: "Degree Third year", total: 0, donors: 0 }
+    { className: "D3", total: 0, donors: 0 }
   ]);
 
   // Fetch live stats from public backend endpoint

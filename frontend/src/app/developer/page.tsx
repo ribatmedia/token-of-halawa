@@ -21,19 +21,19 @@ const campaignersList = [
   { hn: 4, name: "Sinan Cheekod", class: "Final year" },
   { hn: 5, name: "Sinan rafi", class: "Final year" },
   { hn: 6, name: "Ubayy Valliyad", class: "Final year" },
-  // Degree Third year
-  { hn: 7, name: "Adhil Ameen", class: "Degree Third year" },
-  { hn: 8, name: "Hashir puthoor", class: "Degree Third year" },
-  { hn: 9, name: "Muhammed shaheer", class: "Degree Third year" },
-  { hn: 10, name: "Muhammed Riswan", class: "Degree Third year" },
-  // Degree second year
-  { hn: 11, name: "Muhammed Ali", class: "Degree second year" },
-  { hn: 12, name: "Muhammed Fayis", class: "Degree second year" },
-  { hn: 13, name: "Sinan k", class: "Degree second year" },
-  { hn: 14, name: "Yaseen kondotty", class: "Degree second year" },
-  // Degree first year
-  { hn: 15, name: "Muhammed Melattoor", class: "Degree first year" },
-  { hn: 16, name: "Nihal valliyad", class: "Degree first year" },
+  // D3
+  { hn: 7, name: "Adhil Ameen", class: "D3" },
+  { hn: 8, name: "Hashir puthoor", class: "D3" },
+  { hn: 9, name: "Muhammed shaheer", class: "D3" },
+  { hn: 10, name: "Muhammed Riswan", class: "D3" },
+  // D2
+  { hn: 11, name: "Muhammed Ali", class: "D2" },
+  { hn: 12, name: "Muhammed Fayis", class: "D2" },
+  { hn: 13, name: "Sinan k", class: "D2" },
+  { hn: 14, name: "Yaseen kondotty", class: "D2" },
+  // D1
+  { hn: 15, name: "Muhammed Melattoor", class: "D1" },
+  { hn: 16, name: "Nihal valliyad", class: "D1" },
   // Plus two
   { hn: 17, name: "Anas Rahman", class: "Plus two" },
   { hn: 18, name: "Anas koduvally", class: "Plus two" },
@@ -363,7 +363,7 @@ export default function DeveloperPage() {
   };
 
   const exportCampaignersCSV = () => {
-    const header = ['HN Code', 'Name', 'Class'];
+    const header = ['Roll No', 'Name', 'Class'];
     const csvContent = [
       header.join(','),
       ...campaignersList.map(c => `${c.hn},"${c.name}","${c.class}"`)

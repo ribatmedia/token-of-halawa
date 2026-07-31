@@ -3826,7 +3826,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                             </span>
                             <div>
                               <p className="font-extrabold uppercase text-slate-50 tracking-wide text-xs">{item.name}</p>
-                              <p className="text-white/80 text-[10px] mt-0.5 font-medium">{item.class} Â· {item.donorsCount} donors</p>
+                              <p className="text-white/80 text-[10px] mt-0.5 font-medium">{item.class} • {item.donorsCount} donors</p>
                             </div>
                           </div>
                           <span className="font-black text-white text-sm">₹{item.total.toLocaleString()}</span>
@@ -3863,7 +3863,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               </span>
                               <div>
                                 <p className="font-extrabold uppercase text-[#0f4c81] dark:text-[#9cd4ff] tracking-wide text-xs">{item.className}</p>
-                                <p className="opacity-60 text-[10px] mt-0.5">{item.receivers} receivers Â· {item.donorsCount} donors</p>
+                                <p className="opacity-60 text-[10px] mt-0.5">{item.receivers} receivers • {item.donorsCount} donors</p>
                               </div>
                             </div>
                             <span className="font-black text-[#0c7ae6] dark:text-[#38bdf8] text-sm">₹{item.total.toLocaleString()}</span>

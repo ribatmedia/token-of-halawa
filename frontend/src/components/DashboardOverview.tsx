@@ -572,7 +572,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
   };
 
-  // Reset selected Roll No when changing class selector so no student is auto-selected
+  // Reset selected R.NO when changing class selector so no student is auto-selected
   useEffect(() => {
     setSelectedHn('');
   }, [selectedClass]);
@@ -696,7 +696,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
         if (loginRole === 'campaigner') {
           if (!selectedHn) {
-            setAuthError('Please select your Roll No');
+            setAuthError('Please select your R.NO');
             setAuthLoading(false);
             return;
           }
@@ -1365,7 +1365,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select Roll No / Student Name</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Select R.NO / Student Name</label>
                   <select
                     value={selectedHn}
                     onChange={(e) => setSelectedHn(e.target.value)}
@@ -1373,7 +1373,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   >
                     <option value="" disabled>-- Select Student / വിദ്യാർത്ഥியை തിരഞ്ഞെടുക്കുക --</option>
                     {campaignersList.filter(c => c.class === selectedClass).map(c => (
-                      <option key={c.hn} value={c.hn} className="text-slate-800">HN {c.hn} ({c.name})</option>
+                      <option key={c.hn} value={c.hn} className="text-slate-800">R.NO {c.hn} ({c.name})</option>
                     ))}
                   </select>
                 </div>
@@ -1391,7 +1391,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   ) : (
                     <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left">
                       <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 block">
-                        âš ï¸ Please select a student from the HN list above
+⚠️ Please select a student from the R.NO list above
                       </span>
                     </div>
                   );
@@ -1580,7 +1580,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 </button>
               </div>
               <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase">{user?.fullName || 'Campaigner'}</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} Â· Roll No: {(user as any)?.hn || '001'}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Class: {(user as any)?.class || 'Final Year'} • R.NO: {(user as any)?.hn || '001'}</p>
               <span className="mt-2.5 inline-block bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                 Approved Active
               </span>
@@ -2617,7 +2617,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             });
 
             const campaignersExportColumns = [
-              { id: 'hn', label: 'Roll No', getValue: (c: any) => String(c.hn) },
+              { id: 'hn', label: 'R.NO', getValue: (c: any) => String(c.hn) },
               { id: 'name', label: 'Name', getValue: (c: any) => c.name },
               { id: 'class', label: 'Class', getValue: (c: any) => c.class },
             ];
@@ -2630,7 +2630,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <Users className="w-5 h-5 text-emerald-400" />
                       Campaigners Directory
                     </h3>
-                    <p className="text-xs opacity-60 mt-1">Full list of registered campaigners, classes, and Roll Numbers (Roll No).</p>
+                    <p className="text-xs opacity-60 mt-1">Full list of registered campaigners, classes, and Roll Numbers.</p>
                   </div>
                 </div>
 
@@ -2642,7 +2642,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       type="text" 
                       value={campaignerSearch}
                       onChange={(e) => setCampaignerSearch(e.target.value)}
-                      placeholder="Search campaigner by name or Roll No..."
+                      placeholder="Search campaigner by name or R.NO..."
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/40"
                     />
                   </div>
@@ -2676,7 +2676,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-extrabold">
-                        <th className="py-3 px-4">Roll No</th>
+                        <th className="py-3 px-4">R.NO</th>
                         <th className="py-3 px-4">Name</th>
                         <th className="py-3 px-4">Class / Batch</th>
                         <th className="py-3 px-4">Role</th>
@@ -2741,7 +2741,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             });
 
             const campaignersStatsExportColumns = [
-              { id: 'hn', label: 'Roll No', getValue: (c: any) => String(c.hn) },
+              { id: 'hn', label: 'R.NO', getValue: (c: any) => String(c.hn) },
               { id: 'name', label: 'Name', getValue: (c: any) => c.name },
               { id: 'class', label: 'Class', getValue: (c: any) => c.class },
               { id: 'collected', label: 'Collected', getValue: (c: any) => String(c.collected) },
@@ -2774,7 +2774,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
-                        <th className="py-3 px-4">Roll No</th>
+                        <th className="py-3 px-4">R.NO</th>
                         <th className="py-3 px-4">Name</th>
                         <th className="py-3 px-4">Class</th>
                         <th className="py-3 px-4">Collected</th>
@@ -3101,7 +3101,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           <thead>
                             <tr className="border-b border-white/10 text-slate-400 text-xs uppercase font-black">
                               <th className="py-2.5 px-4">Class Rank</th>
-                              <th className="py-2.5 px-4">Roll No</th>
+                              <th className="py-2.5 px-4">R.NO</th>
                               <th className="py-2.5 px-4">Name</th>
                               <th className="py-2.5 px-4">Collected</th>
                             </tr>

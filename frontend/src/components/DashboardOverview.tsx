@@ -343,7 +343,6 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [deletedDonationIds, setDeletedDonationIds] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem('toh_deleted_donations'); // Wipe stuck items so they sync with the backend
         const saved = localStorage.getItem('toh_deleted_donations');
         return saved ? JSON.parse(saved) : [];
       } catch (e) {
@@ -1185,6 +1184,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       }
     } catch (err) {
       console.warn('API call failed, applied local state deletion:', err);
+      // Fallback for offline mode: apply optimistic deletion locally
+      setDeletedDonationIds(prev => [...prev, String(id)]);
+      setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.id !== id));
     }
   };
 
@@ -1205,6 +1207,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       }
     } catch (err) {
       console.warn('API call failed, applied local donor deletion:', err);
+      // Fallback for offline mode: apply optimistic deletion locally
+      setDeletedDonorIds(prev => [...prev, String(id)]);
+      setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
+      setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.donorId !== id && item.donor?.id !== id));
     }
   };
 

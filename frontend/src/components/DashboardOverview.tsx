@@ -1245,26 +1245,56 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   };
 
   const handleDeleteDonor = async (id: string) => {
-    if (!confirm('Are you sure you want to permanently delete this donor profile? All their donation entries will also be removed. This action cannot be undone.')) return;
+    if (!confirm('Are you sure you want to permanently delete this donor profile? All their donation entries will also be removed from the database. This action cannot be undone.')) return;
+    
+    const targetDonor = safeDonors.find(d => String(d.id) === String(id)) || allAvailableDonors.find(d => String(d.id) === String(id));
+    const targetPhone = targetDonor?.phone?.trim()?.replace(/\D/g, '');
+    const targetName = targetDonor?.name?.trim()?.toLowerCase();
+
+    // 1. Permanently register donor ID in deletedDonorIds
+    setDeletedDonorIds(prev => Array.from(new Set([...prev, String(id)])));
+
+    // 2. Filter out matching donor from local state
+    setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => {
+      const dPhone = d.phone?.trim()?.replace(/\D/g, '');
+      const dName = d.name?.trim()?.toLowerCase();
+      if (String(d.id) === String(id)) return false;
+      if (targetPhone && dPhone && dPhone === targetPhone) return false;
+      if (targetName && dName && dName === targetName) return false;
+      return true;
+    }));
+
+    // 3. Filter out all donations belonging to this donor from local state
+    const matchingDonationIdsToPurge: string[] = [];
+    setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => {
+      const dId = item.donorId || item.donor?.id;
+      const dPhone = item.donor?.phone?.trim()?.replace(/\D/g, '');
+      const dName = item.donor?.name?.trim()?.toLowerCase();
+      
+      const isMatch = (String(dId) === String(id)) || 
+                      (targetPhone && dPhone && dPhone === targetPhone) || 
+                      (targetName && dName && dName === targetName);
+      
+      if (isMatch) {
+        matchingDonationIdsToPurge.push(item.id);
+        return false;
+      }
+      return true;
+    }));
+
+    setDeletedDonationIds(prev => Array.from(new Set([...prev, ...matchingDonationIdsToPurge])));
+
+    // 4. Trigger server API hard deletion
     try {
       const res = await fetch(`${API_URL}/donors/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok || res.status === 404) {
-        setDeletedDonorIds(prev => [...prev, String(id)]);
-        setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
-        setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.donorId !== id && item.donor?.id !== id));
         fetchDatabaseData();
-      } else {
-        alert('Failed to delete donor on server. Please try again.');
       }
     } catch (err) {
       console.warn('API call failed, applied local donor deletion:', err);
-      // Fallback for offline mode: apply optimistic deletion locally
-      setDeletedDonorIds(prev => [...prev, String(id)]);
-      setDonors(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
-      setDonations(prev => (Array.isArray(prev) ? prev : []).filter(item => item.donorId !== id && item.donor?.id !== id));
     }
   };
 

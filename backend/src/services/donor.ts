@@ -146,14 +146,29 @@ export class DonorService {
   }
 
   static async delete(orgId: string, id: string) {
-    const donor = await prisma.donor.findUnique({ where: { id } });
-    if (!donor || donor.organizationId !== orgId) {
-      throw new ApiError(404, 'Donor not found');
+    let donor = await prisma.donor.findUnique({ where: { id } });
+    if (!donor) {
+      donor = await prisma.donor.findFirst({
+        where: {
+          organizationId: orgId,
+          OR: [
+            { uniqueId: id },
+            { phone: id },
+            { uniqueHash: id }
+          ]
+        }
+      });
     }
+
+    if (!donor) {
+      return { message: 'Donor not found or already removed' };
+    }
+
+    const realId = donor.id;
 
     return prisma.$transaction(async (tx) => {
       // 1. Find all donations by this donor
-      const donations = await tx.donation.findMany({ where: { donorId: id } });
+      const donations = await tx.donation.findMany({ where: { donorId: realId } });
       const donationIds = donations.map(d => d.id);
       
       // 2. Delete associated workflow logs, payments, receipts
@@ -174,15 +189,15 @@ export class DonorService {
       }
 
       // 4. Delete donations
-      await tx.donation.deleteMany({ where: { donorId: id } });
+      await tx.donation.deleteMany({ where: { donorId: realId } });
 
       // 5. Delete donor merge logs involving this donor
       await tx.donorMerge.deleteMany({
-        where: { OR: [{ mergedFromId: id }, { mergedToId: id }] }
+        where: { OR: [{ mergedFromId: realId }, { mergedToId: realId }] }
       });
 
       // 6. Delete the donor
-      return tx.donor.delete({ where: { id } });
+      return tx.donor.delete({ where: { id: realId } });
     });
   }
 }

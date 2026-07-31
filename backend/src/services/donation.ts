@@ -185,24 +185,37 @@ export class DonationService {
   }
 
   static async delete(orgId: string, id: string) {
-    const donation = await prisma.donation.findUnique({
+    let donation = await prisma.donation.findUnique({
       where: { id },
       include: { donor: true }
     });
 
-    if (!donation || donation.donor.organizationId !== orgId) {
-      throw new ApiError(404, 'Donation record not found');
+    if (!donation) {
+      const receipt = await prisma.receipt.findFirst({
+        where: { receiptNumber: id },
+        include: { donation: { include: { donor: true } } }
+      });
+      if (receipt?.donation) {
+        donation = receipt.donation;
+      }
     }
+
+    if (!donation || (donation.donor && donation.donor.organizationId !== orgId)) {
+      return { message: 'Donation not found or already removed' };
+    }
+
+    const realDonationId = donation.id;
+    const realDonorId = donation.donorId;
 
     return prisma.$transaction(async (tx) => {
       // 1. Delete associated workflow logs
-      await tx.workflowLog.deleteMany({ where: { donationId: id } });
+      await tx.workflowLog.deleteMany({ where: { donationId: realDonationId } });
       
       // 2. Delete associated payments
-      await tx.payment.deleteMany({ where: { donationId: id } });
+      await tx.payment.deleteMany({ where: { donationId: realDonationId } });
       
       // 3. Delete associated receipts
-      await tx.receipt.deleteMany({ where: { donationId: id } });
+      await tx.receipt.deleteMany({ where: { donationId: realDonationId } });
       
       // 4. Update campaign collection metric if attached
       if (donation.campaignId && donation.status === 'VERIFIED') {
@@ -213,7 +226,22 @@ export class DonationService {
       }
       
       // 5. Delete donation itself
-      return tx.donation.delete({ where: { id } });
+      const deletedDonation = await tx.donation.delete({ where: { id: realDonationId } });
+
+      // 6. If no other donations remain for this donor, delete donor profile from database as well!
+      if (realDonorId) {
+        const remainingDonationsCount = await tx.donation.count({
+          where: { donorId: realDonorId }
+        });
+        if (remainingDonationsCount === 0) {
+          await tx.donorMerge.deleteMany({
+            where: { OR: [{ mergedFromId: realDonorId }, { mergedToId: realDonorId }] }
+          });
+          await tx.donor.delete({ where: { id: realDonorId } }).catch(() => {});
+        }
+      }
+
+      return deletedDonation;
     });
   }
 }

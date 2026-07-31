@@ -11,6 +11,6 @@ router.post('/', requirePermission(PERMISSIONS.DONATION_CREATE), DonationControl
 router.get('/all', requirePermission(PERMISSIONS.DONATION_VERIFY), DonationController.getAll);
 router.get('/queue', requirePermission(PERMISSIONS.DONATION_VERIFY), DonationController.getQueue);
 router.patch('/:id/verify', requirePermission(PERMISSIONS.DONATION_VERIFY), DonationController.verify);
-router.delete('/:id', requirePermission(PERMISSIONS.DONATION_CREATE), DonationController.delete);
+router.delete('/:id', requirePermission(PERMISSIONS.DONATION_DELETE), DonationController.delete);
 
 export default router;

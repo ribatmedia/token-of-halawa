@@ -2455,6 +2455,20 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                     }
                                     setDonorNameInput(d.name || '');
                                     setDonorPhoneInput(d.phone || '');
+
+                                    // Auto-select first unpaid month for this donor
+                                    const allMonths = ['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+                                    const paidForDonor = (d.paidMonths || []).map((m: string) => m.trim().toLowerCase());
+                                    const unpaidMonths = allMonths.filter(m => {
+                                      const norm = m.toLowerCase();
+                                      const shortNorm = norm.substring(0, 3);
+                                      return !paidForDonor.some((pm: string) => pm === norm || pm.substring(0, 3) === shortNorm);
+                                    });
+                                    if (unpaidMonths.length > 0) {
+                                      setDonationMonthInput(unpaidMonths[0]);
+                                    } else {
+                                      setDonationMonthInput('All Months Paid');
+                                    }
                                   }}
                                   className="px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-white/5 last:border-0"
                                 >
@@ -2581,25 +2595,59 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         
                         if (donationTab === 'renew') {
                           // Find months this donor already paid for
-                          const paidMonths = donorIdInput 
-                            ? donations
-                                .filter(q => q.donorId === donorIdInput)
-                                .flatMap(q => {
-                                  const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
-                                  if (!monthMatch) return [];
-                                  return monthMatch[1].replace('Custom:', '').split(',').map((m: string) => m.trim());
-                                })
-                                .filter(Boolean)
-                            : [];
+                          const selectedDonorObj = allAvailableDonors.find(d => String(d.id) === String(donorIdInput));
+                          
+                          const donorPaidMonths = (() => {
+                            if (!donorIdInput && !selectedDonorObj) return [];
+                            const fromObj = selectedDonorObj?.paidMonths || [];
+                            const fromDonations = safeDonations
+                              .filter(q => {
+                                const qDonorId = q.donorId || q.donor?.id;
+                                const qPhone = q.donor?.phone?.replace(/\D/g, '');
+                                const sPhone = selectedDonorObj?.phone?.replace(/\D/g, '');
+                                const qName = q.donor?.name?.trim()?.toLowerCase();
+                                const sName = selectedDonorObj?.name?.trim()?.toLowerCase();
+
+                                if (donorIdInput && qDonorId && String(qDonorId) === String(donorIdInput)) return true;
+                                if (sPhone && qPhone && sPhone.length >= 7 && sPhone === qPhone) return true;
+                                if (sName && qName && sName.length > 1 && sName === qName) return true;
+                                return false;
+                              })
+                              .flatMap(q => {
+                                const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
+                                if (!monthMatch) return [];
+                                return monthMatch[1].replace('Custom:', '').split(',').map((m: string) => m.trim());
+                              })
+                              .filter(Boolean);
+
+                            const combined = Array.from(new Set([...fromObj, ...fromDonations]));
+                            return combined.map(m => m.trim().toLowerCase());
+                          })();
+
                           // Filter out paid months; no '10 Months' or 'One Time Payment' for renew
-                          const availableMonths = allMonths.filter(m => !paidMonths.includes(m));
+                          const availableMonths = allMonths.filter(m => {
+                            const norm = m.toLowerCase();
+                            const shortNorm = norm.substring(0, 3);
+                            return !donorPaidMonths.some(pm => {
+                              const pNorm = pm.toLowerCase();
+                              const pShort = pNorm.substring(0, 3);
+                              return pNorm === norm || pShort === shortNorm;
+                            });
+                          });
+
+                          if (availableMonths.length === 0) {
+                            return [
+                              <option key="all-paid" value="All Months Paid" disabled className="text-slate-500 font-bold">✓ All Months Paid (മുഴുവൻ മാസങ്ങളും അടച്ചതാണ്)</option>
+                            ];
+                          }
+
                           return [...availableMonths, 'Custom Selection'].map(m => (
-                            <option key={m} value={m} className="text-slate-800">{m}</option>
+                            <option key={m} value={m} className="text-slate-800 font-bold">{m}</option>
                           ));
                         } else {
                           // New donor: show all options including 10 Months and One Time Payment
                           return [...allMonths, '10 Months', 'One Time Payment', 'Custom Selection'].map(m => (
-                            <option key={m} value={m} className="text-slate-800">{m}</option>
+                            <option key={m} value={m} className="text-slate-800 font-bold">{m}</option>
                           ));
                         }
                       })()}
@@ -2616,14 +2664,27 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       <div className="mt-4 p-4 bg-slate-200/40 dark:bg-black/10 border border-slate-350 dark:border-white/5 rounded-2xl space-y-3 animate-in fade-in duration-300">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">Select Active Months</span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                          {['January', 'February', 'March', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(month => {
+                          {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'].map(month => {
                             const isChecked = customSelectedMonths.includes(month);
+                            
+                            // Check if already paid
+                            let isPaid = false;
+                            if (donationTab === 'renew' && donorIdInput) {
+                              const selectedDonorObj = allAvailableDonors.find(d => String(d.id) === String(donorIdInput));
+                              const donorPaidMonths = (selectedDonorObj?.paidMonths || []).map((m: string) => m.trim().toLowerCase());
+                              const norm = month.toLowerCase();
+                              const shortNorm = norm.substring(0, 3);
+                              isPaid = donorPaidMonths.some((pm: string) => pm === norm || pm.substring(0, 3) === shortNorm);
+                            }
+
                             return (
-                              <label key={month} className="flex items-center gap-2 cursor-pointer select-none">
+                              <label key={month} className={`flex items-center gap-2 select-none ${isPaid ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
                                 <input 
                                   type="checkbox"
-                                  checked={isChecked}
+                                  checked={isChecked || isPaid}
+                                  disabled={isPaid}
                                   onChange={() => {
+                                    if (isPaid) return;
                                     let updated;
                                     if (isChecked) {
                                       updated = customSelectedMonths.filter(m => m !== month);
@@ -2635,7 +2696,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                   }}
                                   className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-white/10 border-white/10"
                                 />
-                                <span className="text-xs text-slate-700 dark:text-slate-300 font-semibold">{month}</span>
+                                <span className={`text-xs font-semibold ${isPaid ? 'line-through text-slate-400 font-bold' : 'text-slate-700 dark:text-slate-300'}`}>
+                                  {month} {isPaid ? '(Paid)' : ''}
+                                </span>
                               </label>
                             );
                           })}

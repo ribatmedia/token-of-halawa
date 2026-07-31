@@ -1031,7 +1031,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       const newDonationId = `TOH-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       let finalDonorName = donorNameInput || 'General Donor';
       if (donationTab === 'renew' && donorIdInput) {
-        finalDonorName = donors.find(d => d.id === donorIdInput)?.name || 'General Donor';
+        finalDonorName = allAvailableDonors.find(d => d.id === donorIdInput)?.name || 'General Donor';
       }
 
       const newEntry = {
@@ -1039,11 +1039,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         amount: Number(donationAmount) || 100,
         status: 'VERIFIED',
         createdAt: new Date().toISOString(),
-        donor: { name: finalDonorName, phone: donorPhoneInput || '', location: donorAddressInput || 'Kerala' },
+        donor: { id: donorIdInput || `dnr-${Date.now()}`, name: finalDonorName, phone: donorPhoneInput || '', location: donorAddressInput || 'Kerala' },
         notes: notes ? `${notes} (Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'})` : `Logged by: ${user?.fullName || 'Campaigner'}. Class: ${(user as any)?.class || 'Plus one'}. Month: ${donationMonthInput}. Status: ${amountStatusInput}. Plan: ${monthPlanInput}`
       };
 
-      setDonations(prev => [newEntry, ...prev]);
+      setDonations(prev => [newEntry, ...(Array.isArray(prev) ? prev : [])]);
       setFormSuccess(true);
 
       setSelectedReceiptData({

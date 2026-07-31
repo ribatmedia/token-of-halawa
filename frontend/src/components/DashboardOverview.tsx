@@ -1992,8 +1992,39 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           const isRenew = item.notes?.includes('Renew');
                           const itemClass = item.notes?.match(/Class:\s*([^\.]+)/)?.[1] || '';
                           const itemCamp = item.notes?.match(/Logged by:\s*([^\.]+)/)?.[1] || 'Unknown';
-                          const cleanId = item.id.split('-')[0].slice(0, 4).toUpperCase();
-                          const receiptNo = item.receipts?.[0]?.receiptNumber || `TOH-2026-${cleanId}`;
+                          
+                          const rawReceiptNo = item.receipts?.[0]?.receiptNumber || item.receiptNo;
+                          let receiptNo = rawReceiptNo;
+                          if (!receiptNo) {
+                            if (typeof item.id === 'string' && item.id.startsWith('TOH-2026-')) {
+                              receiptNo = item.id;
+                            } else if (typeof item.id === 'string' && item.id.includes('-')) {
+                              const parts = item.id.split('-');
+                              const lastPart = parts[parts.length - 1].slice(-4).toUpperCase();
+                              receiptNo = `TOH-2026-${lastPart}`;
+                            } else {
+                              receiptNo = `TOH-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+                            }
+                          }
+
+                          const donorDonations = safeDonations.filter(q => {
+                            const qId = q.donorId || q.donor?.id;
+                            const dId = item.donorId || item.donor?.id;
+                            const qName = q.donor?.name?.trim()?.toLowerCase();
+                            const dName = item.donor?.name?.trim()?.toLowerCase();
+                            if (qId && dId && String(qId) === String(dId)) return true;
+                            if (qName && dName && qName === dName) return true;
+                            return false;
+                          });
+
+                          const paidMonths = donorDonations
+                            .filter(q => ['APPROVED', 'VERIFIED', 'PENDING'].includes(q.status))
+                            .flatMap(q => {
+                              const monthMatch = q.notes?.match(/Month:\s*([^.]+)/);
+                              if (!monthMatch) return [];
+                              return monthMatch[1].replace('Custom:', '').split(',').map((m: string) => m.trim());
+                            })
+                            .filter(Boolean);
                           
                           return (
                             <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium hover:bg-slate-550/5 transition duration-150">
@@ -2060,6 +2091,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         phone: item.donor?.phone || '',
                                         amount: item.amount,
                                         month: itemMonth,
+                                        paidMonths: paidMonths,
                                         plan: itemPlan
                                       });
                                       setWhatsAppAutoShare(true);

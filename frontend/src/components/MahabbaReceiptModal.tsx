@@ -14,6 +14,7 @@ interface ReceiptData {
   phone?: string;
   amount: string | number;
   month?: string;
+  paidMonths?: string[];
   plan?: string;
 }
 
@@ -93,7 +94,18 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
     }
   };
 
-  const selectedMonth = receiptData?.month?.substring(0, 3) || '';
+  // Parse current months being paid in this specific receipt
+  const currentMonthsList = (receiptData?.month || '')
+    .split(',')
+    .map(s => s.trim().substring(0, 3))
+    .filter(Boolean);
+
+  // Parse all previously paid months for this donor
+  const paidMonthsList = (receiptData?.paidMonths || [])
+    .flatMap(m => typeof m === 'string' ? m.split(',') : [])
+    .map(s => s.trim().substring(0, 3))
+    .filter(Boolean);
+
   const lay = customLayout as Record<string, { dx: number; dy: number; size: number }> | undefined;
   const p = (key: string) => {
     const el = lay?.[key];
@@ -133,15 +145,43 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
         <div style={{ position: 'absolute', ...p('months'), display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center', width: '90%' }}>
           {MONTH_ROWS.map((row, ri) => (
             <div key={ri} style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-              {row.map(m => (
-                <div key={m} style={{
-                  backgroundColor: m === selectedMonth ? '#18A66A' : '#eef2f6',
-                  color: m === selectedMonth ? 'white' : '#64748b',
-                  borderRadius: '10px', padding: '5px 10px', fontSize: `${p('months').fontSize}`, fontWeight: m === selectedMonth ? 700 : 500
-                }}>
-                  {m}
-                </div>
-              ))}
+              {row.map(m => {
+                const isCurrentMonth = currentMonthsList.includes(m);
+                const isPaidMonth = paidMonthsList.includes(m);
+
+                let bgColor = '#eef2f6';
+                let textColor = '#64748b';
+                let fontWeight: number | string = 500;
+                let border = 'none';
+
+                if (isCurrentMonth) {
+                  // Current month being paid in this receipt -> Dark Green
+                  bgColor = '#15803D';
+                  textColor = '#ffffff';
+                  fontWeight = 800;
+                  border = '1.5px solid #14532D';
+                } else if (isPaidMonth) {
+                  // Previously paid month for donor -> Light Green
+                  bgColor = '#86EFAC';
+                  textColor = '#14532D';
+                  fontWeight = 700;
+                  border = '1px solid #4ADE80';
+                }
+
+                return (
+                  <div key={m} style={{
+                    backgroundColor: bgColor,
+                    color: textColor,
+                    borderRadius: '10px',
+                    padding: '5px 10px',
+                    fontSize: `${p('months').fontSize}`,
+                    fontWeight: fontWeight,
+                    border: border
+                  }}>
+                    {m}
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>

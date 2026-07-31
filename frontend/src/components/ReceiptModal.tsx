@@ -12,6 +12,7 @@ interface ReceiptData {
   phone?: string;
   amount: string | number;
   month?: string;
+  paidMonths?: string[];
   plan?: string;
 }
 
@@ -56,7 +57,15 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
     day: '2-digit', month: 'short', year: 'numeric'
   });
 
-  const selectedMonth = receiptData?.month?.substring(0, 3) || '';
+  const currentMonthsList = (receiptData?.month || '')
+    .split(',')
+    .map(s => s.trim().substring(0, 3))
+    .filter(Boolean);
+
+  const paidMonthsList = (receiptData?.paidMonths || [])
+    .flatMap(m => typeof m === 'string' ? m.split(',') : [])
+    .map(s => s.trim().substring(0, 3))
+    .filter(Boolean);
 
   const generateImage = async (): Promise<string | null> => {
     if (!receiptRef.current) return null;
@@ -150,11 +159,41 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           <div style={{ position: 'absolute', ...p('months'), display: 'flex', flexDirection: 'column', gap: '0.5cqw', alignItems: 'center', width: '90%' }}>
             {MONTH_ROWS.map((row, ri) => (
               <div key={ri} style={{ display: 'flex', gap: '0.7cqw', justifyContent: 'center' }}>
-                {row.map(m => (
-                  <div key={m} style={{ backgroundColor: m === selectedMonth ? '#18A66A' : '#eef2f6', color: m === selectedMonth ? 'white' : '#64748b', borderRadius: '0.9cqw', padding: '0.5cqw 0.9cqw', fontSize: `${(POS.months.s / 1080) * 100}cqw`, fontWeight: m === selectedMonth ? 700 : 500 }}>
-                    {m}
-                  </div>
-                ))}
+                {row.map(m => {
+                  const isCurrentMonth = currentMonthsList.includes(m);
+                  const isPaidMonth = paidMonthsList.includes(m);
+
+                  let bgColor = '#eef2f6';
+                  let textColor = '#64748b';
+                  let fontWeight: number | string = 500;
+                  let border = 'none';
+
+                  if (isCurrentMonth) {
+                    bgColor = '#15803D';
+                    textColor = '#ffffff';
+                    fontWeight = 800;
+                    border = '0.15cqw solid #14532D';
+                  } else if (isPaidMonth) {
+                    bgColor = '#86EFAC';
+                    textColor = '#14532D';
+                    fontWeight = 700;
+                    border = '0.1cqw solid #4ADE80';
+                  }
+
+                  return (
+                    <div key={m} style={{
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      borderRadius: '0.9cqw',
+                      padding: '0.5cqw 0.9cqw',
+                      fontSize: `${(POS.months.s / 1080) * 100}cqw`,
+                      fontWeight: fontWeight,
+                      border: border
+                    }}>
+                      {m}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>

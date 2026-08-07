@@ -28,13 +28,13 @@ interface ReceiptModalProps {
 const MONTH_ROWS = [MONTHS.slice(0, 5), MONTHS.slice(5)];
 
 const POS: Record<string, { x: number; y: number; s: number; centered?: boolean }> = {
-  receiptNo: { x: 340, y: 305, s: 26 },
-  date: { x: 340, y: 349, s: 26 },
+  receiptNo: { x: 340, y: 440, s: 26 },
+  date: { x: 340, y: 480, s: 26 },
   name: { x: 540, y: 400, s: 64, centered: true },
-  placePhone: { x: 540, y: 478, s: 34, centered: true },
-  amount: { x: 540, y: 560, s: 70, centered: true },
-  months: { x: 540, y: 960, s: 16, centered: true },
-  plan: { x: 540, y: 1060, s: 22, centered: true },
+  placePhone: { x: 540, y: 468, s: 34, centered: true },
+  amount: { x: 540, y: 595, s: 70, centered: true },
+  months: { x: 540, y: 725, s: 16, centered: true },
+  plan: { x: 540, y: 785, s: 22, centered: true },
 };
 
 export default function ReceiptModal({ isOpen, onClose, receiptData, customLayout, previewMode, autoShareWhatsApp }: ReceiptModalProps) {

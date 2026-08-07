@@ -52,100 +52,112 @@ const translations = {
     totalCollected: 'Total Collected',
     targetProgress: 'Target Completion Progress',
     liveRankings: 'Live Rankings',
-    expectedTotal: 'Expected Total'
+    expectedTotal: 'Expected Total',
+    renewDonor: 'Renew Donor',
+    donorsDirectory: 'Donors Directory',
+    myCollections: 'My Collections'
   },
   ml: {
-    title: 'à´‡à´¨àµà´±à´²à´¿à´œà´¨àµà´±àµ à´¡àµŠà´£àµ‡à´·àµ» à´¹à´¬àµ',
-    subtitle: 'à´Ÿàµ‹à´•àµà´•àµº à´“à´«àµ à´¹à´²à´¾à´µ à´¡àµŠà´£àµ‡à´·àµ» à´¸à´¿à´¸àµà´±àµà´±à´‚',
-    todayCollection: 'à´‡à´¨àµà´¨à´¤àµà´¤àµ† à´¸à´‚à´­à´¾à´µà´¨',
-    monthlyCollection: 'à´ªàµà´°à´¤à´¿à´®à´¾à´¸ à´¸à´‚à´­à´¾à´µà´¨',
-    pendingVerification: 'à´ªà´°à´¿à´¶àµ‹à´§à´¨à´¯à´¿à´²àµà´³àµà´³à´µ',
-    activeDonors: 'à´¸à´œàµ€à´µ à´¦à´¾à´¤à´¾à´•àµà´•àµ¾',
-    quickActions: 'à´¦àµà´°àµà´¤ à´ªàµà´°à´•àµà´°à´¿à´¯à´•àµ¾',
-    logDonation: 'à´¡àµŠà´£àµ‡à´·àµ» à´°àµ‡à´–à´ªàµà´ªàµ†à´Ÿàµà´¤àµà´¤àµà´•',
-    registerDonor: 'à´¦à´¾à´¤à´¾à´µà´¿à´¨àµ† à´šàµ‡àµ¼à´•àµà´•àµà´•',
-    verifyDonations: 'à´¡àµŠà´£àµ‡à´·àµ» à´µàµ†Ñ€Ð¸à´«àµˆ à´šàµ†à´¯àµà´¯àµà´•',
-    whatsappReceipt: 'à´µà´¾à´Ÿàµà´¸à´¾à´ªàµà´ªàµ à´¬àµà´°àµ‹à´¡àµà´•à´¾à´¸àµà´±àµà´±àµ',
-    topVolunteers: 'à´®à´¿à´•à´šàµà´š à´•àµà´¯à´¾à´®àµà´ªà´¯à´¿à´¨àµ¼à´®à´¾àµ¼',
-    topClasses: 'à´®à´¿à´•à´šàµà´š à´•àµà´²à´¾à´¸àµà´•àµ¾',
-    recentActivity: 'à´¸à´®àµ€à´ªà´•à´¾à´² à´ªàµà´°à´µàµ¼à´¤àµà´¤à´¨à´™àµà´™àµ¾',
-    heatmap: 'à´¡àµŠà´£àµ‡à´·àµ» à´µàµ†à´²àµ‹à´¸à´¿à´±àµà´±à´¿ à´¹àµ€à´±àµà´±àµà´®à´¾à´ªàµà´ªàµ',
-    chartGrowth: 'à´ªàµà´°à´¤à´¿à´®à´¾à´¸ à´µà´³àµ¼à´šàµà´šà´¾ à´¨à´¿à´°à´•àµà´•àµ',
-    chartTrend: 'à´•àµà´¯à´¾à´®àµà´ªà´¯à´¿àµ» à´ªàµà´°àµ‹à´—à´¤à´¿',
-    searchPlaceholder: 'à´¤à´¿à´°à´¯àµà´•...',
-    outstandingAmount: 'à´¬à´¾à´•àµà´•à´¿à´¯àµà´³àµà´³ à´•àµà´Ÿà´¿à´¶àµà´¶à´¿à´•',
-    themeToggle: 'à´¤àµ€à´‚ à´®à´¾à´±àµà´±àµà´•',
-    languageToggle: 'à´­à´¾à´· à´®à´¾à´±àµà´±àµà´•',
-    syncStatus: 'à´“à´«àµâ€Œà´²àµˆàµ» à´•àµà´¯àµ‚ à´¸à´®à´¨àµà´µà´¯à´¿à´ªàµà´ªà´¿à´šàµà´šàµ',
-    targetDonors: 'à´²à´•àµà´·àµà´¯à´®à´¿à´Ÿàµà´Ÿ à´¦à´¾à´¤à´¾à´•àµà´•àµ¾',
-    totalDonors: 'à´†à´•àµ† à´¦à´¾à´¤à´¾à´•àµà´•àµ¾',
-    achievedPercent: 'à´²à´­à´¿à´šàµà´š à´¶à´¤à´®à´¾à´¨à´‚',
-    totalCollected: 'à´†à´•àµ† à´¶àµ‡à´–à´°à´¿à´šàµà´šà´¤àµ',
-    targetProgress: 'à´²à´•àµà´·àµà´¯ à´ªàµ‚àµ¼à´¤àµà´¤àµ€à´•à´°à´£ à´ªàµà´°àµ‹à´—à´¤à´¿',
-    liveRankings: 'à´¤à´¤àµà´¸à´®à´¯ à´±à´¾à´™àµà´•à´¿à´‚à´—àµ',
-    expectedTotal: 'à´ªàµà´°à´¤àµ€à´•àµà´·à´¿à´•àµà´•àµà´¨àµà´¨ à´¤àµà´•'
+    title: 'ഇന്റലിജന്റ് ഡൊണേഷൻ ഹബ്',
+    subtitle: 'ടോക്കൺ ഓഫ് ഹലാവ ഡൊണേഷൻ സിസ്റ്റം',
+    todayCollection: 'ഇന്നത്തെ സംഭാവന',
+    monthlyCollection: 'പ്രതിമാസ സംഭാവന',
+    pendingVerification: 'പരിശോധനയിലുള്ളവ',
+    activeDonors: 'സജീവ ദാതാക്കൾ',
+    quickActions: 'ദ്രുത പ്രക്രിയകൾ',
+    logDonation: 'ഡൊണേഷൻ രേഖപ്പെടുത്തുക',
+    registerDonor: 'ദാതാവിനെ ചേർക്കുക',
+    verifyDonations: 'ഡൊണേഷൻ വേരിഫൈ ചെയ്യുക',
+    whatsappReceipt: 'വാട്സാപ്പ് ബ്രോഡ്കാസ്റ്റ്',
+    topVolunteers: 'മികച്ച ക്യാമ്പയിനർമാർ',
+    topClasses: 'മികച്ച ക്ലാസുകൾ',
+    recentActivity: 'സമീപകാല പ്രവർത്തനങ്ങൾ',
+    heatmap: 'ഡൊണേഷൻ ഹീറ്റ്മാപ്പ്',
+    chartGrowth: 'പ്രതിമാസ വളർച്ചാ നിരക്ക്',
+    chartTrend: 'ക്യാമ്പയിൻ പുരോഗതി',
+    searchPlaceholder: 'തിരയുക...',
+    outstandingAmount: 'ബാക്കിയുള്ള കുടിശ്ശിക',
+    themeToggle: 'തീം മാറ്റുക',
+    languageToggle: 'ഭാഷ മാറ്റുക',
+    syncStatus: 'ഓഫ്‌ലൈൻ ക്യൂ സമന്വയിപ്പിച്ചു',
+    targetDonors: 'ലക്ഷ്യമിട്ട ദാതാക്കൾ',
+    totalDonors: 'ആകെ ദാതാക്കൾ',
+    achievedPercent: 'ലഭിച്ച ശതമാനം',
+    totalCollected: 'ആകെ ശേഖരിച്ചത്',
+    targetProgress: 'ലക്ഷ്യ പൂർത്തീകരണ പുരോഗതി',
+    liveRankings: 'തത്സമയ റാങ്കിംഗ്',
+    expectedTotal: 'പ്രതീക്ഷിക്കുന്ന തുക',
+    renewDonor: 'പുതുക്കുക',
+    donorsDirectory: 'ദാതാക്കളുടെ വിവരങ്ങൾ',
+    myCollections: 'എന്റെ പിരിവുകൾ'
   },
   ar: {
-    title: 'Ù…Ø±ÙƒØ² Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª Ø§Ù„Ø°ÙƒÙŠ',
-    subtitle: 'Ù†Ø¸Ø§Ù… Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª ØªÙˆÙƒÙ† Ø§Ù„Ø­Ù„Ø§ÙˆØ©',
-    todayCollection: 'ØªØ¨Ø±Ø¹Ø§Øª Ø§Ù„ÙŠÙˆÙ…',
-    monthlyCollection: 'Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª Ø§Ù„Ø´Ù‡Ø±ÙŠØ©',
-    pendingVerification: 'ÙÙŠ Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØ­Ù‚Ù‚',
-    activeDonors: 'Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ†',
-    quickActions: 'Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø³Ø±ÙŠØ¹Ø©',
-    logDonation: 'ØªØ³Ø¬ÙŠÙ„ ØªØ¨Ø±Ø¹',
-    registerDonor: 'ØªØ³Ø¬ÙŠÙ„ Ù…ØªØ¨Ø±Ø¹',
-    verifyDonations: 'Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØªØ¨Ø±Ø¹Ø§Øª',
-    whatsappReceipt: 'Ø¨Ø« ÙˆØ§ØªØ³Ø§Ø¨',
-    topVolunteers: 'Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…ØªØµØ¯Ø±ÙŠÙ† Ù…Ù† Ø§Ù„Ù…Ù†Ø¸Ù…ÙŠÙ†',
-    topClasses: 'Ø£ÙØ¶Ù„ Ø§Ù„ÙØµÙˆÙ„ Ø§Ù„Ø¯Ø±Ø§Ø³ÙŠØ©',
-    recentActivity: 'Ø³Ø¬Ù„Ø§Øª Ø§Ù„Ù†Ø´Ø§Ø· Ø§Ù„Ø­Ø¯ÙŠØ«Ø©',
-    heatmap: 'Ø®Ø±ÙŠØ·Ø© Ø³Ø±Ø¹Ø© Ø§Ù„ØªØ¨Ø±Ø¹ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹ÙŠØ©',
-    chartGrowth: 'Ù…Ø³Ø§Ø± Ø§Ù„Ù†Ù…Ùˆ Ø§Ù„Ø´Ù‡Ø±ÙŠ',
-    chartTrend: 'ØªÙ‚Ø¯Ù… Ø¬Ù…Ø¹ Ø§Ù„Ø­Ù…Ù„Ø©',
-    searchPlaceholder: 'Ø¨Ø­Ø«...',
-    outstandingAmount: 'Ø§Ù„Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø³ØªØ­Ù‚ Ù„Ù„ØªØ¬Ø¯ÙŠØ¯',
-    themeToggle: 'ØªØºÙŠÙŠØ± Ø§Ù„Ù…Ø¸Ù‡Ø±',
-    languageToggle: 'ØªØºÙŠÙŠØ± Ø§Ù„Ù„ØºØ©',
-    syncStatus: 'ØªÙ… Ù…Ø²Ø§Ù…Ù†Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø¨Ø¯ÙˆÙ† Ø¥Ù†ØªØ±Ù†Øª',
-    targetDonors: 'Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ† Ø§Ù„Ù…Ø³ØªÙ‡Ø¯ÙÙŠÙ†',
-    totalDonors: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…ØªØ¨Ø±Ø¹ÙŠÙ†',
-    achievedPercent: 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²',
-    totalCollected: 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹',
-    targetProgress: 'Ø§Ù„ØªÙ‚Ø¯Ù… Ù†Ø­Ùˆ Ø§Ù„Ù‡Ø¯Ù',
-    liveRankings: 'Ø§Ù„ØªØ±ØªÙŠØ¨ Ø§Ù„Ù…Ø¨Ø§Ø´Ø±',
-    expectedTotal: 'Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ù…ØªÙˆÙ‚Ø¹'
+    title: 'مركز التبرعات الذكي',
+    subtitle: 'نظام إدارة التبرعات توكن الحلاوة',
+    todayCollection: 'تبرعات اليوم',
+    monthlyCollection: 'التبرعات الشهرية',
+    pendingVerification: 'في انتظار التحقق',
+    activeDonors: 'المتبرعين النشطين',
+    quickActions: 'إجراءات سريعة',
+    logDonation: 'تسجيل تبرع',
+    registerDonor: 'تسجيل متبرع',
+    verifyDonations: 'التحقق من التبرعات',
+    whatsappReceipt: 'بث واتساب',
+    topVolunteers: 'قائمة المتصدرين من المنظمين',
+    topClasses: 'أفضل الفصول الدراسية',
+    recentActivity: 'سجلات النشاط الحديثة',
+    heatmap: 'خريطة سرعة التبرع الأسبوعية',
+    chartGrowth: 'مسار النمو الشهري',
+    chartTrend: 'تقدم جمع الحملة',
+    searchPlaceholder: 'بحث...',
+    outstandingAmount: 'الرصيد المستحق للتجديد',
+    themeToggle: 'تغيير المظهر',
+    languageToggle: 'تغيير اللغة',
+    syncStatus: 'تم مزامنة البيانات بدون إنترنت',
+    targetDonors: 'المتبرعين المستهدفين',
+    totalDonors: 'إجمالي المتبرعين',
+    achievedPercent: 'نسبة الإنجاز',
+    totalCollected: 'إجمالي المجموع',
+    targetProgress: 'التقدم نحو الهدف',
+    liveRankings: 'الترتيب المباشر',
+    expectedTotal: 'المجموع المتوقع',
+    renewDonor: 'تجديد المتبرع',
+    donorsDirectory: 'دليل المتبرعين',
+    myCollections: 'تحصيلاتي'
   },
   ta: {
-    title: 'à®ªà¯à®¤à¯à®¤à®¿à®šà®¾à®²à®¿à®¤à¯à®¤à®©à®®à®¾à®© à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®®à¯ˆà®¯à®®à¯',
-    subtitle: 'à®Ÿà¯‹à®•à¯à®•à®©à¯ à®†à®ƒà®ªà¯ à®¹à®²à®¾à®µà®¾ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®‡à®¯à®¨à¯à®¤à®¿à®°à®®à¯',
-    todayCollection: 'à®‡à®©à¯à®±à¯ˆà®¯ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ',
-    monthlyCollection: 'à®®à®¾à®¤à®¾à®¨à¯à®¤à®¿à®° à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ',
-    pendingVerification: 'à®šà®°à®¿à®ªà®¾à®°à¯à®ªà¯à®ªà¯ à®¨à®¿à®²à¯à®µà¯ˆà®¯à®¿à®²à¯ à®‰à®³à¯à®³à®¤à¯',
-    activeDonors: 'à®šà¯†à®¯à®²à®¿à®²à¯ à®‰à®³à¯à®³ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯à®•à®³à¯',
-    quickActions: 'à®µà®¿à®°à¯ˆà®µà®¾à®© à®šà¯†à®¯à®²à¯à®•à®³à¯',
-    logDonation: 'à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®ªà®¤à®¿à®µà¯à®šà¯†à®¯à¯',
-    registerDonor: 'à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯ à®ªà®¤à®¿à®µà¯',
-    verifyDonations: 'à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®•à®³à¯ˆ à®šà®°à®¿à®ªà®¾à®°à¯',
-    whatsappReceipt: 'à®µà®¾à®Ÿà¯à®¸à¯à®…à®ªà¯ à®’à®³à®¿à®ªà®°à®ªà¯à®ªà¯',
-    topVolunteers: 'à®®à¯à®©à¯à®©à®£à®¿ à®ªà®¿à®°à®šà¯à®šà®¾à®°à®•à®°à¯à®•à®³à¯',
-    topClasses: 'à®®à¯à®©à¯à®©à®£à®¿ à®µà®•à¯à®ªà¯à®ªà¯à®•à®³à¯',
-    recentActivity: 'à®šà®®à¯€à®ªà®¤à¯à®¤à®¿à®¯ à®¨à®Ÿà®µà®Ÿà®¿à®•à¯à®•à¯ˆà®•à®³à¯',
-    heatmap: 'à®µà®¾à®°à®¾à®¨à¯à®¤à®¿à®° à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®µà¯†à®ªà¯à®ª à®µà®°à¯ˆà®ªà®Ÿà®®à¯',
-    chartGrowth: 'à®®à®¾à®¤à®¾à®¨à¯à®¤à®¿à®° à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆ à®µà®³à®°à¯à®šà¯à®šà®¿',
-    chartTrend: 'à®…à®°à®šà¯ à®¨à®¿à®¤à®¿à®ªà¯ à®ªà¯‹à®•à¯à®•à¯',
-    searchPlaceholder: 'à®¤à¯‡à®Ÿà¯à®•...',
-    outstandingAmount: 'à®¨à®¿à®²à¯à®µà¯ˆà®¯à®¿à®²à¯ à®‰à®³à¯à®³ à®¤à¯Šà®•à¯ˆ',
-    themeToggle: 'à®µà®£à¯à®£ à®¤à¯€à®®à¯ à®®à®¾à®±à¯à®±à®®à¯',
-    languageToggle: 'à®®à¯Šà®´à®¿à®¯à¯ˆ à®®à®¾à®±à¯à®±à¯à®•',
-    syncStatus: 'à®†à®ƒà®ªà¯à®²à¯ˆà®©à¯ à®¤à®°à®µà¯ à®’à®¤à¯à®¤à®¿à®šà¯ˆà®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®Ÿà®¤à¯',
-    targetDonors: 'à®‡à®²à®•à¯à®•à¯ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯à®•à®³à¯',
-    totalDonors: 'à®®à¯Šà®¤à¯à®¤ à®¨à®©à¯à®•à¯Šà®Ÿà¯ˆà®¯à®¾à®³à®°à¯à®•à®³à¯',
-    achievedPercent: 'à®…à®Ÿà¯ˆà®¨à¯à®¤ à®šà®¤à®µà¯€à®¤à®®à¯',
-    totalCollected: 'à®®à¯Šà®¤à¯à®¤à®®à¯ à®µà®šà¯‚à®²à®¿à®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®Ÿà®¤à¯',
-    targetProgress: 'à®‡à®²à®•à¯à®•à¯ à®¨à®¿à®±à¯ˆà®µà¯ à®®à¯à®©à¯à®©à¯‡à®±à¯à®±à®®à¯',
-    liveRankings: 'à®¨à¯‡à®°à®Ÿà®¿ à®¤à®°à®µà®°à®¿à®šà¯ˆ',
-    expectedTotal: 'à®Žà®¤à®¿à®°à¯à®ªà®¾à®°à¯à®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®®à¯ à®®à¯Šà®¤à¯à®¤à®®à¯'
+    title: 'புத்திசாலித்தனமான நன்கொடை மையம்',
+    subtitle: 'டோக்கன் ஆஃப் ஹலாவா நன்கொடை இயந்திரம்',
+    todayCollection: 'இன்றைய நன்கொடை',
+    monthlyCollection: 'மாதாந்திர நன்கொடை',
+    pendingVerification: 'சரிபார்ப்பு நிலுவையில் உள்ளது',
+    activeDonors: 'செயலில் உள்ள நன்கொடையாளர்கள்',
+    quickActions: 'விரைவான செயல்கள்',
+    logDonation: 'நன்கொடை பதிவுசெய்',
+    registerDonor: 'நன்கொடையாளர் பதிவு',
+    verifyDonations: 'நன்கொடைகளை சரிபார்',
+    whatsappReceipt: 'வாட்ஸ்அப் ஒளிபரப்பு',
+    topVolunteers: 'முன்னணி பிரச்சாரகர்கள்',
+    topClasses: 'முன்னணி வகுப்புகள்',
+    recentActivity: 'சமீபத்திய நடவடிக்கைகள்',
+    heatmap: 'வாராந்திர நன்கொடை வரைபடம்',
+    chartGrowth: 'மாதாந்திர நன்கொடை வளர்ச்சி',
+    chartTrend: 'அரசு நிதி போக்கு',
+    searchPlaceholder: 'தேடுக...',
+    outstandingAmount: 'நிலுவையில் உள்ள தொகை',
+    themeToggle: 'வண்ண தீம் மாற்றம்',
+    languageToggle: 'மொழியை மாற்றுக',
+    syncStatus: 'ஆஃப்லைன் தரவு ஒத்திசைக்கப்பட்டது',
+    targetDonors: 'இலக்கு நன்கொடையாளர்கள்',
+    totalDonors: 'மொத்த நன்கொடையாளர்கள்',
+    achievedPercent: 'அடைந்த சதவீதம்',
+    totalCollected: 'மொத்தம் வசூலிக்கப்பட்டது',
+    targetProgress: 'இலக்கு நிறைவு முன்னேற்றம்',
+    liveRankings: 'நேரடி தரவரிசை',
+    expectedTotal: 'எதிர்பார்க்கப்படும் மொத்தம்',
+    renewDonor: 'புதுப்பிக்குக',
+    donorsDirectory: 'நன்கொடையாளர் கோப்பகம்',
+    myCollections: 'எனது வசூல்கள்'
   }
 };
 
@@ -202,7 +214,21 @@ const campaignersList = [
 
 export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRole?: 'admin' | 'campaigner' }) {
   const { theme, toggleTheme, token, user, organization, setAuth, clearAuth, _hasHydrated } = useAuthStore();
-  const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>('en');
+  const [lang, setLang] = useState<'en' | 'ml' | 'ar' | 'ta'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('toh_language');
+      if (saved && ['en', 'ml', 'ar', 'ta'].includes(saved)) {
+        return saved as any;
+      }
+    }
+    return 'en';
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('toh_language', lang);
+    }
+  }, [lang]);
   const [isClient, setIsClient] = useState(false);
   const [showSyncAlert, setShowSyncAlert] = useState(false);
   const t = translations[lang];
@@ -1768,9 +1794,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                 className="bg-transparent outline-none cursor-pointer font-bold text-slate-700 dark:text-slate-300 pr-1"
               >
                 <option value="en" className="text-slate-850">English</option>
-                <option value="ml" className="text-slate-850">à´®à´²à´¯à´¾à´³à´‚</option>
-                <option value="ar" className="text-slate-850">Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©</option>
-                <option value="ta" className="text-slate-850">à®¤à®®à®¿à®´à¯</option>
+                <option value="ml" className="text-slate-850">മലയാളം</option>
+                <option value="ar" className="text-slate-850">العربية</option>
+                <option value="ta" className="text-slate-850">தமிழ்</option>
               </select>
             </div>
 

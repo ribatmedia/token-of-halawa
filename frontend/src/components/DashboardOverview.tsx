@@ -55,7 +55,32 @@ const translations = {
     expectedTotal: 'Expected Total',
     renewDonor: 'Renew Donor',
     donorsDirectory: 'Donors Directory',
-    myCollections: 'My Collections'
+    myCollections: 'My Collections',
+    volunteerPortal: 'VOLUNTEER PORTAL',
+    adminPortal: 'ADMIN PORTAL',
+    dashboard: 'Dashboard',
+    campaignerDashboard: 'Campaigner Dashboard',
+    adminDashboard: 'Admin Dashboard',
+    addDonation: 'Add Donation',
+    leaderboard: 'Leaderboard',
+    messages: 'Messages',
+    overallRank: 'Overall Rank',
+    classRank: 'Class Rank',
+    leadingCollectors: 'Leading Collectors',
+    profiles: 'profiles',
+    active: 'Active',
+    markAsRead: 'Mark as Read',
+    messageFromAdmin: 'Message from Admin',
+    analytics: 'Analytics',
+    verifyPhysical: 'Verify Physical',
+    manageCampaigners: 'Manage Campaigners',
+    campaignersStats: 'Campaigners Stats',
+    classRankings: 'Class Rankings',
+    classCollections: 'Class Collections',
+    classDashboard: 'Class Dashboard',
+    developerTools: 'Developer Tools',
+    myReceipts: 'My Receipts',
+    donationEntries: 'Donation Entries'
   },
   ml: {
     title: 'ഇന്റലിജന്റ് ഡൊണേഷൻ ഹബ്',
@@ -89,7 +114,32 @@ const translations = {
     expectedTotal: 'പ്രതീക്ഷിക്കുന്ന തുക',
     renewDonor: 'പുതുക്കുക',
     donorsDirectory: 'ദാതാക്കളുടെ വിവരങ്ങൾ',
-    myCollections: 'എന്റെ പിരിവുകൾ'
+    myCollections: 'എന്റെ പിരിവുകൾ',
+    volunteerPortal: 'വോളന്റിയർ പോർട്ടൽ',
+    adminPortal: 'അഡ്മിൻ പോർട്ടൽ',
+    dashboard: 'ഡാഷ്‌ബോർഡ്',
+    campaignerDashboard: 'ക്യാമ്പയിനർ ഡാഷ്‌ബോർഡ്',
+    adminDashboard: 'അഡ്മിൻ ഡാഷ്‌ബോർഡ്',
+    addDonation: 'സംഭാവന ചേർക്കുക',
+    leaderboard: 'ലീഡർബോർഡ്',
+    messages: 'സന്ദേശങ്ങൾ',
+    overallRank: 'ആകെ റാങ്ക്',
+    classRank: 'ക്ലാസ് റാങ്ക്',
+    leadingCollectors: 'മുൻനിര പിരിവുകാർ',
+    profiles: 'പ്രൊഫൈലുകൾ',
+    active: 'ആക്ടീവ്',
+    markAsRead: 'വായിച്ചതായി അടയാളപ്പെടുത്തുക',
+    messageFromAdmin: 'അഡ്മിന്റെ സന്ദേശം',
+    analytics: 'അനലിറ്റിക്സ്',
+    verifyPhysical: 'വേരിഫൈ ചെയ്യുക',
+    manageCampaigners: 'ക്യാമ്പയിനർമാർ',
+    campaignersStats: 'ക്യാമ്പയിനർ സ്റ്റാറ്റ്സ്',
+    classRankings: 'ക്ലാസ് റാങ്കിംഗ്',
+    classCollections: 'ക്ലാസ്സ് പിരിവുകൾ',
+    classDashboard: 'ക്ലാസ്സ് ഡാഷ്‌ബോർഡ്',
+    developerTools: 'ഡെവലപ്പർ ടൂൾസ്',
+    myReceipts: 'എന്റെ റസീപ്റ്റുകൾ',
+    donationEntries: 'ഡൊണേഷൻ വിവരങ്ങൾ'
   },
   ar: {
     title: 'مركز التبرعات الذكي',
@@ -123,7 +173,32 @@ const translations = {
     expectedTotal: 'المجموع المتوقع',
     renewDonor: 'تجديد المتبرع',
     donorsDirectory: 'دليل المتبرعين',
-    myCollections: 'تحصيلاتي'
+    myCollections: 'تحصيلاتي',
+    volunteerPortal: 'بوابة المتطوعين',
+    adminPortal: 'بوابة المسؤول',
+    dashboard: 'لوحة التحكم',
+    campaignerDashboard: 'لوحة المنظم',
+    adminDashboard: 'لوحة المسؤول',
+    addDonation: 'إضافة تبرع',
+    leaderboard: 'قائمة المتصدرين',
+    messages: 'الرسائل',
+    overallRank: 'الترتيب العام',
+    classRank: 'ترتيب الصف',
+    leadingCollectors: 'المحصلين المتصدرين',
+    profiles: 'ملفات شخصية',
+    active: 'نشط',
+    markAsRead: 'تحديد كمقروء',
+    messageFromAdmin: 'رسالة من المسؤول',
+    analytics: 'التحليلات',
+    verifyPhysical: 'التحقق الميداني',
+    manageCampaigners: 'إدارة المنظمين',
+    campaignersStats: 'إحصائيات المنظمين',
+    classRankings: 'ترتيب الصفوف',
+    classCollections: 'تحصيلات الصف',
+    classDashboard: 'لوحة الصف',
+    developerTools: 'أدوات المطور',
+    myReceipts: 'إيصالاتي',
+    donationEntries: 'سجلات التبرعات'
   },
   ta: {
     title: 'புத்திசாலித்தனமான நன்கொடை மையம்',
@@ -157,7 +232,32 @@ const translations = {
     expectedTotal: 'எதிர்பார்க்கப்படும் மொத்தம்',
     renewDonor: 'புதுப்பிக்குக',
     donorsDirectory: 'நன்கொடையாளர் கோப்பகம்',
-    myCollections: 'எனது வசூல்கள்'
+    myCollections: 'எனது வசூல்கள்',
+    volunteerPortal: 'தன்னார்வலர் போர்டல்',
+    adminPortal: 'நிர்வாகி போர்டல்',
+    dashboard: 'டாஷ்போர்டு',
+    campaignerDashboard: 'பிரச்சாரகர் டாஷ்போர்டு',
+    adminDashboard: 'நிர்வாகி டாஷ்போர்டு',
+    addDonation: 'நன்கொடை சேர்க்க',
+    leaderboard: 'முன்னணிப் பட்டியல்',
+    messages: 'செய்திகள்',
+    overallRank: 'ஒட்டுமொத்த தரவரிசை',
+    classRank: 'வகுப்பு தரவரிசை',
+    leadingCollectors: 'முன்னணி வசூலிப்பாளர்கள்',
+    profiles: 'சுயவிவரங்கள்',
+    active: 'செயலில்',
+    markAsRead: 'படித்ததாகக் குறிக்கவும்',
+    messageFromAdmin: 'நிர்வாகியின் செய்தி',
+    analytics: 'பகுப்பாய்வு',
+    verifyPhysical: 'நேரடி சரிபார்ப்பு',
+    manageCampaigners: 'பிரச்சாரகர்களை நிர்வகி',
+    campaignersStats: 'பிரச்சாரகர் புள்ளிவிவரங்கள்',
+    classRankings: 'வகுப்பு தரவரிசைகள்',
+    classCollections: 'வகுப்பு வசூல்கள்',
+    classDashboard: 'வகுப்பு டாஷ்போர்டு',
+    developerTools: 'தேவலாப்பர் கருவிகள்',
+    myReceipts: 'எனது ரசீதுகள்',
+    donationEntries: 'நன்கொடை பதிவுகள்'
   }
 };
 
@@ -1609,31 +1709,31 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   // Role sidebar items configuration
   const sidebars = {
     admin: [
-      { id: 'analytics', name: 'Analytics', icon: BarChart2 },
-      { id: 'donations', name: 'Donation Entries', icon: IndianRupee },
-      { id: 'verify', name: 'Verify Physical', icon: ShieldCheck },
-      { id: 'campaigners', name: 'Manage Campaigners', icon: Users },
-      { id: 'campaigners-stats', name: 'Campaigners Stats', icon: FileText },
-      { id: 'donors', name: 'Donors Directory', icon: UserCheck },
-      { id: 'rankings', name: 'Class Rankings', icon: Trophy },
-      { id: 'class-collections', name: 'Class Collections', icon: IndianRupee },
-      { id: 'class-dashboard', name: 'Class Dashboard', icon: Laptop },
-      { id: 'developer', name: 'Developer Tools', icon: KeyRound }
+      { id: 'analytics', name: 'Analytics', key: 'analytics', icon: BarChart2 },
+      { id: 'donations', name: 'Donation Entries', key: 'donationEntries', icon: IndianRupee },
+      { id: 'verify', name: 'Verify Physical', key: 'verifyPhysical', icon: ShieldCheck },
+      { id: 'campaigners', name: 'Manage Campaigners', key: 'manageCampaigners', icon: Users },
+      { id: 'campaigners-stats', name: 'Campaigners Stats', key: 'campaignersStats', icon: FileText },
+      { id: 'donors', name: 'Donors Directory', key: 'donorsDirectory', icon: UserCheck },
+      { id: 'rankings', name: 'Class Rankings', key: 'classRankings', icon: Trophy },
+      { id: 'class-collections', name: 'Class Collections', key: 'classCollections', icon: IndianRupee },
+      { id: 'class-dashboard', name: 'Class Dashboard', key: 'classDashboard', icon: Laptop },
+      { id: 'developer', name: 'Developer Tools', key: 'developerTools', icon: KeyRound }
     ],
     leader: [
-      { id: 'progress', name: 'Analytics', icon: BarChart2 },
-      { id: 'campaigners', name: 'Campaigners', icon: Users },
-      { id: 'rankings', name: 'Class Rankings', icon: Trophy },
-      { id: 'verify', name: 'Verify Physical', icon: ShieldCheck },
-      { id: 'donors', name: 'Donors Directory', icon: UserCheck },
-      { id: 'v-history', name: 'My Receipts', icon: FileText }
+      { id: 'progress', name: 'Analytics', key: 'analytics', icon: BarChart2 },
+      { id: 'campaigners', name: 'Campaigners', key: 'manageCampaigners', icon: Users },
+      { id: 'rankings', name: 'Class Rankings', key: 'classRankings', icon: Trophy },
+      { id: 'verify', name: 'Verify Physical', key: 'verifyPhysical', icon: ShieldCheck },
+      { id: 'donors', name: 'Donors Directory', key: 'donorsDirectory', icon: UserCheck },
+      { id: 'v-history', name: 'My Receipts', key: 'myReceipts', icon: FileText }
     ],
     volunteer: [
-      { id: 'v-overview', name: 'Dashboard', icon: Laptop },
-      { id: 'v-add', name: 'Add Donation', icon: PlusCircle },
-      { id: 'v-history', name: 'My Collections', icon: Clock },
-      { id: 'v-leaderboard', name: 'Leaderboard', icon: Trophy },
-      { id: 'v-messages', name: 'Messages', icon: MessageSquare }
+      { id: 'v-overview', name: 'Dashboard', key: 'dashboard', icon: Laptop },
+      { id: 'v-add', name: 'Add Donation', key: 'addDonation', icon: PlusCircle },
+      { id: 'v-history', name: 'My Collections', key: 'myCollections', icon: Clock },
+      { id: 'v-leaderboard', name: 'Leaderboard', key: 'leaderboard', icon: Trophy },
+      { id: 'v-messages', name: 'Messages', key: 'messages', icon: MessageSquare }
     ]
   };
 
@@ -1676,11 +1776,11 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           {/* Unified Role Display */}
           {!(user as any)?.hn ? (
             <div className="px-4 py-2.5 rounded-xl border border-blue-500/20 bg-blue-500/5 text-center">
-              <span className="text-xs font-bold text-blue-500 uppercase tracking-wider">Admin Dashboard</span>
+              <span className="text-xs font-bold text-blue-500 uppercase tracking-wider">{t.adminDashboard}</span>
             </div>
           ) : (
             <div className="px-4 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-center">
-              <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Campaigner Dashboard</span>
+              <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">{t.campaignerDashboard}</span>
             </div>
           )}
 
@@ -1745,7 +1845,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="text-sm font-semibold">{item.name}</span>
+                  <span className="text-sm font-semibold">{t[item.key as keyof typeof t] || item.name}</span>
                 </button>
               );
             })}
@@ -1769,10 +1869,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
         <header className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-white/5 gap-4">
           <div>
             <span className="text-xs uppercase font-extrabold tracking-widest opacity-60">
-              {selectedRole.toUpperCase()} PORTAL
+              {selectedRole === 'admin' ? t.adminPortal : t.volunteerPortal}
             </span>
             <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mt-1">
-              {sidebars[selectedRole].find(item => item.id === activeTab)?.name || 'Portal Overview'}
+              {t[sidebars[selectedRole].find(item => item.id === activeTab)?.key as keyof typeof t] || 'Portal Overview'}
             </h2>
           </div>
 
@@ -4039,37 +4139,37 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 shrink-0"><Bell className="w-4 h-4" /></div>
                     <div>
-                      <span className="font-bold block">Message from Admin <span className="opacity-50 text-[10px] font-normal ml-2">13 Jul 2026, 04:30 PM</span></span>
+                      <span className="font-bold block">{t.messageFromAdmin} <span className="opacity-50 text-[10px] font-normal ml-2">13 Jul 2026, 04:30 PM</span></span>
                       <span className="opacity-80">Campaign tracking active. Ensure all physical receipt uploads are verified.</span>
                     </div>
                   </div>
-                  <button className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">Mark as Read</button>
+                  <button className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline shrink-0">{t.markAsRead}</button>
                 </div>
 
                 {/* personal stats metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                    <span className="text-xs font-bold opacity-60 uppercase">Total Collected</span>
+                    <span className="text-xs font-bold opacity-60 uppercase">{t.totalCollected}</span>
                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{myCollectedTotal.toLocaleString()}.00</h3>
                   </div>
                   
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold opacity-60 uppercase">Total Donors</span>
-                      <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-2.5 py-0.5 rounded-full">Active</span>
+                      <span className="text-xs font-bold opacity-60 uppercase">{t.totalDonors}</span>
+                      <span className="bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-2.5 py-0.5 rounded-full">{t.active}</span>
                     </div>
                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">
-                      {myDonorsCount} <span className="text-xs font-medium opacity-50">profiles</span>
+                      {myDonorsCount} <span className="text-xs font-medium opacity-50">{t.profiles}</span>
                     </h3>
                   </div>
 
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                    <span className="text-xs font-bold opacity-60 uppercase">Overall Rank</span>
+                    <span className="text-xs font-bold opacity-60 uppercase">{t.overallRank}</span>
                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">#{overallRank}</h3>
                   </div>
 
                   <div className={`p-6 rounded-3xl ${glassClass} flex flex-col justify-between`}>
-                    <span className="text-xs font-bold opacity-60 uppercase">Class Rank</span>
+                    <span className="text-xs font-bold opacity-60 uppercase">{t.classRank}</span>
                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">#{classRank}</h3>
                   </div>
                 </div>
@@ -4080,7 +4180,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <div className="bg-gradient-to-br from-[#0c82f2] to-[#0762cf] text-white p-6 rounded-3xl shadow-xl flex flex-col justify-between space-y-4">
                     <div className="flex justify-between items-center pb-2 border-b border-white/10">
                       <h4 className="text-sm font-bold uppercase tracking-wider text-white">
-                        Leading Collectors
+                        {t.leadingCollectors}
                       </h4>
                       <Trophy className="w-4 h-4 text-amber-300 animate-bounce" />
                     </div>
@@ -4106,7 +4206,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                   <div className={`p-6 rounded-3xl ${glassClass} space-y-4`}>
                     <div className="flex justify-between items-center pb-2 border-b border-white/5">
                       <h4 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">
-                        Leaderboard
+                        {t.leaderboard}
                       </h4>
                       <Activity className="w-4 h-4 text-[#0c7ae6]" />
                     </div>

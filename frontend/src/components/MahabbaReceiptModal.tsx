@@ -16,6 +16,9 @@ interface ReceiptData {
   month?: string;
   paidMonths?: string[];
   plan?: string;
+  status?: string;
+  paymentStatus?: string;
+  isPending?: boolean;
 }
 
 interface MahabbaReceiptModalProps {
@@ -44,9 +47,7 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
 
   if (!previewMode && (!isOpen || !receiptData)) return null;
 
-  const formattedDate = new Date(receiptData?.date || Date.now()).toLocaleDateString('en-GB', {
-    day: '2-digit', month: 'short', year: 'numeric'
-  });
+
 
   const generateImage = async (): Promise<string | null> => {
     if (!receiptRef.current) return null;
@@ -135,6 +136,13 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
     return { top, left: `${POS[key].x + dx}px`, fontSize: fs } as const;
   };
 
+  const receiptDateObj = receiptData?.date ? new Date(receiptData.date) : new Date();
+  const formattedDate = (isNaN(receiptDateObj.getTime()) ? new Date() : receiptDateObj).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+
+  const isPending = receiptData?.status === 'PENDING' || receiptData?.status === 'NOT_GIVEN' || receiptData?.isPending === true || receiptData?.paymentStatus === 'NOT_GIVEN';
+
   const receiptContent = (
     <div className="relative" style={{ width: '1080px', height: '1350px' }}>
       <img
@@ -144,11 +152,43 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
         style={{ width: '1080px', height: '1350px' }}
       />
       <div className="absolute inset-0" style={{ width: '1080px', height: '1350px' }}>
+        {isPending && (
+          <div style={{
+            position: 'absolute',
+            top: '300px',
+            left: '695px',
+            width: '270px',
+            height: '78px',
+            backgroundColor: '#ffffff',
+            borderRadius: '32px',
+            border: '2px solid #ef4444',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            padding: '0 8px',
+            zIndex: 10,
+            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.15)'
+          }}>
+            <span style={{
+              color: '#ef4444',
+              fontWeight: 800,
+              fontSize: '15px',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              fontFamily: "'Inter', sans-serif"
+            }}>
+              PAYMENT PENDING
+            </span>
+          </div>
+        )}
+
         <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 700, color: '#111' }}>
-          : {receiptData?.receiptNo || 'N/A'}
+          {receiptData?.receiptNo || 'N/A'}
         </div>
         <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 700, color: '#111' }}>
-          : {formattedDate}
+          {formattedDate}
         </div>
         <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '100%', padding: '0 60px', lineHeight: 1.1 }}>
           {receiptData?.name || ''}

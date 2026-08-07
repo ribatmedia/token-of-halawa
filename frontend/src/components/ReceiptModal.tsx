@@ -14,6 +14,9 @@ interface ReceiptData {
   month?: string;
   paidMonths?: string[];
   plan?: string;
+  status?: string;
+  paymentStatus?: string;
+  isPending?: boolean;
 }
 
 interface ReceiptModalProps {
@@ -144,6 +147,14 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
       if (POS[key].centered) return { top, left: `calc(50% + ${dx / 10.8}%)`, transform: 'translateX(-50%)', fontSize: fs } as const;
       return { top, left: `${((POS[key].x + dx) / 1080) * 100}%`, fontSize: fs } as const;
     };
+    const receiptDateObj = receiptData?.date ? new Date(receiptData.date) : new Date();
+    const formattedDate = (isNaN(receiptDateObj.getTime()) ? new Date() : receiptDateObj).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const isPending = receiptData?.status === 'PENDING' || receiptData?.status === 'NOT_GIVEN' || receiptData?.isPending === true || receiptData?.paymentStatus === 'NOT_GIVEN';
 
     return (
       <div
@@ -158,11 +169,42 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
       >
         <img src="/receipt-template.svg" alt="" className="absolute inset-0 w-full h-full" />
         <div className="absolute inset-0">
+          {isPending && (
+            <div style={{
+              position: 'absolute',
+              top: '22.2%',
+              left: '64.5%',
+              width: '25%',
+              height: '5.8%',
+              backgroundColor: '#ffffff',
+              borderRadius: '3cqw',
+              border: '0.2cqw solid #ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4cqw',
+              padding: '0 0.8cqw',
+              zIndex: 10,
+              boxShadow: '0 0.1cqw 0.4cqw rgba(239, 68, 68, 0.15)'
+            }}>
+              <span style={{
+                color: '#ef4444',
+                fontWeight: 800,
+                fontSize: '1.35cqw',
+                letterSpacing: '0.04cqw',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                fontFamily: "'Inter', sans-serif"
+              }}>
+                PAYMENT PENDING
+              </span>
+            </div>
+          )}
           <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
-            : {receiptData?.receiptNo || 'N/A'}
+            {receiptData?.receiptNo || 'N/A'}
           </div>
           <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
-            : {formattedDate}
+            {formattedDate}
           </div>
           <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', 'Anek Malayalam', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '90%', lineHeight: 1.1 }}>
             {receiptData?.name || ''}

@@ -8,7 +8,7 @@ import {
   MapPin, ShieldCheck, Sun, Moon, Globe, MessageSquare, PlusCircle, 
   Download, RefreshCw, BarChart2, Activity, UserPlus, FileText, Check, 
   UserCheck, Trophy, Flame, Award, Star, Laptop, DollarSign, IndianRupee, Search, 
-  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy,
+  Filter, Share2, CheckSquare, XCircle, Clock, KeyRound, Sparkles, Bell, Menu, Trash2, Phone, X, Camera, Copy, Pencil,
   Receipt, FileSpreadsheet, List, BookOpen
 } from 'lucide-react';
 import ReceiptModal from './ReceiptModal';
@@ -601,6 +601,81 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [selectedReceiptData, setSelectedReceiptData] = useState<any>(null);
   const [whatsAppAutoShare, setWhatsAppAutoShare] = useState(false);
+
+  // Edit Donation Modal States
+  const [editingDonation, setEditingDonation] = useState<any | null>(null);
+  const [editDonorName, setEditDonorName] = useState('');
+  const [editDonorPlace, setEditDonorPlace] = useState('');
+  const [editDonorPhone, setEditDonorPhone] = useState('');
+  const [editAmount, setEditAmount] = useState('');
+  const [editStatus, setEditStatus] = useState<'GIVEN' | 'NOT_GIVEN'>('GIVEN');
+  const [editMonth, setEditMonth] = useState('June');
+  const [editPlan, setEditPlan] = useState('100/month');
+
+  const handleOpenEditModal = (item: any) => {
+    const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || 'June';
+    const itemPlan = item.notes?.match(/Plan:\s*([^\.]+)/)?.[1] || '100/month';
+    const statusMatch = item.notes?.match(/Status:\s*([^\.]+)/)?.[1] || (item.status === 'PENDING' ? 'NOT_GIVEN' : 'GIVEN');
+
+    setEditingDonation(item);
+    setEditDonorName(item.donor?.name || '');
+    setEditDonorPlace(item.donor?.location || item.donor?.category || 'Kerala');
+    setEditDonorPhone(item.donor?.phone || '');
+    setEditAmount(String(item.amount || '100'));
+    setEditStatus(statusMatch === 'NOT_GIVEN' || item.status === 'PENDING' ? 'NOT_GIVEN' : 'GIVEN');
+    setEditMonth(itemMonth);
+    setEditPlan(itemPlan);
+  };
+
+  const handleSaveEditDonation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDonation) return;
+
+    const donationId = editingDonation.id;
+    const isPending = editStatus === 'NOT_GIVEN';
+
+    const loggedBy = editingDonation.notes?.match(/Logged by:\s*([^\.]+)/)?.[1] || user?.fullName || 'Campaigner';
+    const itemClass = editingDonation.notes?.match(/Class:\s*([^\.]+)/)?.[1] || (user as any)?.class || 'Plus one';
+    
+    const updatedNotes = `Logged by: ${loggedBy}. Class: ${itemClass}. Month: ${editMonth}. Status: ${editStatus}. Plan: ${editPlan}`;
+
+    // 1. Update donations state locally
+    setDonations(prev => (Array.isArray(prev) ? prev : []).map(d => {
+      if (d.id === donationId) {
+        return {
+          ...d,
+          amount: Number(editAmount) || d.amount,
+          status: isPending ? 'PENDING' : 'APPROVED',
+          notes: updatedNotes,
+          donor: {
+            ...d.donor,
+            name: editDonorName,
+            location: editDonorPlace,
+            phone: editDonorPhone
+          }
+        };
+      }
+      return d;
+    }));
+
+    // 2. Update donors state locally
+    const dId = editingDonation.donorId || editingDonation.donor?.id;
+    if (dId) {
+      setDonors(prev => (Array.isArray(prev) ? prev : []).map(donor => {
+        if (donor.id === dId || donor.name === editingDonation.donor?.name) {
+          return {
+            ...donor,
+            name: editDonorName,
+            location: editDonorPlace,
+            phone: editDonorPhone
+          };
+        }
+        return donor;
+      }));
+    }
+
+    setEditingDonation(null);
+  };
   
   // Custom Donor Search State
   const [renewSearchQuery, setRenewSearchQuery] = useState('');
@@ -4362,6 +4437,144 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
       </main>
       
+      
+      {/* EDIT / UPDATE DONOR & DONATION MODAL */}
+      {editingDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-6 rounded-3xl w-full max-w-lg shadow-2xl relative">
+            <button
+              onClick={() => setEditingDonation(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-full transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-xl font-extrabold text-slate-800 dark:text-white mb-1 flex items-center gap-2">
+              <Pencil className="w-5 h-5 text-amber-500" /> Update Collection & Donor Info
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Modify donor name, location, phone, amount or payment status.</p>
+
+            <form onSubmit={handleSaveEditDonation} className="space-y-4">
+              <div>
+                <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Donor Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editDonorName}
+                  onChange={e => setEditDonorName(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-semibold outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Place / Location
+                  </label>
+                  <input
+                    type="text"
+                    value={editDonorPlace}
+                    onChange={e => setEditDonorPlace(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-semibold outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    WhatsApp / Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={editDonorPhone}
+                    onChange={e => setEditDonorPhone(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-semibold outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={editAmount}
+                    onChange={e => setEditAmount(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-extrabold outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Payment Status
+                  </label>
+                  <select
+                    value={editStatus}
+                    onChange={e => setEditStatus(e.target.value as any)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-extrabold outline-none focus:border-amber-500"
+                  >
+                    <option value="GIVEN" className="text-slate-800">Amount Received</option>
+                    <option value="NOT_GIVEN" className="text-slate-800">Amount Pending (Not Given)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Month
+                  </label>
+                  <select
+                    value={editMonth}
+                    onChange={e => setEditMonth(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-semibold outline-none focus:border-amber-500"
+                  >
+                    {['June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'].map(m => (
+                      <option key={m} value={m} className="text-slate-800">{m}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Plan
+                  </label>
+                  <select
+                    value={editPlan}
+                    onChange={e => setEditPlan(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-semibold outline-none focus:border-amber-500"
+                  >
+                    {['100/month', '200/month', '500/month', '1000/month'].map(p => (
+                      <option key={p} value={p} className="text-slate-800">{p}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setEditingDonation(null)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold shadow-lg transition cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <ReceiptModal 
         isOpen={showReceiptModal} 
         onClose={() => { setShowReceiptModal(false); setWhatsAppAutoShare(false); }} 

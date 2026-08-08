@@ -4496,15 +4496,23 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
-                    Amount (₹)
+                  <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1.5 flex items-center justify-between">
+                    <span>Amount (₹)</span>
+                    {selectedRole !== 'admin' && (
+                      <span className="text-[10px] text-amber-500 font-normal lowercase">(Admin edit only)</span>
+                    )}
                   </label>
                   <input
                     type="number"
                     required
+                    disabled={selectedRole !== 'admin'}
                     value={editAmount}
                     onChange={e => setEditAmount(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-black/30 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm font-extrabold outline-none focus:border-amber-500"
+                    className={`w-full px-4 py-2.5 rounded-xl border text-sm font-extrabold outline-none ${
+                      selectedRole !== 'admin'
+                        ? 'bg-slate-200/60 dark:bg-black/50 border-slate-300 dark:border-white/5 text-slate-500 dark:text-slate-400 cursor-not-allowed'
+                        : 'bg-slate-100 dark:bg-black/30 border-slate-300 dark:border-white/10 text-slate-800 dark:text-white focus:border-amber-500'
+                    }`}
                   />
                 </div>
 

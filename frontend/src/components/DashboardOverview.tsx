@@ -2065,6 +2065,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               : safeDonations;
 
             // 1. Calculate Stats
+            const notGivenTotal = baseData
+              .filter(item => item.status === 'PENDING' || item.notes?.includes('Status: NOT_GIVEN') || item.notes?.includes('NOT_GIVEN'))
+              .reduce((acc, item) => acc + Number(item.amount), 0);
+
             const newCollectionTotal = baseData
               .filter(item => !item.notes?.includes('Renew'))
               .reduce((acc, item) => acc + Number(item.amount), 0);
@@ -2089,10 +2093,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               const itemCamp = item.notes?.match(/Logged by:\s*([^\.]+)/)?.[1] || '';
               const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '';
 
+              const isItemNotGiven = item.status === 'PENDING' || item.notes?.includes('Status: NOT_GIVEN') || item.notes?.includes('NOT_GIVEN');
               const matchesClass = donationClassFilter === 'ALL' || itemClass.trim().toLowerCase() === donationClassFilter.toLowerCase();
               const matchesCampaigner = donationCampaignerFilter === 'ALL' || itemCamp.trim().toLowerCase() === donationCampaignerFilter.toLowerCase();
               const matchesMonth = donationMonthFilter === 'ALL' || itemMonth.trim().toLowerCase() === donationMonthFilter.toLowerCase();
-              const matchesStatus = donationStatusFilter === 'ALL' || item.status === donationStatusFilter;
+              const matchesStatus = donationStatusFilter === 'ALL' ||
+                (donationStatusFilter === 'NOT_GIVEN' && isItemNotGiven) ||
+                (donationStatusFilter === 'RECEIVED' && !isItemNotGiven) ||
+                (donationStatusFilter === 'PENDING' && isItemNotGiven) ||
+                (donationStatusFilter === 'APPROVED' && !isItemNotGiven);
 
               return matchesSearch && matchesClass && matchesCampaigner && matchesMonth && matchesStatus;
             });
@@ -2113,18 +2122,22 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
               <div className="space-y-6 flex-1 flex flex-col">
                 
                 {/* Stats row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className={`p-5 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total New Collection</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{newCollectionTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-xl font-black text-slate-800 dark:text-white mt-2">₹{newCollectionTotal.toLocaleString()}.00</h3>
                   </div>
-                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                  <div className={`p-5 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Renew Collection</span>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white mt-2">₹{renewCollectionTotal.toLocaleString()}.00</h3>
+                    <h3 className="text-xl font-black text-slate-800 dark:text-white mt-2">₹{renewCollectionTotal.toLocaleString()}.00</h3>
                   </div>
-                  <div className={`p-6 rounded-3xl ${glassClass}`}>
+                  <div className={`p-5 rounded-3xl ${glassClass}`}>
+                    <span className="text-xs font-bold opacity-60 uppercase text-amber-500">Total Not Given</span>
+                    <h3 className="text-xl font-black text-amber-500 mt-2">₹{notGivenTotal.toLocaleString()}.00</h3>
+                  </div>
+                  <div className={`p-5 rounded-3xl ${glassClass}`}>
                     <span className="text-xs font-bold opacity-60 uppercase">Total Collection</span>
-                    <h3 className="text-2xl font-black text-emerald-500 mt-2">₹{totalCollection.toLocaleString()}.00</h3>
+                    <h3 className="text-xl font-black text-emerald-500 mt-2">₹{totalCollection.toLocaleString()}.00</h3>
                   </div>
                 </div>
 
@@ -2175,9 +2188,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                       className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none cursor-pointer"
                     >
                       <option value="ALL">All Entries</option>
-                      <option value="PENDING">Pending</option>
-                      <option value="APPROVED">Verified</option>
-                      <option value="REJECTED">Rejected</option>
+                      <option value="RECEIVED">Received</option>
+                      <option value="NOT_GIVEN">Not Given</option>
                     </select>
                   </div>
 

@@ -155,23 +155,23 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
         {isPending && (
           <div style={{
             position: 'absolute',
-            top: '420px',
-            left: '680px',
-            width: '245px',
-            height: '82px',
+            top: '410px',
+            left: '630px',
+            width: '330px',
+            height: '98px',
             backgroundColor: '#dc2626',
-            borderRadius: '41px',
+            borderRadius: '49px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 20,
-            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)'
+            boxShadow: '0 4px 14px rgba(220, 38, 38, 0.45)'
           }}>
             <span style={{
               color: '#ffffff',
-              fontWeight: 800,
-              fontSize: '15px',
-              letterSpacing: '0.5px',
+              fontWeight: 900,
+              fontSize: '22px',
+              letterSpacing: '0.6px',
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
               fontFamily: "'Inter', sans-serif"

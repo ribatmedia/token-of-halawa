@@ -170,33 +170,33 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
         <img src="/receipt-template.svg" alt="" className="absolute inset-0 w-full h-full" />
         <div className="absolute inset-0">
           {isPending && (
-            <div style={{
-              position: 'absolute',
-              top: '31.2%',
-              left: '63.0%',
-              width: '24.5%',
-              height: '6.4%',
-              backgroundColor: '#dc2626',
-              borderRadius: '3.2cqw',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 20,
-              boxShadow: '0 0.2cqw 0.8cqw rgba(220, 38, 38, 0.4)'
+          <div style={{
+            position: 'absolute',
+            top: '30.4%',
+            left: '58.5%',
+            width: '30.5%',
+            height: '7.4%',
+            backgroundColor: '#dc2626',
+            borderRadius: '3.7cqw',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 20,
+            boxShadow: '0 0.3cqw 1cqw rgba(220, 38, 38, 0.45)'
+          }}>
+            <span style={{
+              color: '#ffffff',
+              fontWeight: 900,
+              fontSize: '1.85cqw',
+              letterSpacing: '0.05cqw',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              fontFamily: "'Inter', sans-serif"
             }}>
-              <span style={{
-                color: '#ffffff',
-                fontWeight: 800,
-                fontSize: '1.25cqw',
-                letterSpacing: '0.04cqw',
-                textTransform: 'uppercase',
-                whiteSpace: 'nowrap',
-                fontFamily: "'Inter', sans-serif"
-              }}>
-                AMOUNT PENDING
-              </span>
-            </div>
-          )}
+              AMOUNT PENDING
+            </span>
+          </div>
+        )}
           <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 400, color: '#111', whiteSpace: 'nowrap' }}>
             {receiptData?.receiptNo || 'N/A'}
           </div>

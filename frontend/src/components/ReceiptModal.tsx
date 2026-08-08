@@ -172,12 +172,12 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           {isPending && (
             <div style={{
               position: 'absolute',
-              top: '21.5%',
-              left: '63.8%',
-              width: '26.5%',
+              top: '31.2%',
+              left: '63.0%',
+              width: '24.5%',
               height: '6.4%',
               backgroundColor: '#dc2626',
-              borderRadius: '3cqw',
+              borderRadius: '3.2cqw',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -187,7 +187,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
               <span style={{
                 color: '#ffffff',
                 fontWeight: 800,
-                fontSize: '1.35cqw',
+                fontSize: '1.25cqw',
                 letterSpacing: '0.04cqw',
                 textTransform: 'uppercase',
                 whiteSpace: 'nowrap',

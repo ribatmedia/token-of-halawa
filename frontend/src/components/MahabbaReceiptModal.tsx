@@ -191,7 +191,7 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
           {receiptData?.name || ''}
         </div>
         <div style={{ position: 'absolute', ...p('placePhone'), fontWeight: 500, color: '#333', textAlign: 'center', width: '100%' }}>
-          {receiptData?.place || ''}
+          {receiptData?.place && receiptData.place !== 'GENERAL' && receiptData.place !== 'General' ? receiptData.place : 'Kerala'}
         </div>
         <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center' }}>
           ₹ {receiptData?.amount || '0'}

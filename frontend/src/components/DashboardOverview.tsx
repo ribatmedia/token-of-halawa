@@ -2260,6 +2260,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                             })
                             .filter(Boolean);
                           
+                          const itemPlace = (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala';
+
                           return (
                             <tr key={item.id} className="border-b border-white/5 text-slate-800 dark:text-slate-300 font-medium hover:bg-slate-550/5 transition duration-150">
                               <td className="py-4 px-4 font-mono text-xs">
@@ -2321,7 +2323,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         receiptNo: receiptNo,
                                         date: item.createdAt,
                                         name: item.donor?.name || 'General Donor',
-                                        place: item.donor?.category || 'Kerala',
+                                        place: (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala',
                                         phone: item.donor?.phone || '',
                                         amount: item.amount,
                                         month: itemMonth,
@@ -2344,7 +2346,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                         receiptNo: receiptNo,
                                         date: item.createdAt,
                                         name: item.donor?.name || 'General Donor',
-                                        place: item.donor?.category || 'Kerala',
+                                        place: (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala',
                                         phone: item.donor?.phone || '',
                                         amount: item.amount,
                                         month: itemMonth,

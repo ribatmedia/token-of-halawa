@@ -207,7 +207,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
             {receiptData?.name || ''}
           </div>
           <div style={{ position: 'absolute', ...p('placePhone'), fontFamily: "'Inter', 'Anek Malayalam', sans-serif", fontWeight: 500, color: '#333', textAlign: 'center', width: '80%' }}>
-            {receiptData?.place || ''}
+            {receiptData?.place && receiptData.place !== 'GENERAL' && receiptData.place !== 'General' ? receiptData.place : 'Kerala'}
           </div>
           <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
             ₹ {receiptData?.amount || '0'}

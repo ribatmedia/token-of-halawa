@@ -592,8 +592,21 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   const [donorPhoneInput, setDonorPhoneInput] = useState('');
   const [donorWhatsAppInput, setDonorWhatsAppInput] = useState('');
   const [donorAddressInput, setDonorAddressInput] = useState('');
-  const [donationMonthInput, setDonationMonthInput] = useState('July');
-  const [donationDateInput, setDonationDateInput] = useState('2026-07-13');
+  const getCurrentMonthName = () => {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return monthNames[new Date().getMonth()];
+  };
+
+  const getCurrentDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [donationMonthInput, setDonationMonthInput] = useState(getCurrentMonthName());
+  const [donationDateInput, setDonationDateInput] = useState(getCurrentDateString());
   const [amountStatusInput, setAmountStatusInput] = useState<'RECEIVED' | 'PENDING'>('RECEIVED');
   const [monthPlanInput, setMonthPlanInput] = useState('100/month');
   
@@ -1334,6 +1347,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       setDonorAddressInput('');
       setDonationAmount('');
       setNotes('');
+      setDonationMonthInput(getCurrentMonthName());
+      setDonationDateInput(getCurrentDateString());
     }
   };
 

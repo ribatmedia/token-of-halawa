@@ -2296,17 +2296,25 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                               </td>
                               <td className="py-4 px-4 font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">₹{Number(item.amount).toLocaleString()}.00</td>
                               <td className="py-4 px-4">
-                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
-                                  item.status === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :
-                                  item.status === 'REJECTED' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
-                                  'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                                }`}>
-                                  {item.status === 'APPROVED' ? 'Verified' : item.status === 'REJECTED' ? 'Rejected' : 'Pending'}
-                                </span>
+                                {(() => {
+                                  const isNotGiven = item.status === 'PENDING' || item.notes?.includes('Status: NOT_GIVEN') || item.notes?.includes('NOT_GIVEN');
+                                  if (isNotGiven) {
+                                    return (
+                                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                        NOT GIVEN
+                                      </span>
+                                    );
+                                  }
+                                  return (
+                                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                      RECEIVED
+                                    </span>
+                                  );
+                                })()}
                               </td>
                               <td className="py-4 px-4 text-right">
                                 <div className="flex justify-end items-center gap-2">
-                                  {item.status === 'PENDING' && (
+                                  {selectedRole !== 'volunteer' && item.status === 'PENDING' && (
                                     <button
                                       onClick={() => handleApproveDonation(item.id, 'APPROVED')}
                                       className="p-1.5 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full transition cursor-pointer"
@@ -2316,19 +2324,30 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                     </button>
                                   )}
                                   <button
+                                    onClick={() => handleOpenEditModal(item)}
+                                    className="p-1.5 hover:bg-amber-500/10 text-amber-500 rounded-full transition cursor-pointer"
+                                    title="Edit / Update Entry"
+                                  >
+                                    <Pencil className="w-4 h-4" />
+                                  </button>
+                                  <button
                                     onClick={() => {
                                       const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '';
                                       const itemPlan = item.notes?.match(/Plan:\s*([^\.]+)/)?.[1] || '';
+                                      const itemIsPending = item.status === 'PENDING' || item.notes?.includes('Status: NOT_GIVEN') || item.notes?.includes('NOT_GIVEN');
+                                      const itemPlace = (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala';
                                       setSelectedReceiptData({
                                         receiptNo: receiptNo,
                                         date: item.createdAt,
                                         name: item.donor?.name || 'General Donor',
-                                        place: (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala',
+                                        place: itemPlace,
                                         phone: item.donor?.phone || '',
                                         amount: item.amount,
                                         month: itemMonth,
                                         paidMonths: paidMonths,
-                                        plan: itemPlan
+                                        plan: itemPlan,
+                                        isPending: itemIsPending,
+                                        status: itemIsPending ? 'PENDING' : 'VERIFIED'
                                       });
                                       setWhatsAppAutoShare(true);
                                       setShowReceiptModal(true);
@@ -2342,16 +2361,20 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                     onClick={() => {
                                       const itemMonth = item.notes?.match(/Month:\s*([^\.]+)/)?.[1] || '';
                                       const itemPlan = item.notes?.match(/Plan:\s*([^\.]+)/)?.[1] || '';
+                                      const itemIsPending = item.status === 'PENDING' || item.notes?.includes('Status: NOT_GIVEN') || item.notes?.includes('NOT_GIVEN');
+                                      const itemPlace = (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala';
                                       setSelectedReceiptData({
                                         receiptNo: receiptNo,
                                         date: item.createdAt,
                                         name: item.donor?.name || 'General Donor',
-                                        place: (item.donor?.location && item.donor?.location !== 'GENERAL' ? item.donor?.location : '') || (item.donor?.address && item.donor?.address !== 'GENERAL' ? item.donor?.address : '') || (item.donor?.category && item.donor?.category !== 'GENERAL' ? item.donor?.category : '') || 'Kerala',
+                                        place: itemPlace,
                                         phone: item.donor?.phone || '',
                                         amount: item.amount,
                                         month: itemMonth,
                                         paidMonths: paidMonths,
-                                        plan: itemPlan
+                                        plan: itemPlan,
+                                        isPending: itemIsPending,
+                                        status: itemIsPending ? 'PENDING' : 'VERIFIED'
                                       });
                                       setShowReceiptModal(true);
                                     }}

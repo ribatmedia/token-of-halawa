@@ -184,10 +184,10 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
           </div>
         )}
 
-        <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 700, color: '#111' }}>
+        <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 400, color: '#111' }}>
           {receiptData?.receiptNo || 'N/A'}
         </div>
-        <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 700, color: '#111' }}>
+        <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 400, color: '#111' }}>
           {formattedDate}
         </div>
         <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '100%', padding: '0 60px', lineHeight: 1.1 }}>

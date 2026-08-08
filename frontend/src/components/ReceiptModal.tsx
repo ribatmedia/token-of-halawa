@@ -200,10 +200,10 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
               </span>
             </div>
           )}
-          <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
+          <div style={{ position: 'absolute', ...p('receiptNo'), fontWeight: 400, color: '#111', whiteSpace: 'nowrap' }}>
             {receiptData?.receiptNo || 'N/A'}
           </div>
-          <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 700, color: '#111', whiteSpace: 'nowrap' }}>
+          <div style={{ position: 'absolute', ...p('date'), fontFamily: "'Nohemi', sans-serif", fontWeight: 400, color: '#111', whiteSpace: 'nowrap' }}>
             {formattedDate}
           </div>
           <div style={{ position: 'absolute', ...p('name'), fontFamily: "'Nohemi', 'Anek Malayalam', sans-serif", fontWeight: 800, color: '#111', textAlign: 'center', width: '90%', lineHeight: 1.1 }}>

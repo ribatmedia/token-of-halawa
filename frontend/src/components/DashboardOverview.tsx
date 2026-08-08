@@ -1193,6 +1193,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           finalDonorName = allAvailableDonors.find(d => d.id === donorIdInput)?.name || renewSearchQuery || 'General Donor';
         }
 
+        const isPendingEntry = amountStatusInput === 'PENDING';
         setSelectedReceiptData({
           receiptNo: data.donation?.receipts?.[0]?.receiptNumber || `TOH-2026-${cleanId}`,
           date: new Date().toISOString(),
@@ -1201,7 +1202,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           phone: donorPhoneInput || '',
           amount: donationAmount,
           month: donationMonthInput,
-          plan: monthPlanInput
+          plan: monthPlanInput,
+          isPending: isPendingEntry,
+          status: isPendingEntry ? 'PENDING' : 'VERIFIED'
         });
         setShowReceiptModal(true);
 

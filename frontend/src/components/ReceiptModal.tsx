@@ -172,23 +172,20 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
           {isPending && (
             <div style={{
               position: 'absolute',
-              top: '22.2%',
-              left: '64.5%',
-              width: '25%',
-              height: '5.8%',
-              backgroundColor: '#ffffff',
+              top: '21.5%',
+              left: '63.8%',
+              width: '26.5%',
+              height: '6.4%',
+              backgroundColor: '#dc2626',
               borderRadius: '3cqw',
-              border: '0.2cqw solid #ef4444',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.4cqw',
-              padding: '0 0.8cqw',
-              zIndex: 10,
-              boxShadow: '0 0.1cqw 0.4cqw rgba(239, 68, 68, 0.15)'
+              zIndex: 20,
+              boxShadow: '0 0.2cqw 0.8cqw rgba(220, 38, 38, 0.4)'
             }}>
               <span style={{
-                color: '#ef4444',
+                color: '#ffffff',
                 fontWeight: 800,
                 fontSize: '1.35cqw',
                 letterSpacing: '0.04cqw',
@@ -196,7 +193,7 @@ export default function ReceiptModal({ isOpen, onClose, receiptData, customLayou
                 whiteSpace: 'nowrap',
                 fontFamily: "'Inter', sans-serif"
               }}>
-                PAYMENT PENDING
+                AMOUNT PENDING
               </span>
             </div>
           )}

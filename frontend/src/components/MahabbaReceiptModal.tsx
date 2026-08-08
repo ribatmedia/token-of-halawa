@@ -155,31 +155,28 @@ export default function MahabbaReceiptModal({ isOpen, onClose, receiptData, prev
         {isPending && (
           <div style={{
             position: 'absolute',
-            top: '300px',
-            left: '695px',
-            width: '270px',
-            height: '78px',
-            backgroundColor: '#ffffff',
-            borderRadius: '32px',
-            border: '2px solid #ef4444',
+            top: '292px',
+            left: '685px',
+            width: '285px',
+            height: '84px',
+            backgroundColor: '#dc2626',
+            borderRadius: '42px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '4px',
-            padding: '0 8px',
-            zIndex: 10,
-            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.15)'
+            zIndex: 20,
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)'
           }}>
             <span style={{
-              color: '#ef4444',
+              color: '#ffffff',
               fontWeight: 800,
-              fontSize: '15px',
+              fontSize: '16px',
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
               fontFamily: "'Inter', sans-serif"
             }}>
-              PAYMENT PENDING
+              AMOUNT PENDING
             </span>
           </div>
         )}

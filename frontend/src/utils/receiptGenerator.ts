@@ -137,7 +137,13 @@ export async function renderReceiptToCanvas(
     } catch {}
   }
 
-  const lay = customLayout as Record<string, { dx: number; dy: number; size: number }> | undefined;
+  let lay = customLayout as Record<string, { dx: number; dy: number; size: number }> | undefined;
+  if (!lay && typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('receipt_layout_settings');
+      if (saved) lay = JSON.parse(saved);
+    } catch {}
+  }
   const getLayout = (key: string) => {
     const el = lay?.[key];
     const dx = el?.dx ?? 0;

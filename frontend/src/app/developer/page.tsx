@@ -829,7 +829,10 @@ export default function DeveloperPage() {
                         name: 'Shafique PC',
                         place: 'Kozhikode',
                         amount: '5000',
-                        date: new Date().toISOString()
+                        date: new Date().toISOString(),
+                        plan: '500/Month',
+                        month: 'Sep',
+                        paidMonths: ['Jun', 'Jul', 'Aug']
                      }} 
                    />
                 </div>

@@ -134,10 +134,18 @@ export default function ReceiptModal({
     .replace(/\u00E2\u201A\u00B9/g, '\u20B9')
     .replace(/â‚¹/g, '\u20B9')
     .trim();
-  const hasPlan = Boolean(cleanPlan && cleanPlan !== 'N/A' && cleanPlan.toLowerCase() !== 'general');
-  const planText = cleanPlan.toLowerCase().startsWith('plan:') ? cleanPlan : `Plan: ${cleanPlan}`;
+  const hasPlan = previewMode || Boolean(cleanPlan && cleanPlan !== 'N/A' && cleanPlan.toLowerCase() !== 'general');
+  const planDisplay = (previewMode && (!cleanPlan || cleanPlan === 'N/A' || cleanPlan.toLowerCase() === 'general'))
+    ? 'Plan: \u20B9500/Month'
+    : (cleanPlan.toLowerCase().startsWith('plan:') ? cleanPlan : `Plan: ${cleanPlan}`);
 
-  const hasMonths = currentMonthsList.length > 0 || paidMonthsList.length > 0;
+  const hasMonths = previewMode || currentMonthsList.length > 0 || paidMonthsList.length > 0;
+  const effectiveCurrentMonths = (previewMode && currentMonthsList.length === 0 && paidMonthsList.length === 0)
+    ? ['Sep']
+    : currentMonthsList;
+  const effectivePaidMonths = (previewMode && currentMonthsList.length === 0 && paidMonthsList.length === 0)
+    ? ['Jun', 'Jul', 'Aug']
+    : paidMonthsList;
 
   // Screen preview inner
   const ReceiptInner = ({ width }: { width: string }) => {
@@ -195,7 +203,7 @@ export default function ReceiptModal({
           </div>
           {hasPlan && (
             <div style={{ position: 'absolute', ...p('plan'), color: '#334155', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '4cqw', padding: '0.6cqw 2cqw', fontWeight: 800, whiteSpace: 'nowrap' }}>
-              {planText}
+              {planDisplay}
             </div>
           )}
           <div style={{ position: 'absolute', ...p('amount'), color: '#fff', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -216,8 +224,8 @@ export default function ReceiptModal({
               boxShadow: '0 0.2cqw 0.8cqw rgba(0,0,0,0.06)'
             }}>
               {MONTHS.map(m => {
-                const isCurrentMonth = currentMonthsList.includes(m);
-                const isPaidMonth = paidMonthsList.includes(m);
+                const isCurrentMonth = effectiveCurrentMonths.includes(m);
+                const isPaidMonth = effectivePaidMonths.includes(m);
 
                 let bgColor = '#f8fafc';
                 let textColor = '#64748b';
@@ -242,7 +250,7 @@ export default function ReceiptModal({
                     color: textColor,
                     borderRadius: '0.6cqw',
                     padding: '0.2cqw 0.5cqw',
-                    fontSize: `${(POS.months.s / 1080) * 100}cqw`,
+                    fontSize: `${((lay?.months?.size ?? POS.months.s) / 1080) * 100}cqw`,
                     fontWeight: fontWeight,
                     border: border
                   }}>
@@ -323,7 +331,7 @@ export default function ReceiptModal({
         </div>
         {hasPlan && (
           <div style={{ position: 'absolute', ...pFixed('plan'), color: '#334155', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '30px', padding: '6px 20px', fontWeight: 800, whiteSpace: 'nowrap' }}>
-            {planText}
+            {planDisplay}
           </div>
         )}
         <div style={{ position: 'absolute', ...pFixed('amount'), color: '#fff', fontWeight: 800, textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -344,8 +352,8 @@ export default function ReceiptModal({
             boxShadow: '0 1px 8px rgba(0,0,0,0.06)'
           }}>
             {MONTHS.map(m => {
-              const isCurrentMonth = currentMonthsList.includes(m);
-              const isPaidMonth = paidMonthsList.includes(m);
+              const isCurrentMonth = effectiveCurrentMonths.includes(m);
+              const isPaidMonth = effectivePaidMonths.includes(m);
 
               let bgColor = '#f8fafc';
               let textColor = '#64748b';
@@ -372,7 +380,7 @@ export default function ReceiptModal({
                   padding: '2px 6px',
                   width: '58px',
                   textAlign: 'center',
-                  fontSize: `${POS.months.s + (lay?.months?.size || 0)}px`,
+                  fontSize: `${lay?.months?.size ?? POS.months.s}px`,
                   fontWeight: fontWeight,
                   border: border
                 }}>

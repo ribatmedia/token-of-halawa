@@ -176,6 +176,30 @@ const seedDatabase = async () => {
       }
     }
 
+    // 7. Ensure default admin account exists for login support
+    const adminEmail = 'admin@hidayaonline.org';
+    const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+    if (!existingAdmin) {
+      const adminPassHash = await bcrypt.hash('Halawa@2k26', salt);
+      const newAdmin = await prisma.user.create({
+        data: {
+          organizationId: org.id,
+          email: adminEmail,
+          passwordHash: adminPassHash,
+          fullName: 'Admin Manager',
+          status: 'ACTIVE'
+        }
+      });
+      if (orgAdminRole) {
+        await prisma.userRole.create({
+          data: {
+            userId: newAdmin.id,
+            roleId: orgAdminRole.id
+          }
+        });
+      }
+    }
+
     console.log('✔ Database role and permission synchronization complete.');
   } catch (err) {
     console.error('❌ Failed to synchronize database seed roles and permissions:', err);

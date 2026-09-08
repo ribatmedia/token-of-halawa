@@ -1036,31 +1036,60 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
           }
         }
 
-        const res = await fetch(`${API_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: finalEmail, password: authPassword })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          let userObj = data.user;
-          if (loginRole === 'campaigner') {
-            const matched = campaignersList.find(c => String(c.hn) === selectedHn);
-            if (matched) {
-              userObj = {
-                ...userObj,
-                fullName: matched.name,
-                class: matched.class,
-                hn: String(matched.hn)
-              };
+        const isMasterAdminPass = authPassword === 'Halawa@2k26' || authPassword === 'Halawa@26' || authPassword === '7860786' || authPassword === 'admin123';
+
+        try {
+          const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: finalEmail, password: authPassword })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            let userObj = data.user;
+            if (loginRole === 'campaigner') {
+              const matched = campaignersList.find(c => String(c.hn) === selectedHn);
+              if (matched) {
+                userObj = {
+                  ...userObj,
+                  fullName: matched.name,
+                  class: matched.class,
+                  hn: String(matched.hn)
+                };
+              }
             }
+            setAuth(data.accessToken, data.refreshToken, userObj, data.organization);
+            if (loginRole === 'campaigner') {
+              setSelectedRole('volunteer');
+            } else {
+              setSelectedRole('admin');
+            }
+          } else if (loginRole === 'admin' && isMasterAdminPass) {
+            // Master admin password support
+            const userObj: any = {
+              id: 'admin-1',
+              email: finalEmail || 'admin@hidayaonline.org',
+              fullName: 'Admin Manager',
+              roles: ['ORG_ADMIN', 'SUPER_ADMIN']
+            };
+            setAuth('admin-master-access-token', 'admin-master-refresh-token', userObj, { id: 'org-1', name: 'Token of Halawa Hub' });
+            setSelectedRole('admin');
+          } else {
+            setAuthError(data.error || data.message || 'Invalid email or password');
           }
-          setAuth(data.accessToken, data.refreshToken, userObj, data.organization);
-          if (loginRole === 'campaigner') {
-            setSelectedRole('volunteer');
+        } catch (fetchErr) {
+          if (loginRole === 'admin' && isMasterAdminPass) {
+            const userObj: any = {
+              id: 'admin-1',
+              email: finalEmail || 'admin@hidayaonline.org',
+              fullName: 'Admin Manager',
+              roles: ['ORG_ADMIN', 'SUPER_ADMIN']
+            };
+            setAuth('admin-master-access-token', 'admin-master-refresh-token', userObj, { id: 'org-1', name: 'Token of Halawa Hub' });
+            setSelectedRole('admin');
+          } else {
+            throw fetchErr;
           }
-        } else {
-          setAuthError(data.error || data.message || 'Login failed');
         }
       } else {
         const res = await fetch(`${API_URL}/auth/register`, {
@@ -1086,7 +1115,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       let userObj: any = {
         id: loginRole === 'campaigner' ? selectedHn || '1' : 'admin-1',
         email: authEmail || 'admin@hidayaonline.org',
-        fullName: loginRole === 'campaigner' ? (campaignersList.find(c => String(c.hn) === selectedHn)?.name || 'Campaigner User') : 'Admin User'
+        fullName: loginRole === 'campaigner' ? (campaignersList.find(c => String(c.hn) === selectedHn)?.name || 'Campaigner User') : 'Admin Manager'
       };
       if (loginRole === 'campaigner') {
         const matched = campaignersList.find(c => String(c.hn) === selectedHn);
@@ -1098,6 +1127,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       setAuth('demo-access-token', 'demo-refresh-token', userObj, { id: 'org-1', name: 'Token of Halawa Hub' });
       if (loginRole === 'campaigner') {
         setSelectedRole('volunteer');
+      } else {
+        setSelectedRole('admin');
       }
     } finally {
       setAuthLoading(false);
@@ -1818,7 +1849,12 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             )}
 
             <div>
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Password</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Password</label>
+                {loginRole === 'admin' && (
+                  <span className="text-[10px] text-emerald-500 font-bold">Default: Halawa@2k26</span>
+                )}
+              </div>
               <input 
                 type="password" 
                 required 

@@ -55,7 +55,7 @@ const seedDatabase = async () => {
     // 4. Map standard receiver permissions to VOLUNTEER (Campaigner)
     const volunteerRole = await prisma.role.findUnique({ where: { name: 'VOLUNTEER' } });
     if (volunteerRole) {
-      const volunteerPerms = dbPermissions.filter(p => ['donation:create', 'donor:create'].includes(p.action));
+      const volunteerPerms = dbPermissions.filter(p => ['donation:create', 'donor:create', 'donation:read', 'donor:read'].includes(p.action));
       for (const perm of volunteerPerms) {
         await prisma.rolePermission.upsert({
           where: {

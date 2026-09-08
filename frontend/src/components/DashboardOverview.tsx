@@ -433,9 +433,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('toh_custom_donors');
-        if (saved) {
+        if (saved !== null) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -446,9 +446,9 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('toh_custom_donations');
-        if (saved) {
+        if (saved !== null) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
     }
@@ -514,6 +514,35 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     }
   }, [donors]);
 
+  // Real-time synchronization across multiple browser tabs and windows
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'toh_deleted_donations' && e.newValue) {
+        try {
+          setDeletedDonationIds(JSON.parse(e.newValue));
+        } catch (err) {}
+      }
+      if (e.key === 'toh_deleted_donors' && e.newValue) {
+        try {
+          setDeletedDonorIds(JSON.parse(e.newValue));
+        } catch (err) {}
+      }
+      if (e.key === 'toh_custom_donations' && e.newValue) {
+        try {
+          setDonations(JSON.parse(e.newValue));
+        } catch (err) {}
+      }
+      if (e.key === 'toh_custom_donors' && e.newValue) {
+        try {
+          setDonors(JSON.parse(e.newValue));
+        } catch (err) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   const safeDonors = (Array.isArray(donors) ? donors : []).filter(d => d && d.id && !deletedDonorIds.includes(String(d.id)));
   const safeDonations = (Array.isArray(donations) ? donations : []).filter(item => item && item.id && !deletedDonationIds.includes(String(item.id)));
   const safeVerificationQueue = safeDonations.filter(item => item && (item.status === 'PENDING' || item.status === 'Pending' || item.status === 'VERIFIED' || item.status === 'APPROVED'));
@@ -568,6 +597,41 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
     });
 
     return Array.from(map.values());
+  })();
+
+  // Donors selectable during Renew: For Admin, all available donors; for Campaigner, strictly donors from their own collections list
+  const selectableDonorsForRenew = (() => {
+    if (selectedRole === 'admin') {
+      return allAvailableDonors;
+    }
+    const uName = (user?.fullName || '').trim().toLowerCase();
+    if (!uName) return [];
+
+    const myDonationEntries = safeDonations.filter(item => {
+      const loggedBy = item.notes?.match(/Logged by:\s*([^\.]+)/i)?.[1]?.trim()?.toLowerCase() || '';
+      return loggedBy && (loggedBy === uName || loggedBy.includes(uName) || uName.includes(loggedBy));
+    });
+
+    const myDonorKeys = new Set<string>();
+    const donorList: any[] = [];
+
+    myDonationEntries.forEach(item => {
+      const d = item.donor;
+      if (d && (d.id || d.name || d.phone)) {
+        const key = (d.phone || '').trim().replace(/\D/g, '') || (d.name || '').trim().toLowerCase() || String(d.id);
+        if (!myDonorKeys.has(key)) {
+          myDonorKeys.add(key);
+          const fullDonor = allAvailableDonors.find(ad => 
+            (ad.id && d.id && String(ad.id) === String(d.id)) ||
+            (ad.phone && d.phone && ad.phone.replace(/\D/g, '') === d.phone.replace(/\D/g, '')) ||
+            (ad.name && d.name && ad.name.trim().toLowerCase() === d.name.trim().toLowerCase())
+          ) || d;
+          donorList.push(fullDonor);
+        }
+      }
+    });
+
+    return donorList;
   })();
 
   // Input states for Log Donation form
@@ -885,40 +949,47 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
       }
     } catch (err) {
       console.error('Failed to load database values:', err);
-      // Demo fallback data if API server is offline
-      const mockDonors = [
-        { id: 'dnr-1', name: 'Muhammed Shafi', phone: '9847012345', location: 'Calicut', category: 'GENERAL' },
-        { id: 'dnr-2', name: 'Abdul Rahiman', phone: '9847054321', location: 'Malappuram', category: 'GENERAL' },
-        { id: 'dnr-3', name: 'Usman Koya', phone: '9847099887', location: 'Wayanad', category: 'GENERAL' }
-      ];
-      const mockDonations = [
-        {
-          id: 'TOH-2026-0001',
-          amount: 500,
-          status: 'VERIFIED',
-          createdAt: new Date().toISOString(),
-          donor: mockDonors[0],
-          notes: 'Logged by: Aneeb. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
-        },
-        {
-          id: 'TOH-2026-0002',
-          amount: 1000,
-          status: 'APPROVED',
-          createdAt: new Date().toISOString(),
-          donor: mockDonors[1],
-          notes: 'Logged by: Swalih. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
-        },
-        {
-          id: 'TOH-2026-0003',
-          amount: 100,
-          status: 'APPROVED',
-          createdAt: new Date().toISOString(),
-          donor: mockDonors[2],
-          notes: 'Logged by: Asif ali. Class: Final year. Month: July. Status: Paid. Plan: Monthly'
+      // Only initialize demo fallback data if storage has NEVER been initialized
+      if (typeof window !== 'undefined') {
+        const hasSavedDonations = localStorage.getItem('toh_custom_donations') !== null;
+        const hasSavedDonors = localStorage.getItem('toh_custom_donors') !== null;
+        const hasDeleted = localStorage.getItem('toh_deleted_donations') !== null;
+        if (!hasSavedDonations && !hasSavedDonors && !hasDeleted) {
+          const mockDonors = [
+            { id: 'dnr-1', name: 'Muhammed Shafi', phone: '9847012345', location: 'Calicut', category: 'GENERAL' },
+            { id: 'dnr-2', name: 'Abdul Rahiman', phone: '9847054321', location: 'Malappuram', category: 'GENERAL' },
+            { id: 'dnr-3', name: 'Usman Koya', phone: '9847099887', location: 'Wayanad', category: 'GENERAL' }
+          ];
+          const mockDonations = [
+            {
+              id: 'TOH-2026-0001',
+              amount: 500,
+              status: 'VERIFIED',
+              createdAt: new Date().toISOString(),
+              donor: mockDonors[0],
+              notes: 'Logged by: Aneeb. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
+            },
+            {
+              id: 'TOH-2026-0002',
+              amount: 1000,
+              status: 'APPROVED',
+              createdAt: new Date().toISOString(),
+              donor: mockDonors[1],
+              notes: 'Logged by: Swalih. Class: Plus one. Month: July. Status: Paid. Plan: Monthly'
+            },
+            {
+              id: 'TOH-2026-0003',
+              amount: 100,
+              status: 'APPROVED',
+              createdAt: new Date().toISOString(),
+              donor: mockDonors[2],
+              notes: 'Logged by: Asif ali. Class: Final year. Month: July. Status: Paid. Plan: Monthly'
+            }
+          ];
+          setDonors(mockDonors);
+          setDonations(mockDonations);
         }
-      ];
-      setDonors(mockDonors);
-      setDonations(mockDonations);
+      }
     }
   };
 
@@ -1414,6 +1485,10 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
   };
 
   const handleDeleteDonation = async (id: string) => {
+    if (selectedRole !== 'admin') {
+      alert('Permission denied. Only administrators can delete donation collection entries.');
+      return;
+    }
     if (!confirm('Are you sure you want to permanently delete this donation entry? This action cannot be undone.')) return;
 
     // Find target donation to inspect donor details
@@ -2410,13 +2485,15 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                                   >
                                     <Receipt className="w-4 h-4" />
                                   </button>
-                                  <button
-                                    onClick={() => handleDeleteDonation(item.id)}
-                                    className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-full transition cursor-pointer"
-                                    title="Delete Entry Permanently"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
+                                  {selectedRole === 'admin' && (
+                                    <button
+                                      onClick={() => handleDeleteDonation(item.id)}
+                                      className="p-1.5 hover:bg-red-500/10 text-red-500 rounded-full transition cursor-pointer"
+                                      title="Delete Entry Permanently"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  )}
                                 </div>
                               </td>
                             </tr>
@@ -2688,7 +2765,7 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                           type="text"
                           required={donationTab === 'renew' && !donorIdInput}
                           placeholder="Search donor name or phone..."
-                          value={isDonorDropdownOpen ? renewSearchQuery : (allAvailableDonors.find(d => d.id === donorIdInput)?.name || renewSearchQuery)}
+                          value={isDonorDropdownOpen ? renewSearchQuery : (selectableDonorsForRenew.find(d => d.id === donorIdInput)?.name || renewSearchQuery)}
                           onFocus={() => {
                             setIsDonorDropdownOpen(true);
                             setRenewSearchQuery(''); // Clear query to show all on focus
@@ -2707,14 +2784,14 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
                         
                         {isDonorDropdownOpen && (
                           <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl">
-                            {allAvailableDonors.filter(d => 
+                            {selectableDonorsForRenew.filter(d => 
                               !renewSearchQuery || 
                               d.name?.toLowerCase().includes(renewSearchQuery.toLowerCase()) || 
                               d.phone?.includes(renewSearchQuery)
                             ).length === 0 ? (
                               <div className="p-4 text-center text-sm text-slate-500">No donors found</div>
                             ) : (
-                              allAvailableDonors.filter(d => 
+                              selectableDonorsForRenew.filter(d => 
                                 !renewSearchQuery || 
                                 d.name?.toLowerCase().includes(renewSearchQuery.toLowerCase()) || 
                                 d.phone?.includes(renewSearchQuery)
@@ -4204,9 +4281,8 @@ export default function DashboardOverview({ defaultRole = 'admin' }: { defaultRo
             // 1. Calculate stats for logged-in campaigner
             const myCollections = safeDonations.filter(q => {
               const logged = getLoggedBy(q.notes);
-              if (!logged) return true; // If logged empty, include in campaigner view
-              if (!currentUserName) return true;
-              return logged === currentUserName || logged.includes(currentUserName) || currentUserName.includes(logged) || logged.includes('asif') || currentUserName.includes('asif');
+              if (!logged || !currentUserName) return false;
+              return logged === currentUserName || logged.includes(currentUserName) || currentUserName.includes(logged);
             });
             const myCollectedTotal = myCollections.reduce((acc, q) => acc + Number(q.amount || 0), 0);
             

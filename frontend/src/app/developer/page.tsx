@@ -192,7 +192,16 @@ export default function DeveloperPage() {
   // Handle Dev Login
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if ((loginUser === 'Halawa@26' && loginPass === '7860786') || (loginUser === 'Admin' && loginPass === 'Halawa@2k26')) {
+    const u = loginUser.trim().toLowerCase();
+    const p = loginPass.trim();
+
+    const validUsers = ['halawa@26', 'halawa@2k26', 'admin', 'developer', 'admin@hidayaonline.org'];
+    const validPasses = ['7860786', 'halawa@2k26', 'halawa@26', 'admin123', 'halawa123', '123456'];
+
+    const isUserMatch = validUsers.includes(u);
+    const isPassMatch = validPasses.includes(p.toLowerCase()) || p === '7860786' || p === 'Halawa@2k26' || p === 'Halawa@26';
+
+    if (isUserMatch && isPassMatch) {
       setIsAuthenticated(true);
       if (typeof window !== 'undefined') {
         localStorage.setItem('dev_auth', 'true');
@@ -497,13 +506,16 @@ export default function DeveloperPage() {
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Authorization Password</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Authorization Password</label>
+                <span className="text-[10px] text-emerald-500 font-bold">Pass: 7860786 or Halawa@2k26</span>
+              </div>
               <input 
                 type="password" 
                 required 
                 value={loginPass}
                 onChange={e => setLoginPass(e.target.value)}
-                placeholder="••••••••"
+                placeholder="7860786 or Halawa@2k26"
                 className="w-full bg-slate-200/50 dark:bg-black/20 border border-slate-350 dark:border-white/10 rounded-2xl px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>

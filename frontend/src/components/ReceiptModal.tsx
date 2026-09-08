@@ -3,6 +3,7 @@ import { X, Download, Share2 } from 'lucide-react';
 import {
   ReceiptData,
   POS,
+  MONTHS,
   MONTH_ROWS,
   normalizeToShortMonth,
   generateReceiptBlob,

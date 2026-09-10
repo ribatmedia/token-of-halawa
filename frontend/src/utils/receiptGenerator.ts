@@ -21,11 +21,11 @@ export interface ReceiptData {
 export const POS: Record<string, { x: number; y: number; s: number; centered?: boolean }> = {
   receiptNo: { x: 320, y: 442, s: 26 },
   date: { x: 320, y: 480, s: 26 },
-  name: { x: 540, y: 615, s: 52, centered: true },
-  placePhone: { x: 540, y: 662, s: 28, centered: true },
-  plan: { x: 540, y: 700, s: 20, centered: true },
+  name: { x: 540, y: 610, s: 52, centered: true },
+  placePhone: { x: 540, y: 655, s: 28, centered: true },
   amount: { x: 540, y: 821, s: 66, centered: true },
-  months: { x: 540, y: 885, s: 13, centered: true },
+  months: { x: 270, y: 1055, s: 12, centered: true },
+  plan: { x: 810, y: 1055, s: 22, centered: true },
 };
 
 export const normalizeToShortMonth = (str: string): string => {
@@ -150,10 +150,10 @@ export async function renderReceiptToCanvas(
     const dy = el?.dy ?? 0;
     const s = el?.size ?? POS[key]?.s ?? 26;
     return {
-      x: POS[key].centered ? 540 + dx : POS[key].x + dx,
-      y: POS[key].y + dy,
+      x: (POS[key]?.x ?? 540) + dx,
+      y: (POS[key]?.y ?? 500) + dy,
       size: s,
-      centered: POS[key].centered
+      centered: POS[key]?.centered
     };
   };
 
@@ -319,12 +319,14 @@ export async function renderReceiptToCanvas(
     const pillW = 58;
     const pillH = 22;
     const pillGap = 6;
-    const totalW = MONTHS.length * pillW + (MONTHS.length - 1) * pillGap;
+    const rowGap = 5;
+    const rowW = 5 * pillW + 4 * pillGap;
+    const totalH = pillH * 2 + rowGap;
     const cardPadX = 10;
-    const cardPadY = 4;
-    const cardW = totalW + cardPadX * 2;
-    const cardH = pillH + cardPadY * 2;
-    const cardX = 540 + (lay?.months?.dx ?? 0) - cardW / 2;
+    const cardPadY = 6;
+    const cardW = rowW + cardPadX * 2;
+    const cardH = totalH + cardPadY * 2;
+    const cardX = mPos.x - cardW / 2;
     const cardY = mPos.y - cardH / 2;
 
     // Subtle background card behind months to ensure no clash with template text
@@ -345,52 +347,53 @@ export async function renderReceiptToCanvas(
     ctx.stroke();
     ctx.restore();
 
-    let startX = 540 + (lay?.months?.dx ?? 0) - totalW / 2;
-    const rowY = mPos.y - pillH / 2;
+    MONTH_ROWS.forEach((row, ri) => {
+      let startX = mPos.x - rowW / 2;
+      const rowY = (mPos.y - totalH / 2) + ri * (pillH + rowGap);
+      row.forEach((m) => {
+        const isCurrent = currentMonthsList.includes(m);
+        const isPaid = paidMonthsList.includes(m);
 
-    MONTHS.forEach((m) => {
-      const isCurrent = currentMonthsList.includes(m);
-      const isPaid = paidMonthsList.includes(m);
+        let bg = '#f8fafc';
+        let tc = '#64748b';
+        let bc = '#e2e8f0';
+        let fw = 500;
 
-      let bg = '#f8fafc';
-      let tc = '#64748b';
-      let bc = '#e2e8f0';
-      let fw = 500;
+        if (isCurrent) {
+          bg = '#15803D';
+          tc = '#ffffff';
+          bc = '#14532D';
+          fw = 800;
+        } else if (isPaid) {
+          bg = '#86EFAC';
+          tc = '#14532D';
+          bc = '#4ADE80';
+          fw = 700;
+        }
 
-      if (isCurrent) {
-        bg = '#15803D';
-        tc = '#ffffff';
-        bc = '#14532D';
-        fw = 800;
-      } else if (isPaid) {
-        bg = '#86EFAC';
-        tc = '#14532D';
-        bc = '#4ADE80';
-        fw = 700;
-      }
+        ctx.save();
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(startX, rowY, pillW, pillH, 5);
+        } else {
+          drawRoundRectFallback(ctx, startX, rowY, pillW, pillH, 5);
+        }
+        ctx.fill();
 
-      ctx.save();
-      ctx.fillStyle = bg;
-      ctx.beginPath();
-      if (typeof ctx.roundRect === 'function') {
-        ctx.roundRect(startX, rowY, pillW, pillH, 6);
-      } else {
-        drawRoundRectFallback(ctx, startX, rowY, pillW, pillH, 6);
-      }
-      ctx.fill();
+        ctx.strokeStyle = bc;
+        ctx.lineWidth = isCurrent ? 1.5 : 1;
+        ctx.stroke();
 
-      ctx.strokeStyle = bc;
-      ctx.lineWidth = isCurrent ? 1.5 : 1;
-      ctx.stroke();
+        ctx.fillStyle = tc;
+        ctx.font = `${fw} ${mSize}px "Inter", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(m, startX + pillW / 2, rowY + pillH / 2);
+        ctx.restore();
 
-      ctx.fillStyle = tc;
-      ctx.font = `${fw} ${mSize}px "Inter", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(m, startX + pillW / 2, rowY + pillH / 2);
-      ctx.restore();
-
-      startX += pillW + pillGap;
+        startX += pillW + pillGap;
+      });
     });
   }
 

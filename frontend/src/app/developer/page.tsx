@@ -108,12 +108,12 @@ export default function DeveloperPage() {
 
   // Receipt Settings State
   const defaultReceiptLayout = {
-    receiptNo: { dx: 0, dy: 0, size: 28 },
-    date: { dx: 0, dy: 0, size: 28 },
-    name: { dx: 0, dy: 0, size: 72 },
-    placePhone: { dx: 0, dy: 0, size: 52 },
-    amount: { dx: 0, dy: 0, size: 78 },
-    months: { dx: 0, dy: 0, size: 16 },
+    receiptNo: { dx: 0, dy: 0, size: 26 },
+    date: { dx: 0, dy: 0, size: 26 },
+    name: { dx: 0, dy: 0, size: 52 },
+    placePhone: { dx: 0, dy: 0, size: 28 },
+    amount: { dx: 0, dy: 0, size: 66 },
+    months: { dx: 0, dy: 0, size: 12 },
     plan: { dx: 0, dy: 0, size: 22 }
   };
   type ElementKey = keyof typeof defaultReceiptLayout;
@@ -746,9 +746,21 @@ export default function DeveloperPage() {
             <div className={`p-6 md:p-8 rounded-3xl ${glassClass} space-y-6 animate-in fade-in duration-350`}>
               <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <h3 className="text-xl font-bold">Receipt Margin & Position Studio</h3>
-                <button onClick={handleSaveReceiptSettings} className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-500/20 transition-colors">
-                  <Check className="w-4 h-4" /> Save Layout Settings
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => {
+                      localStorage.removeItem('receipt_layout_settings');
+                      setReceiptLayout(defaultReceiptLayout);
+                      setActionMessage('Receipt layout reset to recommended defaults.');
+                    }} 
+                    className="flex items-center gap-1 bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Reset Defaults
+                  </button>
+                  <button onClick={handleSaveReceiptSettings} className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-500/20 transition-colors">
+                    <Check className="w-4 h-4" /> Save Layout Settings
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

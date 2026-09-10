@@ -105,8 +105,9 @@ export default function ReceiptModal({
     const s = el?.size ?? POS[key]?.s ?? 26;
     const top = `${((POS[key].y + dy) / 1350) * 100}%`;
     const fs = `${(s / 1080) * 100}cqw`;
-    if (POS[key].centered) return { top, left: `calc(50% + ${dx / 10.8}%)`, transform: 'translate(-50%, -50%)', fontSize: fs } as const;
-    return { top, left: `${((POS[key].x + dx) / 1080) * 100}%`, transform: 'translateY(-50%)', fontSize: fs } as const;
+    const posX = POS[key]?.x ?? 540;
+    if (POS[key]?.centered) return { top, left: `calc(${posX / 10.8}% + ${dx / 10.8}%)`, transform: 'translate(-50%, -50%)', fontSize: fs } as const;
+    return { top, left: `${((posX + dx) / 1080) * 100}%`, transform: 'translateY(-50%)', fontSize: fs } as const;
   };
 
   // Fixed pixel positioning for offscreen 1080x1350 DOM export fallback
@@ -117,8 +118,9 @@ export default function ReceiptModal({
     const s = el?.size ?? POS[key]?.s ?? 26;
     const top = `${POS[key].y + dy}px`;
     const fs = `${s}px`;
-    if (POS[key].centered) return { top, left: `calc(50% + ${dx}px)`, transform: 'translate(-50%, -50%)', fontSize: fs } as const;
-    return { top, left: `${POS[key].x + dx}px`, transform: 'translateY(-50%)', fontSize: fs } as const;
+    const posX = POS[key]?.x ?? 540;
+    if (POS[key]?.centered) return { top, left: `${posX + dx}px`, transform: 'translate(-50%, -50%)', fontSize: fs } as const;
+    return { top, left: `${posX + dx}px`, transform: 'translateY(-50%)', fontSize: fs } as const;
   };
 
   const cleanAmount = String(receiptData?.amount || '0')
@@ -214,50 +216,56 @@ export default function ReceiptModal({
               position: 'absolute',
               ...p('months'),
               display: 'flex',
-              gap: '0.5cqw',
+              flexDirection: 'column',
+              gap: '0.4cqw',
               alignItems: 'center',
-              justifyContent: 'center',
               backgroundColor: '#ffffff',
-              padding: '0.4cqw 0.8cqw',
+              padding: '0.5cqw 0.8cqw',
               borderRadius: '0.8cqw',
               border: '0.1cqw solid #e2e8f0',
               boxShadow: '0 0.2cqw 0.8cqw rgba(0,0,0,0.06)'
             }}>
-              {MONTHS.map(m => {
-                const isCurrentMonth = effectiveCurrentMonths.includes(m);
-                const isPaidMonth = effectivePaidMonths.includes(m);
+              {MONTH_ROWS.map((row, ri) => (
+                <div key={ri} style={{ display: 'flex', gap: '0.5cqw', justifyContent: 'center' }}>
+                  {row.map(m => {
+                    const isCurrentMonth = effectiveCurrentMonths.includes(m);
+                    const isPaidMonth = effectivePaidMonths.includes(m);
 
-                let bgColor = '#f8fafc';
-                let textColor = '#64748b';
-                let fontWeight: number | string = 500;
-                let border = '0.1cqw solid #e2e8f0';
+                    let bgColor = '#f8fafc';
+                    let textColor = '#64748b';
+                    let fontWeight: number | string = 500;
+                    let border = '0.1cqw solid #e2e8f0';
 
-                if (isCurrentMonth) {
-                  bgColor = '#15803D';
-                  textColor = '#ffffff';
-                  fontWeight = 800;
-                  border = '0.15cqw solid #14532D';
-                } else if (isPaidMonth) {
-                  bgColor = '#86EFAC';
-                  textColor = '#14532D';
-                  fontWeight = 700;
-                  border = '0.1cqw solid #4ADE80';
-                }
+                    if (isCurrentMonth) {
+                      bgColor = '#15803D';
+                      textColor = '#ffffff';
+                      fontWeight = 800;
+                      border = '0.15cqw solid #14532D';
+                    } else if (isPaidMonth) {
+                      bgColor = '#86EFAC';
+                      textColor = '#14532D';
+                      fontWeight = 700;
+                      border = '0.1cqw solid #4ADE80';
+                    }
 
-                return (
-                  <div key={m} style={{
-                    backgroundColor: bgColor,
-                    color: textColor,
-                    borderRadius: '0.6cqw',
-                    padding: '0.2cqw 0.5cqw',
-                    fontSize: `${((lay?.months?.size ?? POS.months.s) / 1080) * 100}cqw`,
-                    fontWeight: fontWeight,
-                    border: border
-                  }}>
-                    {m}
-                  </div>
-                );
-              })}
+                    return (
+                      <div key={m} style={{
+                        backgroundColor: bgColor,
+                        color: textColor,
+                        borderRadius: '0.5cqw',
+                        padding: '0.2cqw 0.4cqw',
+                        width: '5.2cqw',
+                        textAlign: 'center',
+                        fontSize: `${((lay?.months?.size ?? POS.months.s) / 1080) * 100}cqw`,
+                        fontWeight: fontWeight,
+                        border: border
+                      }}>
+                        {m}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -342,52 +350,56 @@ export default function ReceiptModal({
             position: 'absolute',
             ...pFixed('months'),
             display: 'flex',
-            gap: '6px',
+            flexDirection: 'column',
+            gap: '5px',
             alignItems: 'center',
-            justifyContent: 'center',
             backgroundColor: '#ffffff',
-            padding: '4px 10px',
+            padding: '6px 10px',
             borderRadius: '8px',
             border: '1px solid #e2e8f0',
             boxShadow: '0 1px 8px rgba(0,0,0,0.06)'
           }}>
-            {MONTHS.map(m => {
-              const isCurrentMonth = effectiveCurrentMonths.includes(m);
-              const isPaidMonth = effectivePaidMonths.includes(m);
+            {MONTH_ROWS.map((row, ri) => (
+              <div key={ri} style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                {row.map(m => {
+                  const isCurrentMonth = effectiveCurrentMonths.includes(m);
+                  const isPaidMonth = effectivePaidMonths.includes(m);
 
-              let bgColor = '#f8fafc';
-              let textColor = '#64748b';
-              let fontWeight: number | string = 500;
-              let border = '1px solid #e2e8f0';
+                  let bgColor = '#f8fafc';
+                  let textColor = '#64748b';
+                  let fontWeight: number | string = 500;
+                  let border = '1px solid #e2e8f0';
 
-              if (isCurrentMonth) {
-                bgColor = '#15803D';
-                textColor = '#ffffff';
-                fontWeight = 800;
-                border = '1.5px solid #14532D';
-              } else if (isPaidMonth) {
-                bgColor = '#86EFAC';
-                textColor = '#14532D';
-                fontWeight = 700;
-                border = '1px solid #4ADE80';
-              }
+                  if (isCurrentMonth) {
+                    bgColor = '#15803D';
+                    textColor = '#ffffff';
+                    fontWeight = 800;
+                    border = '1.5px solid #14532D';
+                  } else if (isPaidMonth) {
+                    bgColor = '#86EFAC';
+                    textColor = '#14532D';
+                    fontWeight = 700;
+                    border = '1px solid #4ADE80';
+                  }
 
-              return (
-                <div key={m} style={{
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  borderRadius: '6px',
-                  padding: '2px 6px',
-                  width: '58px',
-                  textAlign: 'center',
-                  fontSize: `${lay?.months?.size ?? POS.months.s}px`,
-                  fontWeight: fontWeight,
-                  border: border
-                }}>
-                  {m}
-                </div>
-              );
-            })}
+                  return (
+                    <div key={m} style={{
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      borderRadius: '5px',
+                      padding: '2px 4px',
+                      width: '58px',
+                      textAlign: 'center',
+                      fontSize: `${lay?.months?.size ?? POS.months.s}px`,
+                      fontWeight: fontWeight,
+                      border: border
+                    }}>
+                      {m}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         )}
       </div>

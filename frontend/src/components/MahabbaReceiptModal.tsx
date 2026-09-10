@@ -82,8 +82,9 @@ export default function MahabbaReceiptModal({
     const s = el?.size ?? POS[key]?.s ?? 26;
     const top = `${POS[key].y + dy}px`;
     const fs = `${s}px`;
-    if (POS[key].centered) return { top, left: `calc(50% + ${dx}px)`, transform: 'translate(-50%, -50%)', fontSize: fs } as const;
-    return { top, left: `${POS[key].x + dx}px`, transform: 'translateY(-50%)', fontSize: fs } as const;
+    const posX = POS[key]?.x ?? 540;
+    if (POS[key]?.centered) return { top, left: `${posX + dx}px`, transform: 'translate(-50%, -50%)', fontSize: fs } as const;
+    return { top, left: `${posX + dx}px`, transform: 'translateY(-50%)', fontSize: fs } as const;
   };
 
   const receiptDateObj = receiptData?.date ? new Date(receiptData.date) : new Date();
@@ -182,52 +183,56 @@ export default function MahabbaReceiptModal({
             position: 'absolute',
             ...p('months'),
             display: 'flex',
-            gap: '6px',
+            flexDirection: 'column',
+            gap: '5px',
             alignItems: 'center',
-            justifyContent: 'center',
             backgroundColor: '#ffffff',
-            padding: '4px 10px',
+            padding: '6px 10px',
             borderRadius: '8px',
             border: '1px solid #e2e8f0',
             boxShadow: '0 1px 8px rgba(0,0,0,0.06)'
           }}>
-            {MONTHS.map(m => {
-              const isCurrentMonth = effectiveCurrentMonths.includes(m);
-              const isPaidMonth = effectivePaidMonths.includes(m);
+            {MONTH_ROWS.map((row, ri) => (
+              <div key={ri} style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
+                {row.map(m => {
+                  const isCurrentMonth = effectiveCurrentMonths.includes(m);
+                  const isPaidMonth = effectivePaidMonths.includes(m);
 
-              let bgColor = '#f8fafc';
-              let textColor = '#64748b';
-              let fontWeight: number | string = 500;
-              let border = '1px solid #e2e8f0';
+                  let bgColor = '#f8fafc';
+                  let textColor = '#64748b';
+                  let fontWeight: number | string = 500;
+                  let border = '1px solid #e2e8f0';
 
-              if (isCurrentMonth) {
-                bgColor = '#15803D';
-                textColor = '#ffffff';
-                fontWeight = 800;
-                border = '1.5px solid #14532D';
-              } else if (isPaidMonth) {
-                bgColor = '#86EFAC';
-                textColor = '#14532D';
-                fontWeight = 700;
-                border = '1px solid #4ADE80';
-              }
+                  if (isCurrentMonth) {
+                    bgColor = '#15803D';
+                    textColor = '#ffffff';
+                    fontWeight = 800;
+                    border = '1.5px solid #14532D';
+                  } else if (isPaidMonth) {
+                    bgColor = '#86EFAC';
+                    textColor = '#14532D';
+                    fontWeight = 700;
+                    border = '1px solid #4ADE80';
+                  }
 
-              return (
-                <div key={m} style={{
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  borderRadius: '6px',
-                  padding: '2px 6px',
-                  width: '58px',
-                  textAlign: 'center',
-                  fontSize: `${lay?.months?.size ?? POS.months.s}px`,
-                  fontWeight: fontWeight,
-                  border: border
-                }}>
-                  {m}
-                </div>
-              );
-            })}
+                  return (
+                    <div key={m} style={{
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      borderRadius: '5px',
+                      padding: '2px 4px',
+                      width: '58px',
+                      textAlign: 'center',
+                      fontSize: `${lay?.months?.size ?? POS.months.s}px`,
+                      fontWeight: fontWeight,
+                      border: border
+                    }}>
+                      {m}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         )}
       </div>
